@@ -18,3 +18,14 @@ GiysiGO is intentionally implemented as a **Modular Monolith**:
 - Modules do **not** directly use other modules' entities or database context.
 - Cross-module collaboration uses **in-process public contracts** and **integration events**.
 - This is **not** a microservices setup: no separate deployable services, no external message bus requirement.
+
+## Team branching model
+
+For 4-person collaboration, use per-module feature branches:
+
+- `feature/identity/*`
+- `feature/catalog/*`
+- `feature/ordering/*`
+- `feature/operations/*`
+
+See `docs/BRANCHING.md` for team workflow rules.
