@@ -1,0 +1,28 @@
+# GiysiGO Modular Monolith CODEOWNERS
+# TODO: Replace placeholder usernames with real GitHub handles.
+
+# Repository defaults
+* @placeholder-tech-lead
+
+# Architecture and repository governance
+/.github/ @placeholder-tech-lead
+/docs/ARCHITECTURE.md @placeholder-tech-lead
+
+# Single host/composition root
+/src/API/GiysiGo.API/ @placeholder-tech-lead
+
+# Shared building blocks used across all modules
+/src/BuildingBlocks/ @placeholder-tech-lead @placeholder-identity-owner @placeholder-catalog-owner @placeholder-ordering-owner @placeholder-operations-owner
+
+# Module ownership
+/src/Modules/Identity/ @placeholder-identity-owner
+/src/Modules/Catalog/ @placeholder-catalog-owner
+/src/Modules/Ordering/ @placeholder-ordering-owner
+/src/Modules/Operations/ @placeholder-operations-owner
+
+# Module test ownership
+/tests/Modules/Identity/ @placeholder-identity-owner
+/tests/Modules/Catalog/ @placeholder-catalog-owner
+/tests/Modules/Ordering/ @placeholder-ordering-owner
+/tests/Modules/Operations/ @placeholder-operations-owner
+/tests/API/GiysiGo.API.IntegrationTests/ @placeholder-tech-lead
