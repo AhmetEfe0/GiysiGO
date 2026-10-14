@@ -2,6 +2,8 @@
 
 Bu taslak, dört kişilik ekibin Identity, Catalog, Ordering ve Operations modülleri için hazırlanmıştır. Müşterinin verdiği ilk kategori/fiyat listesi `catalog-draft.json` içinde yapılandırılmıştır. Belirsiz fiyat ve seçim kuralları netleşince seed kayıtları kesinleştirilecektir. Düzenlenebilir MSSQL modeli `database/GiysiGo.Database` içindedir. API iskeleti hazırdır; modül iş akışları henüz uygulanmamıştır.
 
+Her tablonun amacı, hangi aşamada yazılıp okunduğu ve benzer tablolardan farkı için [39 tabloyu tek tek açıklayan rehbere](TABLE-PURPOSES.md) bakın.
+
 ## Kabul edilen iş kuralları
 
 - Corporate hizmet veren şirketi, Store bu şirkete bağlı fiziksel dükkânı temsil eder.
