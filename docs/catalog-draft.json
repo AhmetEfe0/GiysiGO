@@ -1,0 +1,2173 @@
+{
+  "source": "User-supplied catalog; prices in TRY",
+  "categories": [
+    {
+      "code": "DAILY",
+      "name": "GÜNLÜK GİYİM"
+    },
+    {
+      "code": "OUTERWEAR",
+      "name": "DIŞ GİYİM"
+    },
+    {
+      "code": "OCCASION",
+      "name": "DAVET & ŞIK GİYİM"
+    },
+    {
+      "code": "HOME_TEXTILE",
+      "name": "EV TEKSTİLİ"
+    },
+    {
+      "code": "ACCESSORIES",
+      "name": "AKSESUAR & DİĞER"
+    }
+  ],
+  "products": [
+    {
+      "id": "P001",
+      "categoryCode": "DAILY",
+      "name": "Gömlek",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P002",
+      "categoryCode": "DAILY",
+      "name": "Bluz (Kumaş / İpek / Şifon)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P003",
+      "categoryCode": "DAILY",
+      "name": "Tişört / Polo Yaka",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P004",
+      "categoryCode": "DAILY",
+      "name": "Kazak / Triko / Hırka / Süveter",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P005",
+      "categoryCode": "DAILY",
+      "name": "Sweatshirt / Hoodie",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P006",
+      "categoryCode": "DAILY",
+      "name": "Pantolon (Kumaş / Kot)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P007",
+      "categoryCode": "DAILY",
+      "name": "Etek",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P008",
+      "categoryCode": "DAILY",
+      "name": "Pileli Etek",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P009",
+      "categoryCode": "DAILY",
+      "name": "Günlük Elbise",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P010",
+      "categoryCode": "DAILY",
+      "name": "Tulum / Salopet",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P011",
+      "categoryCode": "DAILY",
+      "name": "Şort / Eşofman Altı",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P012",
+      "categoryCode": "OUTERWEAR",
+      "name": "Ceket / Blazer",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P013",
+      "categoryCode": "OUTERWEAR",
+      "name": "Kaban / Palto",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P014",
+      "categoryCode": "OUTERWEAR",
+      "name": "Mont",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P015",
+      "categoryCode": "OUTERWEAR",
+      "name": "Kaz / Kuş Tüyü Mont (Kısa)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P016",
+      "categoryCode": "OUTERWEAR",
+      "name": "Kaz / Kuş Tüyü Kaban / Palto (Uzun)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P017",
+      "categoryCode": "OUTERWEAR",
+      "name": "Kaz / Kuş Tüyü Yelek / Şişme Yelek",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P018",
+      "categoryCode": "OUTERWEAR",
+      "name": "Trençkot / Pardösü",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P019",
+      "categoryCode": "OUTERWEAR",
+      "name": "Hakiki Deri Ceket / Mont",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P020",
+      "categoryCode": "OUTERWEAR",
+      "name": "Suni Deri Ceket / Mont",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P021",
+      "categoryCode": "OUTERWEAR",
+      "name": "Süet Ceket / Mont",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P022",
+      "categoryCode": "OUTERWEAR",
+      "name": "Kürk (Hakiki)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P023",
+      "categoryCode": "OUTERWEAR",
+      "name": "Kürk (Suni)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P024",
+      "categoryCode": "OUTERWEAR",
+      "name": "Motorcu Montu",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P025",
+      "categoryCode": "OCCASION",
+      "name": "Takım Elbise (2 Parça)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P026",
+      "categoryCode": "OCCASION",
+      "name": "Yelekli Takım Elbise (3 Parça)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P027",
+      "categoryCode": "OCCASION",
+      "name": "Abiye / Gece Elbisesi (Sade / Düz)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P028",
+      "categoryCode": "OCCASION",
+      "name": "Abiye / Gece Elbisesi (Taşlı / Pullu / Şifon)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P029",
+      "categoryCode": "OCCASION",
+      "name": "Gelinlik (Sade / Düz)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P030",
+      "categoryCode": "OCCASION",
+      "name": "Gelinlik (İşlemeli / Taşlı / Kuyruklu)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P031",
+      "categoryCode": "OCCASION",
+      "name": "Nişanlık / Kınalık / Kaftan",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P032",
+      "categoryCode": "OCCASION",
+      "name": "Duvak",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P033",
+      "categoryCode": "HOME_TEXTILE",
+      "name": "Elyaf Yorgan (Tek / Çift Kişilik)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P034",
+      "categoryCode": "HOME_TEXTILE",
+      "name": "Yün / Pamuk Yorgan",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P035",
+      "categoryCode": "HOME_TEXTILE",
+      "name": "Kaz Tüyü Yorgan",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P036",
+      "categoryCode": "HOME_TEXTILE",
+      "name": "Battaniye",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P037",
+      "categoryCode": "HOME_TEXTILE",
+      "name": "Battaniye (Büyük Boy)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P038",
+      "categoryCode": "HOME_TEXTILE",
+      "name": "Yatak Örtüsü (Sade)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P039",
+      "categoryCode": "HOME_TEXTILE",
+      "name": "Yatak Örtüsü (Boncuklu/Taşlı/Güpürlü)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P040",
+      "categoryCode": "HOME_TEXTILE",
+      "name": "Tül Perde (m2)",
+      "baseUnit": "M2"
+    },
+    {
+      "id": "P041",
+      "categoryCode": "HOME_TEXTILE",
+      "name": "Fon Perde (m2)",
+      "baseUnit": "M2"
+    },
+    {
+      "id": "P042",
+      "categoryCode": "HOME_TEXTILE",
+      "name": "Masa Örtüsü",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P043",
+      "categoryCode": "HOME_TEXTILE",
+      "name": "Koltuk / Kırlent Kılıfı",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P044",
+      "categoryCode": "HOME_TEXTILE",
+      "name": "Yastık (Elyaf / Tüy)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P045",
+      "categoryCode": "ACCESSORIES",
+      "name": "Eşarp / Şal / Fular",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P046",
+      "categoryCode": "ACCESSORIES",
+      "name": "Kravat / Papyon",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P047",
+      "categoryCode": "ACCESSORIES",
+      "name": "Bez / Kumaş Spor Ayakkabı (Sneaker)",
+      "baseUnit": "PIECE"
+    },
+    {
+      "id": "P048",
+      "categoryCode": "ACCESSORIES",
+      "name": "Kasket / Şapka",
+      "baseUnit": "PIECE"
+    }
+  ],
+  "services": [
+    {
+      "id": "S001",
+      "name": "Kuru Temizleme & Ütü (Standart)"
+    },
+    {
+      "id": "S002",
+      "name": "Sadece Ütü (Temizleme Hariç)"
+    },
+    {
+      "id": "S003",
+      "name": "Kol Kısaltma (Manşetli Tadilat)"
+    },
+    {
+      "id": "S004",
+      "name": "Beden Daraltma (Pens)"
+    },
+    {
+      "id": "S005",
+      "name": "Düğme Dikimi / Onarımı"
+    },
+    {
+      "id": "S006",
+      "name": "Hassas Kuru Temizleme & Ütü"
+    },
+    {
+      "id": "S007",
+      "name": "Sadece Buharlı Form Ütü"
+    },
+    {
+      "id": "S008",
+      "name": "Askı / Kol Boyu Kısaltma"
+    },
+    {
+      "id": "S009",
+      "name": "Beden Daraltma"
+    },
+    {
+      "id": "S010",
+      "name": "Dikiş / Sökük Onarımı"
+    },
+    {
+      "id": "S011",
+      "name": "Yıkama & Ütü"
+    },
+    {
+      "id": "S012",
+      "name": "Sadece Ütü"
+    },
+    {
+      "id": "S013",
+      "name": "Boy Kısaltma"
+    },
+    {
+      "id": "S014",
+      "name": "Yaka / Dikiş Onarımı"
+    },
+    {
+      "id": "S015",
+      "name": "Yün Kuru Temizleme & Form Pres"
+    },
+    {
+      "id": "S016",
+      "name": "Tiftik / Hav Alma Bakımı"
+    },
+    {
+      "id": "S017",
+      "name": "İlmek / Kaçık Örme (Delik Tamiri)"
+    },
+    {
+      "id": "S018",
+      "name": "Kol Boyu Kısaltma"
+    },
+    {
+      "id": "S019",
+      "name": "Fermuar Değişimi"
+    },
+    {
+      "id": "S020",
+      "name": "Manşet / Cep Dikişi"
+    },
+    {
+      "id": "S021",
+      "name": "Kuru Temizleme & Çift Çizgi Pres Ütü"
+    },
+    {
+      "id": "S022",
+      "name": "Sadece Pres Ütü"
+    },
+    {
+      "id": "S023",
+      "name": "Düz Paça Kısaltma"
+    },
+    {
+      "id": "S024",
+      "name": "Duble Paça Yapımı"
+    },
+    {
+      "id": "S025",
+      "name": "Bel Daraltma / Genişletme"
+    },
+    {
+      "id": "S026",
+      "name": "Basen / Paça Daraltma"
+    },
+    {
+      "id": "S027",
+      "name": "Kuru Temizleme & Ütü"
+    },
+    {
+      "id": "S028",
+      "name": "Etek Boyu Kısaltma"
+    },
+    {
+      "id": "S029",
+      "name": "Bel Daraltma"
+    },
+    {
+      "id": "S030",
+      "name": "Gizli Fermuar Değişimi"
+    },
+    {
+      "id": "S031",
+      "name": "Kuru Temizleme & Pile Presi"
+    },
+    {
+      "id": "S032",
+      "name": "Sadece Pile Form Presi"
+    },
+    {
+      "id": "S033",
+      "name": "Bel Tadilatı"
+    },
+    {
+      "id": "S034",
+      "name": "Paça Kısaltma"
+    },
+    {
+      "id": "S035",
+      "name": "Askı / Beden Ayarı"
+    },
+    {
+      "id": "S036",
+      "name": "Bel Lastiği / Kordon Değişimi"
+    },
+    {
+      "id": "S037",
+      "name": "Kuru Temizleme & Form Pres Ütü"
+    },
+    {
+      "id": "S038",
+      "name": "Kol Kısaltma (Düz)"
+    },
+    {
+      "id": "S039",
+      "name": "Kol Kısaltma (Düğmeli)"
+    },
+    {
+      "id": "S040",
+      "name": "Astar Söküğü Tamiri"
+    },
+    {
+      "id": "S041",
+      "name": "Kuru Temizleme & Form Pres"
+    },
+    {
+      "id": "S042",
+      "name": "Sadece Form Pres Ütü"
+    },
+    {
+      "id": "S043",
+      "name": "Kol Kısaltma"
+    },
+    {
+      "id": "S044",
+      "name": "Astar Değişimi / Onarımı"
+    },
+    {
+      "id": "S045",
+      "name": "Düğme / Çıtçıt Dikimi"
+    },
+    {
+      "id": "S046",
+      "name": "Kemik Fermuar Değişimi"
+    },
+    {
+      "id": "S047",
+      "name": "Yırtık / Kumaş Yaması"
+    },
+    {
+      "id": "S048",
+      "name": "Özel Kuru Temizleme & Tüy Kabartma"
+    },
+    {
+      "id": "S049",
+      "name": "Yırtık / Dikiş Onarımı"
+    },
+    {
+      "id": "S050",
+      "name": "Uzun Temizleme & Tüy Kabartma Presi"
+    },
+    {
+      "id": "S051",
+      "name": "Çift Yönlü Uzun Fermuar Değişimi"
+    },
+    {
+      "id": "S052",
+      "name": "Temizleme & Kabartma Bakımı"
+    },
+    {
+      "id": "S053",
+      "name": "Kuru Temizleme & Form Ütüsü"
+    },
+    {
+      "id": "S054",
+      "name": "Su İtici Koruyucu Bakım"
+    },
+    {
+      "id": "S055",
+      "name": "Kol / Boy Kısaltma"
+    },
+    {
+      "id": "S056",
+      "name": "Kemer / Toka Tamiri"
+    },
+    {
+      "id": "S057",
+      "name": "Özel Deri Temizleme & Besleme Yağlaması"
+    },
+    {
+      "id": "S058",
+      "name": "Deri Boyama & Renk Yenileme"
+    },
+    {
+      "id": "S059",
+      "name": "Deri Fermuar Değişimi"
+    },
+    {
+      "id": "S060",
+      "name": "Deri Kol Kısaltma"
+    },
+    {
+      "id": "S061",
+      "name": "Hassas Nemli Temizleme"
+    },
+    {
+      "id": "S062",
+      "name": "Süet Temizleme & Doku Canlandırma"
+    },
+    {
+      "id": "S063",
+      "name": "Fermuar / Düğme Onarımı"
+    },
+    {
+      "id": "S064",
+      "name": "Hassas Kürk Temizleme & Havlandırma"
+    },
+    {
+      "id": "S065",
+      "name": "Klips / Kopça Onarımı"
+    },
+    {
+      "id": "S066",
+      "name": "Astar Onarımı"
+    },
+    {
+      "id": "S067",
+      "name": "Koruma Sökümlü Derin Temizleme & Dezenfeksiyon"
+    },
+    {
+      "id": "S068",
+      "name": "Ağır Hizmet Fermuar Değişimi"
+    },
+    {
+      "id": "S069",
+      "name": "Kuru Temizleme & Çift Pres Ütü"
+    },
+    {
+      "id": "S070",
+      "name": "Pantolon Paça Kısaltma"
+    },
+    {
+      "id": "S071",
+      "name": "Pantolon Bel Daraltma"
+    },
+    {
+      "id": "S072",
+      "name": "Ceket Kol Kısaltma"
+    },
+    {
+      "id": "S073",
+      "name": "Kuru Temizleme & Komple Pres"
+    },
+    {
+      "id": "S074",
+      "name": "Komple Beden Ölçü Provası"
+    },
+    {
+      "id": "S075",
+      "name": "Hassas Kuru Temizleme & Buhar Ütü"
+    },
+    {
+      "id": "S076",
+      "name": "Sadece Askı Buhar Ütüsü"
+    },
+    {
+      "id": "S077",
+      "name": "Beden / Göğüs Daraltma"
+    },
+    {
+      "id": "S078",
+      "name": "Askı Boyu Ayarlama"
+    },
+    {
+      "id": "S079",
+      "name": "Korumalı Hassas Temizleme & Buhar"
+    },
+    {
+      "id": "S080",
+      "name": "Katmanlı Tül Boy Kısaltma"
+    },
+    {
+      "id": "S081",
+      "name": "Düşen Taş / Pul Onarımı"
+    },
+    {
+      "id": "S082",
+      "name": "Detaylı Temizleme & Buhar Pres"
+    },
+    {
+      "id": "S083",
+      "name": "Boy Kısaltma / Beden Ayarı"
+    },
+    {
+      "id": "S084",
+      "name": "Özel Havuz Leke Temizliği & Askı Presi"
+    },
+    {
+      "id": "S085",
+      "name": "Tül Yırtığı Tamiri"
+    },
+    {
+      "id": "S086",
+      "name": "Kuyruk / Korse Tadilatı"
+    },
+    {
+      "id": "S087",
+      "name": "Hassas İşlemeli Kumaş Temizleme & Ütü"
+    },
+    {
+      "id": "S088",
+      "name": "Sırma / Pul / Sim Onarımı"
+    },
+    {
+      "id": "S089",
+      "name": "Hassas Temizleme & Buhar"
+    },
+    {
+      "id": "S090",
+      "name": "Toka / Tarak Sabitleme"
+    },
+    {
+      "id": "S091",
+      "name": "Sanayi Tipi Hijyenik Yıkama & Kurutma"
+    },
+    {
+      "id": "S092",
+      "name": "Büyük Boy / Battal Ebat Farkı"
+    },
+    {
+      "id": "S093",
+      "name": "Yırtık / Sökük Dikişi"
+    },
+    {
+      "id": "S094",
+      "name": "Özel Dolgu Koruma Yıkama & Hav Kurutma"
+    },
+    {
+      "id": "S095",
+      "name": "Çift Kişilik Ebat Farkı"
+    },
+    {
+      "id": "S096",
+      "name": "Kenar Dikiş Onarımı"
+    },
+    {
+      "id": "S097",
+      "name": "Kaz Tüyü Açıcı Yıkama & Kabartma Kurutması"
+    },
+    {
+      "id": "S098",
+      "name": "Yumuşatıcı Yıkama & Kurutma"
+    },
+    {
+      "id": "S099",
+      "name": "Büyük Boy / Pelüş Farkı"
+    },
+    {
+      "id": "S100",
+      "name": "Kenar Overlok Dikişi"
+    },
+    {
+      "id": "S101",
+      "name": "Yıkama & Pres Ütü"
+    },
+    {
+      "id": "S102",
+      "name": "Taşlı / Güpürlü Hassas İşlem Farkı"
+    },
+    {
+      "id": "S103",
+      "name": "Saçak / Dikiş Tamiri"
+    },
+    {
+      "id": "S104",
+      "name": "Yıkama & Buharlı Kırışıklık Açma"
+    },
+    {
+      "id": "S105",
+      "name": "Rulet / Ekstrafor Dikimi"
+    },
+    {
+      "id": "S106",
+      "name": "Kuru Temizleme & Form Presi"
+    },
+    {
+      "id": "S107",
+      "name": "Leke Çıkarma Banyosu & Kolalı Pres"
+    },
+    {
+      "id": "S108",
+      "name": "Sadece Kolalı Pres Ütü"
+    },
+    {
+      "id": "S109",
+      "name": "Köşe Dikiş Tamiri"
+    },
+    {
+      "id": "S110",
+      "name": "Kuru Temizleme"
+    },
+    {
+      "id": "S111",
+      "name": "Elyaf Yıkama & Dezenfeksiyon"
+    },
+    {
+      "id": "S112",
+      "name": "Yün / Kaz Tüyü Özel Yıkama"
+    },
+    {
+      "id": "S113",
+      "name": "İpek Kuru Temizleme & Buhar"
+    },
+    {
+      "id": "S114",
+      "name": "Kenar Dikişi"
+    },
+    {
+      "id": "S115",
+      "name": "Kuru Temizleme & Pres"
+    },
+    {
+      "id": "S116",
+      "name": "Arka Dikiş Onarımı"
+    },
+    {
+      "id": "S117",
+      "name": "Manuel Köpüklü Yıkama & Ozon"
+    },
+    {
+      "id": "S118",
+      "name": "Taban Yapıştırma"
+    },
+    {
+      "id": "S119",
+      "name": "Bağcık Yenileme"
+    },
+    {
+      "id": "S120",
+      "name": "Kalıp Form Kuru Temizleme"
+    },
+    {
+      "id": "S121",
+      "name": "İç Bant / Dikiş Onarımı"
+    }
+  ],
+  "productServices": [
+    {
+      "productId": "P001",
+      "serviceId": "S001",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P001",
+      "serviceId": "S002",
+      "defaultPriceTry": 100,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P001",
+      "serviceId": "S003",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P001",
+      "serviceId": "S004",
+      "defaultPriceTry": 120,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P001",
+      "serviceId": "S005",
+      "defaultPriceTry": 30,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P002",
+      "serviceId": "S006",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P002",
+      "serviceId": "S007",
+      "defaultPriceTry": 80,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P002",
+      "serviceId": "S008",
+      "defaultPriceTry": 130,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P002",
+      "serviceId": "S009",
+      "defaultPriceTry": 140,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P002",
+      "serviceId": "S010",
+      "defaultPriceTry": 70,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P003",
+      "serviceId": "S011",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P003",
+      "serviceId": "S012",
+      "defaultPriceTry": 80,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P003",
+      "serviceId": "S013",
+      "defaultPriceTry": 100,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P003",
+      "serviceId": "S014",
+      "defaultPriceTry": 60,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P004",
+      "serviceId": "S015",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P004",
+      "serviceId": "S016",
+      "defaultPriceTry": 80,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P004",
+      "serviceId": "S017",
+      "defaultPriceTry": 100,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P004",
+      "serviceId": "S018",
+      "defaultPriceTry": 120,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P005",
+      "serviceId": "S011",
+      "defaultPriceTry": 250,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P005",
+      "serviceId": "S019",
+      "defaultPriceTry": 180,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P005",
+      "serviceId": "S020",
+      "defaultPriceTry": 70,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P006",
+      "serviceId": "S021",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P006",
+      "serviceId": "S022",
+      "defaultPriceTry": 80,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P006",
+      "serviceId": "S023",
+      "defaultPriceTry": 120,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P006",
+      "serviceId": "S024",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P006",
+      "serviceId": "S025",
+      "defaultPriceTry": 180,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P006",
+      "serviceId": "S019",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P006",
+      "serviceId": "S026",
+      "defaultPriceTry": 160,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P007",
+      "serviceId": "S027",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P007",
+      "serviceId": "S012",
+      "defaultPriceTry": 70,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P007",
+      "serviceId": "S028",
+      "defaultPriceTry": 130,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P007",
+      "serviceId": "S029",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P007",
+      "serviceId": "S030",
+      "defaultPriceTry": 140,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P008",
+      "serviceId": "S031",
+      "defaultPriceTry": 250,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P008",
+      "serviceId": "S032",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P008",
+      "serviceId": "S033",
+      "defaultPriceTry": 160,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P009",
+      "serviceId": "S027",
+      "defaultPriceTry": 500,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P009",
+      "serviceId": "S012",
+      "defaultPriceTry": 300,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P009",
+      "serviceId": "S028",
+      "defaultPriceTry": 160,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P009",
+      "serviceId": "S009",
+      "defaultPriceTry": 180,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P009",
+      "serviceId": "S030",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P010",
+      "serviceId": "S027",
+      "defaultPriceTry": 300,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P010",
+      "serviceId": "S034",
+      "defaultPriceTry": 120,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P010",
+      "serviceId": "S035",
+      "defaultPriceTry": 140,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P011",
+      "serviceId": "S011",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P011",
+      "serviceId": "S034",
+      "defaultPriceTry": 100,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P011",
+      "serviceId": "S036",
+      "defaultPriceTry": 110,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P012",
+      "serviceId": "S037",
+      "defaultPriceTry": 300,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P012",
+      "serviceId": "S022",
+      "defaultPriceTry": 100,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P012",
+      "serviceId": "S038",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P012",
+      "serviceId": "S039",
+      "defaultPriceTry": 280,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P012",
+      "serviceId": "S009",
+      "defaultPriceTry": 250,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P012",
+      "serviceId": "S040",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P013",
+      "serviceId": "S041",
+      "defaultPriceTry": 500,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P013",
+      "serviceId": "S042",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P013",
+      "serviceId": "S043",
+      "defaultPriceTry": 250,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P013",
+      "serviceId": "S028",
+      "defaultPriceTry": 300,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P013",
+      "serviceId": "S044",
+      "defaultPriceTry": 450,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P013",
+      "serviceId": "S045",
+      "defaultPriceTry": 50,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P014",
+      "serviceId": "S027",
+      "defaultPriceTry": 500,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P014",
+      "serviceId": "S046",
+      "defaultPriceTry": 250,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P014",
+      "serviceId": "S047",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P015",
+      "serviceId": "S048",
+      "defaultPriceTry": 550,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P015",
+      "serviceId": "S019",
+      "defaultPriceTry": 250,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P015",
+      "serviceId": "S049",
+      "defaultPriceTry": 180,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P016",
+      "serviceId": "S050",
+      "defaultPriceTry": 600,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P016",
+      "serviceId": "S051",
+      "defaultPriceTry": 320,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P017",
+      "serviceId": "S052",
+      "defaultPriceTry": 500,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P017",
+      "serviceId": "S019",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P018",
+      "serviceId": "S053",
+      "defaultPriceTry": 500,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P018",
+      "serviceId": "S054",
+      "defaultPriceTry": 100,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P018",
+      "serviceId": "S055",
+      "defaultPriceTry": 240,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P018",
+      "serviceId": "S056",
+      "defaultPriceTry": 100,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P019",
+      "serviceId": "S057",
+      "defaultPriceTry": 1000,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P019",
+      "serviceId": "S058",
+      "defaultPriceTry": 550,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P019",
+      "serviceId": "S059",
+      "defaultPriceTry": 350,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P019",
+      "serviceId": "S060",
+      "defaultPriceTry": 400,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P020",
+      "serviceId": "S061",
+      "defaultPriceTry": 500,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P020",
+      "serviceId": "S019",
+      "defaultPriceTry": 220,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P021",
+      "serviceId": "S062",
+      "defaultPriceTry": 1000,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P021",
+      "serviceId": "S063",
+      "defaultPriceTry": 300,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P022",
+      "serviceId": "S064",
+      "defaultPriceTry": 1500,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P022",
+      "serviceId": "S065",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P022",
+      "serviceId": "S066",
+      "defaultPriceTry": 350,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P023",
+      "serviceId": "S064",
+      "defaultPriceTry": 1000,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P023",
+      "serviceId": "S065",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P023",
+      "serviceId": "S066",
+      "defaultPriceTry": 350,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P024",
+      "serviceId": "S067",
+      "defaultPriceTry": 1000,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P024",
+      "serviceId": "S068",
+      "defaultPriceTry": 400,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P025",
+      "serviceId": "S069",
+      "defaultPriceTry": 500,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P025",
+      "serviceId": "S022",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P025",
+      "serviceId": "S070",
+      "defaultPriceTry": 120,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P025",
+      "serviceId": "S071",
+      "defaultPriceTry": 180,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P025",
+      "serviceId": "S072",
+      "defaultPriceTry": 250,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P026",
+      "serviceId": "S073",
+      "defaultPriceTry": 600,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P026",
+      "serviceId": "S022",
+      "defaultPriceTry": 250,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P026",
+      "serviceId": "S074",
+      "defaultPriceTry": 450,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P027",
+      "serviceId": "S075",
+      "defaultPriceTry": 800,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P027",
+      "serviceId": "S076",
+      "defaultPriceTry": 250,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P027",
+      "serviceId": "S028",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P027",
+      "serviceId": "S077",
+      "defaultPriceTry": 250,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P027",
+      "serviceId": "S078",
+      "defaultPriceTry": 120,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P028",
+      "serviceId": "S079",
+      "defaultPriceTry": 1200,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P028",
+      "serviceId": "S076",
+      "defaultPriceTry": 350,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P028",
+      "serviceId": "S080",
+      "defaultPriceTry": 350,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P028",
+      "serviceId": "S081",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P028",
+      "serviceId": "S030",
+      "defaultPriceTry": 180,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P029",
+      "serviceId": "S082",
+      "defaultPriceTry": 3000,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P029",
+      "serviceId": "S076",
+      "defaultPriceTry": 1000,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P029",
+      "serviceId": "S083",
+      "defaultPriceTry": 500,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P030",
+      "serviceId": "S084",
+      "defaultPriceTry": 4000,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P030",
+      "serviceId": "S085",
+      "defaultPriceTry": 400,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P030",
+      "serviceId": "S086",
+      "defaultPriceTry": 700,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P031",
+      "serviceId": "S087",
+      "defaultPriceTry": 900,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P031",
+      "serviceId": "S088",
+      "defaultPriceTry": 250,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P032",
+      "serviceId": "S089",
+      "defaultPriceTry": 300,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P032",
+      "serviceId": "S090",
+      "defaultPriceTry": 100,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P033",
+      "serviceId": "S091",
+      "defaultPriceTry": 600,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P033",
+      "serviceId": "S092",
+      "defaultPriceTry": 50,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P033",
+      "serviceId": "S093",
+      "defaultPriceTry": 100,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P034",
+      "serviceId": "S094",
+      "defaultPriceTry": 800,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P034",
+      "serviceId": "S095",
+      "defaultPriceTry": 50,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P034",
+      "serviceId": "S096",
+      "defaultPriceTry": 120,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P035",
+      "serviceId": "S097",
+      "defaultPriceTry": 1000,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P035",
+      "serviceId": "S040",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P036",
+      "serviceId": "S098",
+      "defaultPriceTry": 400,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P036",
+      "serviceId": "S099",
+      "defaultPriceTry": 60,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P036",
+      "serviceId": "S100",
+      "defaultPriceTry": 120,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P037",
+      "serviceId": "S098",
+      "defaultPriceTry": 500,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P037",
+      "serviceId": "S099",
+      "defaultPriceTry": 60,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P037",
+      "serviceId": "S100",
+      "defaultPriceTry": 120,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P038",
+      "serviceId": "S101",
+      "defaultPriceTry": 350,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P038",
+      "serviceId": "S102",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P038",
+      "serviceId": "S103",
+      "defaultPriceTry": 130,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P039",
+      "serviceId": "S101",
+      "defaultPriceTry": 350,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P039",
+      "serviceId": "S102",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P039",
+      "serviceId": "S103",
+      "defaultPriceTry": 130,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P040",
+      "serviceId": "S104",
+      "defaultPriceTry": 150,
+      "priceUnit": "M2",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P040",
+      "serviceId": "S028",
+      "defaultPriceTry": 120,
+      "priceUnit": null,
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P040",
+      "serviceId": "S105",
+      "defaultPriceTry": 100,
+      "priceUnit": null,
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P041",
+      "serviceId": "S106",
+      "defaultPriceTry": 220,
+      "priceUnit": "M2",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P041",
+      "serviceId": "S013",
+      "defaultPriceTry": 140,
+      "priceUnit": null,
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P042",
+      "serviceId": "S107",
+      "defaultPriceTry": 160,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P042",
+      "serviceId": "S108",
+      "defaultPriceTry": 80,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P042",
+      "serviceId": "S109",
+      "defaultPriceTry": 80,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P043",
+      "serviceId": "S011",
+      "defaultPriceTry": 100,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P043",
+      "serviceId": "S110",
+      "defaultPriceTry": 150,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P043",
+      "serviceId": "S019",
+      "defaultPriceTry": 100,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P044",
+      "serviceId": "S111",
+      "defaultPriceTry": 300,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P044",
+      "serviceId": "S112",
+      "defaultPriceTry": 220,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ALTERNATIVE"
+    },
+    {
+      "productId": "P045",
+      "serviceId": "S113",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P045",
+      "serviceId": "S114",
+      "defaultPriceTry": 100,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P046",
+      "serviceId": "S115",
+      "defaultPriceTry": 100,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P046",
+      "serviceId": "S116",
+      "defaultPriceTry": 50,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P047",
+      "serviceId": "S117",
+      "defaultPriceTry": 300,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P047",
+      "serviceId": "S118",
+      "defaultPriceTry": 120,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P047",
+      "serviceId": "S119",
+      "defaultPriceTry": 40,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    },
+    {
+      "productId": "P048",
+      "serviceId": "S120",
+      "defaultPriceTry": 200,
+      "priceUnit": "PIECE",
+      "defaultSelected": true,
+      "kind": "BASE"
+    },
+    {
+      "productId": "P048",
+      "serviceId": "S121",
+      "defaultPriceTry": 80,
+      "priceUnit": "PIECE",
+      "defaultSelected": false,
+      "kind": "ADD_ON"
+    }
+  ],
+  "tailoringEntry": [
+    {
+      "name": "Paça Kısaltma (Düz Kumaş)",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 120
+    },
+    {
+      "name": "Paça Kısaltma (Orijinal Kot)",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 130
+    },
+    {
+      "name": "Paça Kısaltma (Duble Paça)",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 150
+    },
+    {
+      "name": "Bel Daraltma / Genişletme",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 180
+    },
+    {
+      "name": "Pantolon / Etek Fermuar Değişimi",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 150
+    },
+    {
+      "name": "Mont / Kaban Kemik Fermuar Değişimi",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 250
+    },
+    {
+      "name": "Elbise Gizli Fermuar Değişimi",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 160
+    },
+    {
+      "name": "Ceket Kol Kısaltma (Düz)",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 200
+    },
+    {
+      "name": "Ceket Kol Kısaltma (Düğmeli)",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 280
+    },
+    {
+      "name": "Gömlek Kol Kısaltma (Manşetli)",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 150
+    },
+    {
+      "name": "Etek / Elbise Boy Kısaltma",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 160
+    },
+    {
+      "name": "Beden Daraltma (Gömlek/Bluz)",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 130
+    },
+    {
+      "name": "Ceket / Kaban Beden Daraltma",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 250
+    },
+    {
+      "name": "Ağ Aşınması / Yama Onarımı",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 140
+    },
+    {
+      "name": "Sökük / Küçük Yırtık Tamiri",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 80
+    },
+    {
+      "name": "Düğme / Çıtçıt Dikimi (Adet)",
+      "defaultSelected": false,
+      "isAddOn": false,
+      "price": 30
+    }
+  ]
+}
