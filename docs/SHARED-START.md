@@ -31,3 +31,4 @@ dotnet test tests/Modules/Operations/GiysiGo.Modules.Operations.Tests.csproj --c
 ```
 
 CI bu projeleri Linux'ta test eder, SSDT SQL projesini Windows'ta DACPAC'e derler. Veritabanı şemasının kaynağı `database/GiysiGo.Database/GiysiGo.Database.sqlproj` içindeki ayrı tablo/prosedür dosyalarıdır. API entegrasyon testi şu anda yalnızca host/health başlangıcını doğrular; gerçek iş akışları geliştikçe modül ve uçtan uca testler eklenir.
+SQL projesi modül klasörlerindeki yeni `.sql` dosyalarını otomatik dahil eder; prosedür eklerken ortak `.sqlproj` dosyasını düzenlemeyin.

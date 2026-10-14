@@ -2,6 +2,8 @@
 
 `GiysiGo.Database/GiysiGo.Database.sqlproj`, veritabanının tek şema kaynağıdır. Visual Studio Solution Explorer'da `identity`, `catalog`, `ordering`, `operations` ve `building_blocks` klasörleri altında tablolar, indeksler, şemalar ve ileride eklenecek stored procedure'ler ayrı dosyalarda görünür. SQL projesi derlenince `.dacpac` üretilir. Toplam 39 tablo vardır; hepsinde `id`, `create_date`, `update_date` ve `delete_date` bulunur.
 
+SQL projesi her modül klasöründeki `.sql` dosyalarını otomatik dahil eder. Yeni tablo veya stored procedure ekleyen geliştirici `.sqlproj` dosyasını değiştirmez; kendi şema klasörüne dosya ekleyip DACPAC derlemesini çalıştırır. `Scripts/PostDeployment.sql` ayrı PostDeploy öğesidir.
+
 ## Yerel kurulum
 
 1. Visual Studio'da `GiysiGo.sln` açıp `GiysiGo.Database` projesini **Build** edin.

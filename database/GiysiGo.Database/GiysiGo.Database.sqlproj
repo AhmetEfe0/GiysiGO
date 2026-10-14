@@ -52,50 +52,11 @@
     <Folder Include="building_blocks\Stored Procedures\" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="building_blocks\Schemas\building_blocks.sql" />
-    <Build Include="building_blocks\Tables\outbox_messages.sql" />
-    <Build Include="catalog\Schemas\catalog.sql" />
-    <Build Include="catalog\Tables\product_categories.sql" />
-    <Build Include="catalog\Tables\product_type_services.sql" />
-    <Build Include="catalog\Tables\product_types.sql" />
-    <Build Include="catalog\Tables\services.sql" />
-    <Build Include="catalog\Tables\store_offerings.sql" />
-    <Build Include="catalog\Tables\stores.sql" />
-    <Build Include="identity\Schemas\identity.sql" />
-    <Build Include="identity\Tables\corporate_memberships.sql" />
-    <Build Include="identity\Tables\corporates.sql" />
-    <Build Include="identity\Tables\customer_addresses.sql" />
-    <Build Include="identity\Tables\permissions.sql" />
-    <Build Include="identity\Tables\role_permissions.sql" />
-    <Build Include="identity\Tables\roles.sql" />
-    <Build Include="identity\Tables\store_assignments.sql" />
-    <Build Include="identity\Tables\user_roles.sql" />
-    <Build Include="identity\Tables\users.sql" />
-    <Build Include="operations\Schemas\operations.sql" />
-    <Build Include="operations\Tables\courier_availability.sql" />
-    <Build Include="operations\Tables\courier_profiles.sql" />
-    <Build Include="operations\Tables\delivery_assignments.sql" />
-    <Build Include="operations\Tables\delivery_events.sql" />
-    <Build Include="operations\Tables\delivery_tasks.sql" />
-    <Build Include="operations\Tables\inspection_photos.sql" />
-    <Build Include="operations\Tables\item_inspections.sql" />
-    <Build Include="operations\Tables\item_work.sql" />
-    <Build Include="operations\Tables\item_work_history.sql" />
-    <Build Include="ordering\Schemas\ordering.sql" />
-    <Build Include="ordering\Tables\cart_item_photos.sql" />
-    <Build Include="ordering\Tables\cart_item_services.sql" />
-    <Build Include="ordering\Tables\cart_items.sql" />
-    <Build Include="ordering\Tables\carts.sql" />
-    <Build Include="ordering\Tables\order_address_snapshots.sql" />
-    <Build Include="ordering\Tables\order_item_photos.sql" />
-    <Build Include="ordering\Tables\order_item_services.sql" />
-    <Build Include="ordering\Tables\order_items.sql" />
-    <Build Include="ordering\Tables\order_status_history.sql" />
-    <Build Include="ordering\Tables\orders.sql" />
-    <Build Include="ordering\Tables\payment_attempts.sql" />
-    <Build Include="ordering\Tables\price_quote_lines.sql" />
-    <Build Include="ordering\Tables\price_quotes.sql" />
-    <Build Include="ordering\Tables\quote_approval_history.sql" />
+    <Build Include="building_blocks\**\*.sql" />
+    <Build Include="catalog\**\*.sql" />
+    <Build Include="identity\**\*.sql" />
+    <Build Include="operations\**\*.sql" />
+    <Build Include="ordering\**\*.sql" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scripts\" />
@@ -103,3 +64,4 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
 </Project>
+
