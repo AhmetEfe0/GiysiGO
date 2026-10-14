@@ -11,7 +11,7 @@ Her modülde Domain, Application, Infrastructure ve IntegrationEvents projeleri 
 
 ## Sabitlenen ortak sözleşmeler
 
-- `ICurrentUser` ve `IPermissionChecker`: Identity sağlar. Permission kodu ve isteğin corporate/store kapsamı sunucuda birlikte denetlenir. JWT üretimi/doğrulaması, rollerin seed'i ve gerçek permission uygulaması Identity sahibinin işidir; mevcut API host henüz kullanıcı oturumu açmaz.
+- `ICurrentUser` ve `IPermissionChecker`: Identity sağlar. Sabit permission adları `PermissionCodes` içindedir; Identity seed'i ve diğer modüllerin kontrolleri aynı kodları kullanır. Permission kodu ve isteğin corporate/store kapsamı sunucuda birlikte denetlenir. JWT üretimi/doğrulaması, rollerin seed'i ve gerçek permission uygulaması Identity sahibinin işidir; mevcut API host henüz kullanıcı oturumu açmaz.
 - `ICustomerAddressReader`: Identity sağlar. Müşterinin kendine ait adresini döndürür. Catalog keşif ve Ordering checkout sırasında çağırır.
 - `IStoreCatalogReader`: Catalog sağlar. Aktif ürün-hizmet teklifini, dükkân konumunu ve koordinata göre hizmet alanını doğrular. Ordering checkout sırasında tekrar çağırır; dönen birim fiyat sipariş satırına kopyalanır.
 - `IOrderPickupReader`: Ordering sağlar. Operations, `OrderPlacedEvent` geldiğinde alım görevinin adresini, iletişim bilgisini, ürün kapasitesini ve zaman penceresini okur; varış noktası için Catalog'un dükkân konumunu kullanır.
