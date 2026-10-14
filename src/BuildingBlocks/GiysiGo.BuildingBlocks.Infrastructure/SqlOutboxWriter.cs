@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Common;
 using System.Text.Json;
 using Dapper;
@@ -9,21 +10,14 @@ namespace GiysiGo.BuildingBlocks.Infrastructure
     {
         public async Task WriteAsync(IIntegrationEvent integrationEvent, Guid aggregateId, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default)
         {
-            const string sql = """
-                INSERT INTO [building_blocks].[outbox_messages]
-                    (id, event_type, aggregate_id, payload, create_date)
-                VALUES
-                    (@Id, @EventType, @AggregateId, @Payload, @CreateDate);
-                """;
-
-            await connection.ExecuteAsync(new CommandDefinition(sql, new
+            await connection.ExecuteAsync(new CommandDefinition("[building_blocks].[spInsertOutboxMessage]", new
             {
                 Id = integrationEvent.EventId,
                 integrationEvent.EventType,
                 AggregateId = aggregateId,
                 Payload = JsonSerializer.Serialize(integrationEvent, integrationEvent.GetType()),
                 CreateDate = integrationEvent.OccurredAtUtc
-            }, transaction, cancellationToken: cancellationToken));
+            }, transaction, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));
         }
     }
 }

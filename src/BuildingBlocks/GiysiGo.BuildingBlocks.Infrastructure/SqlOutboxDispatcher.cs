@@ -1,3 +1,4 @@
+using System.Data;
 using Dapper;
 using GiysiGo.BuildingBlocks.Application.Events;
 using GiysiGo.BuildingBlocks.Application.Transactions;
@@ -16,15 +17,10 @@ namespace GiysiGo.BuildingBlocks.Infrastructure
             {
                 return await transactionRunner.ExecuteAsync(async (connection, transaction, token) =>
                 {
-                    const string selectSql = """
-                        SELECT TOP (1) id AS Id, event_type AS EventType, payload AS Payload
-                        FROM [building_blocks].[outbox_messages] WITH (UPDLOCK, READPAST, ROWLOCK)
-                        WHERE processed_at IS NULL AND delete_date IS NULL
-                        ORDER BY create_date, id;
-                        """;
-
                     var message = await connection.QuerySingleOrDefaultAsync<OutboxMessage>(
-                        new CommandDefinition(selectSql, transaction: transaction, cancellationToken: token));
+                        new CommandDefinition("[building_blocks].[spGetNextOutboxMessage]",
+                            transaction: transaction, commandType: CommandType.StoredProcedure,
+                            cancellationToken: token));
 
                     if (message is null)
                     {
@@ -43,20 +39,9 @@ namespace GiysiGo.BuildingBlocks.Infrastructure
                         await consumer.HandleAsync(message.Payload, connection, transaction, token);
                     }
 
-                    const string updateSql = """
-                        UPDATE [building_blocks].[outbox_messages]
-                        SET processed_at = SYSUTCDATETIME(), update_date = SYSUTCDATETIME(),
-                            attempt_count = attempt_count + 1, last_error = NULL
-                        WHERE id = @Id AND processed_at IS NULL;
-                        """;
-
-                    var changed = await connection.ExecuteAsync(new CommandDefinition(
-                        updateSql, new { message.Id }, transaction, cancellationToken: token));
-
-                    if (changed != 1)
-                    {
-                        throw new InvalidOperationException($"Outbox message {message.Id} was not marked processed.");
-                    }
+                    await connection.ExecuteAsync(new CommandDefinition(
+                        "[building_blocks].[spMarkOutboxMessageProcessed]", new { message.Id }, transaction,
+                        commandType: CommandType.StoredProcedure, cancellationToken: token));
 
                     return true;
                 }, cancellationToken);
@@ -64,15 +49,10 @@ namespace GiysiGo.BuildingBlocks.Infrastructure
             catch (Exception exception) when (messageId.HasValue && !cancellationToken.IsCancellationRequested)
             {
                 await using var connection = await connectionFactory.OpenAsync(cancellationToken);
-                const string failureSql = """
-                    UPDATE [building_blocks].[outbox_messages]
-                    SET attempt_count = attempt_count + 1, last_error = @Error,
-                        update_date = SYSUTCDATETIME()
-                    WHERE id = @Id AND processed_at IS NULL;
-                    """;
                 await connection.ExecuteAsync(new CommandDefinition(
-                    failureSql, new { Id = messageId.Value, Error = exception.Message },
-                    cancellationToken: cancellationToken));
+                    "[building_blocks].[spRecordOutboxMessageFailure]",
+                    new { Id = messageId.Value, Error = exception.Message },
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));
                 throw;
             }
         }
