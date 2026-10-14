@@ -9,6 +9,8 @@
 
 Her modülde Domain, Application, Infrastructure ve IntegrationEvents projeleri solution'a bağlıdır. Domain kendi varlıklarını, Application iş akışlarını ve public arayüzlerini, Infrastructure Dapper/MSSQL erişimini tutar. API, her modülün `Add*Module` metodunu çağırır. Modül sahibi kendi servis ve handler kayıtlarını bu metoda ekler. Başka modülün Domain veya Infrastructure projesine doğrudan referans verilmez.
 
+Repository kullanan entity'lerin beş temel stored procedure sözleşmesi ve iş akışı tablolarının istisnaları `docs/STORED-PROCEDURE-CONVENTIONS.md` içinde sabitlenmiştir.
+
 ## Sabitlenen ortak sözleşmeler
 
 - `ICurrentUser` ve `IPermissionChecker`: Identity sağlar. Sabit permission adları `PermissionCodes` içindedir; Identity seed'i ve diğer modüllerin kontrolleri aynı kodları kullanır. Permission kodu ve isteğin corporate/store kapsamı sunucuda birlikte denetlenir. JWT üretimi/doğrulaması, rollerin seed'i ve gerçek permission uygulaması Identity sahibinin işidir; mevcut API host henüz kullanıcı oturumu açmaz.
