@@ -13,8 +13,8 @@ Her modülde Domain, Application, Infrastructure ve IntegrationEvents projeleri 
 
 - `ICurrentUser` ve `IPermissionChecker`: Identity sağlar. Permission kodu ve isteğin corporate/store kapsamı sunucuda birlikte denetlenir. JWT üretimi/doğrulaması, rollerin seed'i ve gerçek permission uygulaması Identity sahibinin işidir; mevcut API host henüz kullanıcı oturumu açmaz.
 - `ICustomerAddressReader`: Identity sağlar. Müşterinin kendine ait adresini döndürür. Catalog keşif ve Ordering checkout sırasında çağırır.
-- `IStoreCatalogReader`: Catalog sağlar. Aktif ürün-hizmet teklifini ve koordinata göre hizmet alanını doğrular. Ordering checkout sırasında tekrar çağırır; dönen birim fiyat sipariş satırına kopyalanır.
-- `IOrderPickupReader`: Ordering sağlar. Operations, `OrderPlacedEvent` geldiğinde alım görevinin konum ve zaman penceresini okur.
+- `IStoreCatalogReader`: Catalog sağlar. Aktif ürün-hizmet teklifini, dükkân konumunu ve koordinata göre hizmet alanını doğrular. Ordering checkout sırasında tekrar çağırır; dönen birim fiyat sipariş satırına kopyalanır.
+- `IOrderPickupReader`: Ordering sağlar. Operations, `OrderPlacedEvent` geldiğinde alım görevinin adresini, iletişim bilgisini, ürün kapasitesini ve zaman penceresini okur; varış noktası için Catalog'un dükkân konumunu kullanır.
 - Sekiz olay Ordering ve Operations IntegrationEvents projelerinde tanımlıdır. Olayları başka modülün entity'si yerine kullanın. `EventId` tekrar işleme anahtarıdır. `EventType` sürümlü ve sabittir; yayınlandıktan sonra isim/payload değişikliği yeni sürüm gerektirir.
 - `ITransactionRunner` tek SQL bağlantısı ve transaction açar. Çok tablolı iş akışında Dapper komutlarına verilen connection ve transaction aynı olmalıdır. `IOutboxWriter` iş verisiyle **aynı transaction** içinde olay satırını ekler. `RepositoryBase` metotları kendi bağlantısını açtığından bu akışlarda kullanılmaz.
 
