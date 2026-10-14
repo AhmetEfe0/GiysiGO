@@ -1,28 +1,23 @@
-# GiysiGO Modular Monolith CODEOWNERS
-# TODO: Replace placeholder usernames with real GitHub handles.
+* @PnterNN
 
-# Repository defaults
-* @placeholder-tech-lead
+/.github/ @PnterNN
+/docs/ARCHITECTURE.md @PnterNN
+/src/API/GiysiGo.API/ @PnterNN
+/src/BuildingBlocks/ @PnterNN @AhmetEfe0 @sdnrkaleli @selincellkk
+/database/GiysiGo.Database/building_blocks/ @PnterNN
 
-# Architecture and repository governance
-/.github/ @placeholder-tech-lead
-/docs/ARCHITECTURE.md @placeholder-tech-lead
+/src/Modules/Identity/ @PnterNN
+/src/Modules/Catalog/ @sdnrkaleli
+/src/Modules/Ordering/ @AhmetEfe0
+/src/Modules/Operations/ @selincellkk
 
-# Single host/composition root
-/src/API/GiysiGo.API/ @placeholder-tech-lead
+/tests/Modules/Identity/ @PnterNN
+/tests/Modules/Catalog/ @sdnrkaleli
+/tests/Modules/Ordering/ @AhmetEfe0
+/tests/Modules/Operations/ @selincellkk
+/tests/API/GiysiGo.API.IntegrationTests/ @PnterNN
 
-# Shared building blocks used across all modules
-/src/BuildingBlocks/ @placeholder-tech-lead @placeholder-identity-owner @placeholder-catalog-owner @placeholder-ordering-owner @placeholder-operations-owner
-
-# Module ownership
-/src/Modules/Identity/ @placeholder-identity-owner
-/src/Modules/Catalog/ @placeholder-catalog-owner
-/src/Modules/Ordering/ @placeholder-ordering-owner
-/src/Modules/Operations/ @placeholder-operations-owner
-
-# Module test ownership
-/tests/Modules/Identity/ @placeholder-identity-owner
-/tests/Modules/Catalog/ @placeholder-catalog-owner
-/tests/Modules/Ordering/ @placeholder-ordering-owner
-/tests/Modules/Operations/ @placeholder-operations-owner
-/tests/API/GiysiGo.API.IntegrationTests/ @placeholder-tech-lead
+/database/GiysiGo.Database/identity/ @PnterNN
+/database/GiysiGo.Database/catalog/ @sdnrkaleli
+/database/GiysiGo.Database/ordering/ @AhmetEfe0
+/database/GiysiGo.Database/operations/ @selincellkk

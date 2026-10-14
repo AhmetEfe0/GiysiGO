@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../IntegrationEvents/GiysiGo.Modules.Identity.IntegrationEvents.csproj" />
+    <ProjectReference Include="../Domain/GiysiGo.Modules.Identity.Domain.csproj" />
+    <ProjectReference Include="../../../BuildingBlocks/GiysiGo.BuildingBlocks.Application/GiysiGo.BuildingBlocks.Application.csproj" />
+  </ItemGroup>
+</Project>

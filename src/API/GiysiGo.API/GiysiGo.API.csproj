@@ -7,5 +7,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
     <ProjectReference Include="../../BuildingBlocks/GiysiGo.BuildingBlocks.Infrastructure/GiysiGo.BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/Identity/Infrastructure/GiysiGo.Modules.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/Catalog/Infrastructure/GiysiGo.Modules.Catalog.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/Ordering/Infrastructure/GiysiGo.Modules.Ordering.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/Operations/Infrastructure/GiysiGo.Modules.Operations.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
