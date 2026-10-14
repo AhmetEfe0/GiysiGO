@@ -1,6 +1,6 @@
 # GiysiGO veritabanı taslağı
 
-Bu taslak, dört kişilik ekibin mevcut Identity, Catalog, Ordering ve Operations modülleri için hazırlanmıştır. Müşterinin verdiği ilk kategori/fiyat listesi `catalog-draft.json` içinde yapılandırılmıştır. Belirsiz fiyat ve seçim kuralları netleşince seed kayıtları kesinleştirilecektir. Henüz çalışan migration veya uygulama kodu değildir.
+Bu taslak, dört kişilik ekibin Identity, Catalog, Ordering ve Operations modülleri için hazırlanmıştır. Müşterinin verdiği ilk kategori/fiyat listesi `catalog-draft.json` içinde yapılandırılmıştır. Belirsiz fiyat ve seçim kuralları netleşince seed kayıtları kesinleştirilecektir. Düzenlenebilir MSSQL modeli `database/GiysiGo.Database` içindedir. API iskeleti hazırdır; modül iş akışları henüz uygulanmamıştır.
 
 ## Kabul edilen iş kuralları
 
@@ -18,7 +18,7 @@ Bu taslak, dört kişilik ekibin mevcut Identity, Catalog, Ordering ve Operation
 
 ## Dört modül ve tablo sahipliği
 
-Tek uygulama ve tek ilişkisel veritabanı önerilir. Modüller kendi şemalarındaki tabloları ve migration'larını yönetir. Dört modül dört tablo anlamına gelmez.
+Tek uygulama ve tek MSSQL veritabanı önerilir. Modüller kendi şemalarındaki SQL proje dosyalarını yönetir. Dört modül dört tablo anlamına gelmez.
 
 | Modül | Sorumluluk | Tablolar |
 | --- | --- | --- |
@@ -107,7 +107,7 @@ erDiagram
     OrderItemService ||--o| ItemWork : fulfilled_with
 ```
 
-Şema ilişkileri kavramsaldır. Modüller arası çağrılar public contract ve integration event üzerinden yapılır; başka modülün entity veya DbContext'i kullanılmaz. Modül içi ilişkiler foreign key ile korunur. Modüller arası ID referanslarının doğrulanması ve olası foreign key kullanımı migration stratejisinde ayrıca netleştirilir.
+Modüller arası çağrılar public contract ve integration event üzerinden yapılır; başka modülün entity veya repository'si kullanılmaz. SQL şemasında hem modül içi hem modüller arası ilişkiler foreign key ile korunur; DACPAC yayınlama işlemi nesneleri bağımlılık sırasıyla oluşturur.
 
 ## Katalog ve fiyat alanları
 
@@ -148,7 +148,7 @@ Hizmet ve ürün katalogları enum olmaz. Sabit durumlar için enum kullanılabi
 5. Birden fazla hizmet seçilirse varsayılan davranış hepsini sunan dükkânları göstermektir. Ürün tipi biliniyorsa filtre geçerli ürün tipi ve hizmet kombinasyonları üzerinden çalışır.
 6. Mesafe sırasıyla sonuçlar döndürülür.
 
-Veritabanı motoru kesinleşince mekânsal sorgu uygulanır. PostgreSQL seçilirse PostGIS geography ve ST_DWithin metre cinsinden yarıçap sorgusu için uygundur; indeks ve koordinat sırası uygulamada doğrulanmalıdır.
+MSSQL için dükkân yarıçapı sorgusu ilk sürümde aday dükkânlar üzerinde Haversine hesabıyla doğrulanır. Veri büyüdüğünde SQL Server `geography` ve spatial index kullanılabilir; metre/kilometre birimleri ve koordinat sırası entegrasyon testinde doğrulanmalıdır.
 
 Sipariş oluşturulurken adres, dükkânın etkinliği, hizmet bölgesi ve bütün seçili kombinasyonlar tekrar doğrulanır. Sepete ekleme anındaki kontrol tek başına yeterli değildir.
 

@@ -14,5 +14,11 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Placeholder
-        run: echo "TODO: add build and test steps for GiysiGO modular monolith"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore
+        run: dotnet restore src/API/GiysiGo.API/GiysiGo.API.csproj
+      - name: Build
+        run: dotnet build src/API/GiysiGo.API/GiysiGo.API.csproj --no-restore --configuration Release

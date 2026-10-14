@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration>Debug</Configuration>
+    <Platform>AnyCPU</Platform>
+    <Name>GiysiGo.Database</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{A1AA0BCD-FFB2-4E67-B389-E3894173D7A0}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootNamespace>GiysiGo.Database</RootNamespace>
+    <AssemblyName>GiysiGo.Database</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="identity\" />
+    <Folder Include="identity\Schemas\" />
+    <Folder Include="identity\Tables\" />
+    <Folder Include="identity\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="catalog\" />
+    <Folder Include="catalog\Schemas\" />
+    <Folder Include="catalog\Tables\" />
+    <Folder Include="catalog\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ordering\" />
+    <Folder Include="ordering\Schemas\" />
+    <Folder Include="ordering\Tables\" />
+    <Folder Include="ordering\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="operations\" />
+    <Folder Include="operations\Schemas\" />
+    <Folder Include="operations\Tables\" />
+    <Folder Include="operations\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="building_blocks\" />
+    <Folder Include="building_blocks\Schemas\" />
+    <Folder Include="building_blocks\Tables\" />
+    <Folder Include="building_blocks\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="building_blocks\Schemas\building_blocks.sql" />
+    <Build Include="building_blocks\Tables\outbox_messages.sql" />
+    <Build Include="catalog\Schemas\catalog.sql" />
+    <Build Include="catalog\Tables\product_categories.sql" />
+    <Build Include="catalog\Tables\product_type_services.sql" />
+    <Build Include="catalog\Tables\product_types.sql" />
+    <Build Include="catalog\Tables\services.sql" />
+    <Build Include="catalog\Tables\store_offerings.sql" />
+    <Build Include="catalog\Tables\stores.sql" />
+    <Build Include="identity\Schemas\identity.sql" />
+    <Build Include="identity\Tables\corporate_memberships.sql" />
+    <Build Include="identity\Tables\corporates.sql" />
+    <Build Include="identity\Tables\customer_addresses.sql" />
+    <Build Include="identity\Tables\permissions.sql" />
+    <Build Include="identity\Tables\role_permissions.sql" />
+    <Build Include="identity\Tables\roles.sql" />
+    <Build Include="identity\Tables\store_assignments.sql" />
+    <Build Include="identity\Tables\user_roles.sql" />
+    <Build Include="identity\Tables\users.sql" />
+    <Build Include="operations\Schemas\operations.sql" />
+    <Build Include="operations\Tables\courier_availability.sql" />
+    <Build Include="operations\Tables\courier_profiles.sql" />
+    <Build Include="operations\Tables\delivery_assignments.sql" />
+    <Build Include="operations\Tables\delivery_events.sql" />
+    <Build Include="operations\Tables\delivery_tasks.sql" />
+    <Build Include="operations\Tables\inspection_photos.sql" />
+    <Build Include="operations\Tables\item_inspections.sql" />
+    <Build Include="operations\Tables\item_work.sql" />
+    <Build Include="operations\Tables\item_work_history.sql" />
+    <Build Include="ordering\Schemas\ordering.sql" />
+    <Build Include="ordering\Tables\cart_item_photos.sql" />
+    <Build Include="ordering\Tables\cart_item_services.sql" />
+    <Build Include="ordering\Tables\cart_items.sql" />
+    <Build Include="ordering\Tables\carts.sql" />
+    <Build Include="ordering\Tables\order_address_snapshots.sql" />
+    <Build Include="ordering\Tables\order_item_photos.sql" />
+    <Build Include="ordering\Tables\order_item_services.sql" />
+    <Build Include="ordering\Tables\order_items.sql" />
+    <Build Include="ordering\Tables\order_status_history.sql" />
+    <Build Include="ordering\Tables\orders.sql" />
+    <Build Include="ordering\Tables\payment_attempts.sql" />
+    <Build Include="ordering\Tables\price_quote_lines.sql" />
+    <Build Include="ordering\Tables\price_quotes.sql" />
+    <Build Include="ordering\Tables\quote_approval_history.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scripts\" />
+    <PostDeploy Include="Scripts\PostDeployment.sql" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+</Project>

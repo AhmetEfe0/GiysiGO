@@ -1,37 +1,22 @@
-# GiysiGO PostgreSQL şeması
+# GiysiGO MSSQL veritabanı projesi
 
-`schema.sql` boş bir PostgreSQL veritabanına uygulanacak referans DDL'dir. `.NET 10` uygulamasında her geliştirici kendi modülünün EF Core migration'larını bu yapıya göre üretir. Aynı veritabanında hem bu DDL hem migration'lar çalıştırılmaz.
+`GiysiGo.Database/GiysiGo.Database.sqlproj`, veritabanının tek şema kaynağıdır. Visual Studio Solution Explorer'da `identity`, `catalog`, `ordering`, `operations` ve `building_blocks` klasörleri altında tablolar, indeksler, şemalar ve ileride eklenecek stored procedure'ler ayrı dosyalarda görünür. SQL projesi derlenince `.dacpac` üretilir. Toplam 39 tablo vardır; hepsinde `id`, `create_date`, `update_date` ve `delete_date` bulunur.
+
+## Yerel kurulum
+
+1. Visual Studio'da `GiysiGo.sln` açıp `GiysiGo.Database` projesini **Build** edin.
+2. LocalDB kullanıyorsanız PowerShell'de `SqlLocalDB create GiysiGo` ve `SqlLocalDB start GiysiGo` komutlarını çalıştırın.
+3. SQL projesine sağ tıklayıp **Publish** seçin. Hedef sunucu `(localdb)\GiysiGo`, veritabanı `GiysiGo` olsun. Önce **Generate Script** ile değişiklikleri inceleyin, sonra yayınlayın.
+
+Bu makinede komut satırından derleme ve yayınlama örneği:
 
 ```powershell
-psql -v ON_ERROR_STOP=1 -d giysigo -f database/schema.sql
+& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' database/GiysiGo.Database/GiysiGo.Database.sqlproj /p:VisualStudioVersion=18.0 /p:Configuration=Release
+& 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\Microsoft\SQLDB\DAC\SqlPackage.exe' /Action:Publish '/SourceFile:database\GiysiGo.Database\bin\Release\GiysiGo.Database.dacpac' '/TargetConnectionString:Server=(localdb)\GiysiGo;Integrated Security=True;Database=GiysiGo;TrustServerCertificate=True' /p:CreateNewDatabase=True /p:BlockOnPossibleDataLoss=True
 ```
 
-Dosya 4 iş şemasında 38 tablo ve `building_blocks.outbox_messages` altyapı tablosu oluşturur. Uygulama GUID değerlerini üretir; SQL seed veya mock kurye verisi içermez. Katalog girdileri `docs/catalog-draft.json` dosyasındadır. Fiyat birimi belirsiz üç perde hizmeti, doğrudan terzi girişindeki 16 işlem ve olası çift ücretli kombinasyonlar iş kuralları netleşince seed edilir.
+Visual Studio sürümü ve kurulum yolu ekip üyelerine göre değişebilir. Üretim ortamında bağlantı bilgileri kodda tutulmaz; yayın hedefi ortam konfigürasyonundan seçilir. DACPAC yayınlama script'i uygulanmadan önce incelenir; veri dönüşümü veya özel sıra gerektiren değişiklikler `database/migrations` altında numaralı SQL script'leri olarak tutulur. Dapper şema üretmez.
 
-Ana ilişkiler:
+Katalog kaynak verisi `docs/catalog-draft.json` dosyasındadır. Belirsiz fiyat birimli işlemler iş kararı gelmeden aktif seed edilmez. Mock kurye seed'i Operations sorumluluğundadır. SQL Server `datetime2` saat dilimi saklamaz; tüm okuma/yazmalar UTC kabul edilir. `DeleteDate` fiziksel silme yerine pasifleştirme içindir; geçmiş sipariş, teklif ve ödeme kayıtları operasyon boyunca korunur.
 
-```mermaid
-erDiagram
-    corporates ||--o{ stores : owns
-    users ||--o{ customer_addresses : has
-    product_categories ||--o{ product_types : contains
-    product_types ||--o{ product_type_services : supports
-    services ||--o{ product_type_services : applies_to
-    stores ||--o{ store_offerings : enables
-    product_type_services ||--o{ store_offerings : priced_by
-    users ||--o{ orders : places
-    stores ||--o{ orders : fulfills
-    orders ||--|{ order_items : contains
-    order_items ||--|{ order_item_services : requests
-    orders ||--o{ price_quotes : receives
-    price_quotes ||--|{ price_quote_lines : details
-    orders ||--o{ delivery_tasks : needs
-    delivery_tasks ||--o{ delivery_assignments : assigned_as
-    courier_profiles ||--o{ delivery_assignments : receives
-    order_items ||--o| item_inspections : inspected_by
-    order_item_services ||--o| item_work : performed_as
-```
-
-Şemada modüller arası foreign key bulunur fakat .NET modülleri diğer modülün entity sınıfını veya DbContext'ini referanslamaz. Başka modüllerin verilerini public contract ve integration event ile alır. `identity.store_assignments` tablosu `catalog.stores` kaydına bağlı olduğu için migration sırası plan dosyasında açıklanmıştır.
-
-SQL'in sağlayamadığı kurallar application transaction'larında uygulanır: adresin müşteriye ait olması; sepet hizmetinin hem ürün tipine hem seçili dükkâna uygun olması; teklif ve ödeme tutarlarının satır toplamıyla eşleşmesi; izin verilen durum geçişleri; çakışan görevlerde kurye kapasitesi; rolün permission'ı ve şirket/dükkân kapsamı. Bu kontroller için entegrasyon testleri gereklidir.
+Adres sahipliği, dükkân ve ürün-hizmet uyumu, toplam tutar, yetki kapsamı, durum geçişi ve kurye kapasitesi ilgili modül transaction'larında doğrulanır. Genel `RepositoryBase` tek adımlı CRUD içindir; çok tablolı checkout, teklif, ödeme ve atama akışları tek SQL transaction kullanır.

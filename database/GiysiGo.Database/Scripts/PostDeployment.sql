@@ -1,0 +1,2 @@
+-- Idempotent seed komutları modül sahipleri tarafından burada :r ile dahil edilir.
+-- Katalog kararları kesinleşmeden canlı veri eklenmez.

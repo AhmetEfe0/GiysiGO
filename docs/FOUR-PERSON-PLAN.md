@@ -1,13 +1,13 @@
 # GiysiGO dört kişilik geliştirme planı
 
-Bu plan mevcut boş repodan başlar. Backend ASP.NET Core ve .NET 10, veritabanı PostgreSQL, mimari modüler monolittir. Tek API uygulaması ve dört iş modülü vardır. Müşteri ekranı için mevcut ticari dokümandaki Flutter, dükkân paneli için React + TypeScript temel alınır. MVP'de bu iki arayüz yapılır; kurye paneli yerine gerçek atama algoritması mock kurye verileriyle çalışır. `database/schema.sql` ilişkisel şemanın referansıdır. Gerçek uygulamada tablo değişiklikleri her modülün EF Core migration'larıyla yönetilir.
+Bu plan mevcut boş repodan başlar. Backend ASP.NET Core ve .NET 10, veritabanı Microsoft SQL Server (MSSQL), veri erişimi Dapper, mimari modüler monolittir. Tek API uygulaması ve dört iş modülü vardır. Müşteri ekranı için mevcut ticari dokümandaki Flutter, dükkân paneli için React + TypeScript temel alınır. MVP'de bu iki arayüz yapılır; kurye paneli yerine gerçek atama algoritması mock kurye verileriyle çalışır. `database/GiysiGo.Database/GiysiGo.Database.sqlproj` ilişkisel şemanın düzenlenebilir kaynağıdır.
 
 ## Ortak kurallar
 
-1. Her geliştirici kendi `src/Modules/<Module>` ve `tests/Modules/<Module>` klasöründen sorumludur. Birbirinin `DbContext` veya entity tipini doğrudan kullanmaz. Modüller `Guid` kimlikleri, public application contract'ları ve integration event'leriyle konuşur.
+1. Her geliştirici kendi `src/Modules/<Module>` ve `tests/Modules/<Module>` klasöründen sorumludur. Birbirinin entity tipini veya repository'sini doğrudan kullanmaz. Modüller `Guid` kimlikleri, public application contract'ları ve integration event'leriyle konuşur.
 2. API host, ortak altyapı, CI ve kök yapılandırma değişiklikleri en az bir başka ekip üyesinin incelemesinden geçer. `main` dalına doğrudan gönderim yapılmaz. Branch adları repodaki `docs/BRANCHING.md` kuralına uyar.
-3. Her modül kendi PostgreSQL şemasına (`identity`, `catalog`, `ordering`, `operations`) ve migration'larına sahiptir. `building_blocks` outbox tablosu ortak altyapıdır. Migration sırası Identity → Catalog → Ordering → Operations'tır; Catalog'daki Store'a bağlı `identity.store_assignments` gibi sınır ilişkileri Identity migration'ının ikinci adımında eklenir. Aynı veritabanında hem `database/schema.sql` hem EF migration'ları çalıştırılmaz.
-4. Ortak başlangıç: `.NET 10` solution/projeler, PostgreSQL yerel geliştirme kurulumu, bağlantı ayarları, health endpoint, Swagger/OpenAPI, hata biçimi, kullanıcı kimliği ve korelasyon kimliği. Kişi 1 ilk iskeleti açar, herkes ilk PR'ı birlikte inceler. CI'daki placeholder gerçek `dotnet restore`, `dotnet build`, `dotnet test` adımlarına çevrilir.
+3. Her modül kendi MSSQL şemasına (`identity`, `catalog`, `ordering`, `operations`) ve SQL proje klasörüne sahiptir. `building_blocks` outbox tablosu ortak altyapıdır. Tablolar, indeksler ve prosedürler SQL projesinde düzenlenir; DACPAC yayınlama script'i uygulanmadan önce incelenir. Veri taşıma gerektiren özel değişiklikler numaralı SQL script'lerinde tutulur.
+4. Ortak başlangıç: `.NET 10` solution, MSSQL SQL projesi, Dapper/SqlClient, API host, health endpoint, OpenAPI ve Problem Details hazırdır. `ApiControllerBase`, `GenericCrudControllerBase<TEntity>`, `EntityBase<TId>`, `IRepository<TEntity>` ve `RepositoryBase<TEntity>` ortak tabandır. Modül projeleri, JWT kimlik doğrulaması, permission kapsamı, transaction/outbox ve test altyapısı ilk ortak PR'larda bağlanır. CI şimdilik API ve bağımlılıklarını derler; modül ve SQL proje kontrolleri eklenecektir.
 5. Kod üretmeden önce dört karar yazılı hale getirilir: `[x]` hizmet kaldırılabilir mi; perde tadilat fiyatı adet mi m² mi; “Sadece Terzi” 16 işlemin ürün eşleşmeleri; reddedilen siparişin geri taşıma ücreti. Karar gelmeyen kombinasyonlar canlı katalogda pasif kalır.
 6. Müşteri için `apps/customer` altında Flutter, dükkân için `apps/store` altında React + TypeScript açılır. Her iki istemci aynı REST API/OpenAPI sözleşmesini kullanır. Kişi 1 Flutter giriş/oturum iskeletini, kişi 2 React panel kabuğunu kurar; diğerleri kendi ekranlarını bu iskeletlere ekler.
 
@@ -15,7 +15,7 @@ Bu plan mevcut boş repodan başlar. Backend ASP.NET Core ve .NET 10, veritaban�
 
 **Sahip olduğu veriler:** `identity.users`, `roles`, `permissions`, `role_permissions`, `user_roles`, `corporates`, `corporate_memberships`, `store_assignments`, `customer_addresses`. Ortak host ve CI kurulumunun ilk PR'ını da açar.
 
-**İlk işler:** Solution ve API host'u oluştur; her modül için Domain, Application, Infrastructure ve IntegrationEvents projelerini bağla. Identity `DbContext`, ilk migration, parola hashleme, oturum açma/yenileme, kullanıcı profili ve adres CRUD'unu yaz. `Customer`, `CorporateOwner`, `StoreManager`, `StoreStaff`, `PlatformAdmin` rollerini ve permission kodlarını seed et. Bir kullanıcı birden fazla dükkânda farklı rol alabilsin.
+**İlk işler:** Hazır solution/API host'a Identity modülünün Domain, Application, Infrastructure ve IntegrationEvents projelerini bağla; diğer modül projeleri kendi sahiplerince eklenir. Identity Dapper repository'leri ve modüle ait SQL prosedürlerini, parola hashleme, oturum açma/yenileme, kullanıcı profili ve adres CRUD'unu yaz. `Customer`, `CorporateOwner`, `StoreManager`, `StoreStaff`, `PlatformAdmin` rollerini ve permission kodlarını seed et. Bir kullanıcı birden fazla dükkânda farklı rol alabilsin.
 
 **API ve contract:** `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `GET/POST/PUT/DELETE /me/addresses`, şirket ve personel atama endpoint'leri. Diğer modüllere `ICurrentUser`, `IAuthorizationService` ve adres okuma contract'ı ver. Dükkân kapsamını her istekte sunucuda doğrula; sadece UI butonunu gizlemek yeterli değildir.
 
@@ -27,7 +27,7 @@ Bu plan mevcut boş repodan başlar. Backend ASP.NET Core ve .NET 10, veritaban�
 
 **Sahip olduğu veriler:** `catalog.stores`, `product_categories`, `product_types`, `services`, `product_type_services`, `store_offerings`. `docs/catalog-draft.json` bu kişinin gözden geçireceği kaynak veridir; geçersiz/belirsiz kombinasyonları seed etmez.
 
-**İlk işler:** Catalog `DbContext` ve migration'larını oluştur. Beş kategori, 48 ürün tipi ve doğrulanan hizmet/fiyat kombinasyonları için idempotent seed yaz. Platform yöneticisi katalog oluşturabilir; dükkân sahibi sadece mevcut kombinasyonları etkinleştirip kendi fiyatını belirleyebilir. Store açma, adres/koordinat ve hizmet yarıçapı yönetimini ekle.
+**İlk işler:** Catalog Dapper repository'lerini ve SQL prosedürlerini oluştur. Beş kategori, 48 ürün tipi ve doğrulanan hizmet/fiyat kombinasyonları için idempotent seed yaz. Platform yöneticisi katalog oluşturabilir; dükkân sahibi sadece mevcut kombinasyonları etkinleştirip kendi fiyatını belirleyebilir. Store açma, adres/koordinat ve hizmet yarıçapı yönetimini ekle.
 
 **API ve contract:** `GET /catalog/categories`, `GET /catalog/product-types`, `GET /stores?addressId=...&serviceIds=...`, `GET /stores/{id}/offerings`, dükkân için offering/fiyat yönetimi endpoint'leri. Ordering'e `IStoreCatalogReader` benzeri bir okuma contract'ı ver: mağaza aktif mi, ürün-hizmet o mağazada aktif mi, geçerli birim fiyat nedir? Adres mesafesi ve filtreleme tekrar checkout'ta doğrulanmalı.
 
@@ -39,7 +39,7 @@ Bu plan mevcut boş repodan başlar. Backend ASP.NET Core ve .NET 10, veritaban�
 
 **Sahip olduğu veriler:** `ordering.carts`, `cart_items`, `cart_item_services`, `cart_item_photos`, `orders`, `order_address_snapshots`, `order_items`, `order_item_services`, `order_item_photos`, `price_quotes`, `price_quote_lines`, `quote_approval_history`, `payment_attempts`, `order_status_history`.
 
-**İlk işler:** Ordering `DbContext` ve migration'larını oluştur. Bir sepetin tek dükkâna ait olmasını sağla. Her fiziksel ürünü ayrı CartItem/OrderItem yap; fotoğraf referanslarını dosya depolamada tut. Ürün+hizmetlere göre tahmini fiyat hesapla. Checkout'ta adres, dükkân, hizmet ve fiyatı yeniden doğrula; sepeti snapshot'larla siparişe çevir. Aynı checkout tekrar gelirse ikinci sipariş yaratma.
+**İlk işler:** Ordering Dapper repository'lerini ve SQL prosedürlerini oluştur. Bir sepetin tek dükkâna ait olmasını sağla. Her fiziksel ürünü ayrı CartItem/OrderItem yap; fotoğraf referanslarını dosya depolamada tut. Ürün+hizmetlere göre tahmini fiyat hesapla. Checkout'ta adres, dükkân, hizmet ve fiyatı yeniden doğrula; sepeti snapshot'larla siparişe çevir. Aynı checkout tekrar gelirse ikinci sipariş yaratma.
 
 **Teklif/ödeme:** Operations'tan “bütün ürünler incelendi” bilgisi gelince taslak teklife izin ver. `quote.prepare` ve `quote.approve` yetkilerini ayrı denetle. Onaylanan teklif değiştirilemez; düzeltme yeni revizyondur. Müşteri yalnızca kendi son geçerli teklifinin tamamını kabul veya reddedebilir. Ödeme sağlayıcısı için adapter oluştur; MVP'de test sağlayıcısı kullanılabilir. Başarılı ödeme tutarı kabul edilen teklif tutarıyla aynı olmalı, bildirim tekrarları güvenle işlenmelidir.
 
@@ -53,7 +53,7 @@ Bu plan mevcut boş repodan başlar. Backend ASP.NET Core ve .NET 10, veritaban�
 
 **Sahip olduğu veriler:** `operations.courier_profiles`, `courier_availability`, `delivery_tasks`, `delivery_assignments`, `delivery_events`, `item_inspections`, `inspection_photos`, `item_work`, `item_work_history`.
 
-**İlk işler:** Operations `DbContext` ve migration'larını oluştur. Geliştirme/test ortamı için sabit mock kurye seed'i yaz; canlı müşteriye mock kurye gösterme. Sipariş oluşunca CustomerPickup görevi aç. Kurye atamasında zaman aralığı, görevin başlangıç noktasına mesafe, aktiflik, mevcut çakışan görevlerin kapasitesi ve sabit eşitlik bozma kuralını uygula. Aynı göreve çift atamayı ve aynı kuryenin kapasitesini aşmayı transaction içinde engelle. Aday yoksa görev beklesin.
+**İlk işler:** Operations Dapper repository'lerini ve SQL prosedürlerini oluştur. Geliştirme/test ortamı için sabit mock kurye seed'i yaz; canlı müşteriye mock kurye gösterme. Sipariş oluşunca CustomerPickup görevi aç. Kurye atamasında zaman aralığı, görevin başlangıç noktasına mesafe, aktiflik, mevcut çakışan görevlerin kapasitesi ve sabit eşitlik bozma kuralını uygula. Aynı göreve çift atamayı ve aynı kuryenin kapasitesini aşmayı transaction içinde engelle. Aday yoksa görev beklesin.
 
 **Dükkân akışı:** Mock alım/dükkâna teslim olayları ayrı komutlarla yürüsün. Her OrderItem için tek tek fotoğraflı inceleme kaydet. Bütün ürünler incelenmeden Ordering'e teklif hazırlama izni verme. Ödeme doğrulanınca her OrderItemService için ItemWork başlat; hepsi tamamlanınca teslim görevi aç. Teklif reddedilirse RejectedOrderReturn görevi aç. Atama, teslim alma ve teslim edildi durumlarını birbirine karıştırma.
 
@@ -82,7 +82,7 @@ Event yalnızca ID ve gerekli snapshot alanlarını taşır. Başka modülün ta
 
 | Sıra | Çıktı | Bağımlılık |
 | --- | --- | --- |
-| 1 | Solution, API host, PostgreSQL, CI, ortak hata/kimlik yapısı | Yok; dört kişi ilk PR'ı inceler |
+| 1 | Solution, API host, MSSQL, Dapper, CI, ortak hata/kimlik yapısı | Yok; dört kişi ilk PR'ı inceler |
 | 2 | Identity ve Catalog temel tabloları, seed, dükkân keşfi | 1 |
 | 3 | Ordering sepeti ve checkout; Operations alım görevi ve mock kurye ataması | 2, public contract'lar |
 | 4 | Dükkân incelemesi, kesin teklif, yetkili onay, müşteri kararı, ödeme | 3 |
@@ -92,6 +92,6 @@ Ortak son senaryo: müşteri adres seçer → hizmete uygun dükkânı bulur →
 
 ## Şema uygulama notları
 
-`database/schema.sql` PostgreSQL için boş veritabanı referans şemasıdır. Veritabanı CHECK/UNIQUE/FK kuralları temel veri bütünlüğünü sağlar. Şu iş kuralları ayrıca uygulama transaction'larında doğrulanır: müşteri adresinin gerçekten kendisine ait olması; seçilen StoreOffering'in sepetin dükkânına ve ürün tipine ait olması; teklif kalemlerinin aynı siparişe ait olması; tutar toplamlarının satırlarla eşleşmesi; izin verilen durum geçişleri; kurye kapasitesinin çakışan zaman aralıklarında aşılmaması; rol/permission ile şirket/dükkân kapsamının birlikte kontrolü. Modüller arası EF entity navigasyonu kullanılmaz.
+`database/GiysiGo.Database/GiysiGo.Database.sqlproj` MSSQL nesnelerinin düzenlenebilir kaynağıdır. Veritabanı CHECK/UNIQUE/FK kuralları temel veri bütünlüğünü sağlar. Şu iş kuralları ayrıca uygulama transaction'larında doğrulanır: müşteri adresinin gerçekten kendisine ait olması; seçilen StoreOffering'in sepetin dükkânına ve ürün tipine ait olması; teklif kalemlerinin aynı siparişe ait olması; tutar toplamlarının satırlarla eşleşmesi; izin verilen durum geçişleri; kurye kapasitesinin çakışan zaman aralıklarında aşılmaması; rol/permission ile şirket/dükkân kapsamının birlikte kontrolü. Modüller arası doğrudan entity/repository bağımlılığı kullanılmaz.
 
 MVP kataloğunda `[x]` işaretinin anlamı, perde ek hizmetlerinin fiyat birimi ve bazı çift ücret riski taşıyan ürünler henüz net değildir. `catalog-draft.json` veri kaynağıdır, doğrulanmamış satırlar doğrudan canlı seed değildir. `ProductTypeService.PriceUnit` SQL'de zorunludur; birimi bilinmeyen üç perde tadilatı cevap gelene kadar aktif olarak eklenmez.

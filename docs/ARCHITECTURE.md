@@ -15,7 +15,7 @@ GiysiGO is intentionally implemented as a **Modular Monolith**:
 
 ## Boundary rules
 
-- Modules do **not** directly use other modules' entities or database context.
+- Modules do **not** directly use other modules' entities or repositories.
 - Cross-module collaboration uses **in-process public contracts** and **integration events**.
 - This is **not** a microservices setup: no separate deployable services, no external message bus requirement.
 
