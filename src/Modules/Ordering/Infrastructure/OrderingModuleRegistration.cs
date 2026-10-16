@@ -11,8 +11,10 @@ namespace GiysiGo.Modules.Ordering.Infrastructure
         {
             services.AddScoped<ICartCommandRepository, SqlCartCommandRepository>();
             services.AddScoped<IOrderWorkflowRepository, SqlOrderWorkflowRepository>();
-            services.AddScoped<IOrderingWorkflowService, OrderingWorkflowService>();
-            services.AddScoped<ICartCommandService, CartCommandService>();
+            services.AddScoped<IOrderingWorkflowService>(serviceProvider =>
+                ActivatorUtilities.CreateInstance<OrderingWorkflowService>(serviceProvider));
+            services.AddScoped<ICartCommandService>(serviceProvider =>
+                ActivatorUtilities.CreateInstance<CartCommandService>(serviceProvider));
             return services;
         }
     }
