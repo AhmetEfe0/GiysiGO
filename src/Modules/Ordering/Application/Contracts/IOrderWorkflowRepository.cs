@@ -20,10 +20,4 @@ namespace GiysiGo.Modules.Ordering.Application.Contracts
         Task<PaymentCompletionResult> CompletePaymentAttemptAsync(Guid paymentAttemptId, string? providerPaymentId, bool succeeded, DateTime completedAtUtc, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
     }
 
-    public sealed record CheckoutResult(Guid OrderId, Guid SourceCartId, Guid StoreId, DateTime PickupWindowStartUtc, DateTime PickupWindowEndUtc, bool Created);
-    public sealed record CheckoutContext(Guid CartId, Guid CustomerId, Guid StoreId, Guid AddressId, decimal Latitude, decimal Longitude, DateTime PickupWindowStartUtc, DateTime PickupWindowEndUtc);
-    public sealed record CheckoutOfferingSelection(Guid ProductTypeId, Guid ServiceId);
-    public sealed record QuoteDecisionResult(Guid OrderId, Guid QuoteId, bool Accepted, bool Changed);
-    public sealed record PaymentCompletionResult(Guid OrderId, Guid QuoteId, bool Succeeded, bool Changed);
-    public sealed record OrderTransitionResult(Guid OrderId, Guid StoreId, string Status, bool Changed);
 }

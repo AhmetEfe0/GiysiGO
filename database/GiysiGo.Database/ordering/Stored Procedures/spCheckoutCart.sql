@@ -54,16 +54,58 @@ BEGIN
                OR s.is_active = 0 OR s.delete_date IS NOT NULL OR pt.is_active = 0 OR pt.delete_date IS NOT NULL)
     ) THROW 51005, 'Cart contains an unavailable or mismatched service.', 1;
 
-    DECLARE @OrderId uniqueidentifier = NEWID();
-    DECLARE @Total decimal(12,2) = (
-        SELECT COALESCE(SUM(ROUND((COALESCE(so.price_override, pts.default_price) *
-            CASE pts.price_unit WHEN 'M2' THEN COALESCE(ci.customer_measurement, 1) ELSE 1 END), 2)), 0)
-        FROM [ordering].cart_items ci
-        JOIN [ordering].cart_item_services cis ON cis.cart_item_id = ci.id AND cis.delete_date IS NULL
-        JOIN [catalog].store_offerings so ON so.id = cis.store_offering_id
-        JOIN [catalog].product_type_services pts ON pts.id = so.product_type_service_id
-        WHERE ci.cart_id = @CartId AND ci.delete_date IS NULL
+    DECLARE @CartSelections TABLE (
+        CartItemId uniqueidentifier NOT NULL,
+        CartItemServiceId uniqueidentifier NOT NULL PRIMARY KEY,
+        StoreOfferingId uniqueidentifier NOT NULL,
+        ProductTypeId uniqueidentifier NOT NULL,
+        CustomerMeasurement decimal(12,3)
     );
+    INSERT @CartSelections (CartItemId, CartItemServiceId, StoreOfferingId, ProductTypeId, CustomerMeasurement)
+    SELECT ci.id, cis.id, cis.store_offering_id, ci.product_type_id, ci.customer_measurement
+    FROM [ordering].cart_items ci WITH (UPDLOCK, HOLDLOCK)
+    JOIN [ordering].cart_item_services cis WITH (UPDLOCK, HOLDLOCK) ON cis.cart_item_id = ci.id
+    WHERE ci.cart_id = @CartId AND ci.delete_date IS NULL AND cis.delete_date IS NULL;
+
+    IF NOT EXISTS (SELECT 1 FROM @CartSelections)
+        THROW 51004, 'Cart is empty.', 1;
+    IF (SELECT COUNT(DISTINCT ci.id) FROM [ordering].cart_items ci WHERE ci.cart_id = @CartId AND ci.delete_date IS NULL)
+       <> (SELECT COUNT(DISTINCT CartItemId) FROM @CartSelections)
+        THROW 51006, 'Every cart item must have at least one selected service.', 1;
+
+    DECLARE @CheckoutPrices TABLE (
+        CartItemId uniqueidentifier NOT NULL,
+        CartItemServiceId uniqueidentifier NOT NULL PRIMARY KEY,
+        ProductTypeServiceId uniqueidentifier NOT NULL,
+        ServiceNameSnapshot nvarchar(200) NOT NULL,
+        UnitPrice decimal(12,2) NOT NULL,
+        PriceUnit nvarchar(20) NOT NULL,
+        Quantity decimal(12,3) NOT NULL,
+        Amount decimal(12,2) NOT NULL
+    );
+    INSERT @CheckoutPrices (CartItemId, CartItemServiceId, ProductTypeServiceId, ServiceNameSnapshot, UnitPrice, PriceUnit, Quantity, Amount)
+    SELECT selections.CartItemId, selections.CartItemServiceId, pts.id, s.name,
+           price.UnitPrice, pts.price_unit, quantity.Quantity,
+           ROUND(price.UnitPrice * quantity.Quantity, 2)
+    FROM @CartSelections selections
+    JOIN [catalog].store_offerings so WITH (UPDLOCK, HOLDLOCK)
+      ON so.id = selections.StoreOfferingId AND so.store_id = @StoreId
+    JOIN [catalog].product_type_services pts WITH (UPDLOCK, HOLDLOCK)
+      ON pts.id = so.product_type_service_id AND pts.product_type_id = selections.ProductTypeId
+    JOIN [catalog].services s WITH (UPDLOCK, HOLDLOCK) ON s.id = pts.service_id
+    JOIN [catalog].product_types pt WITH (UPDLOCK, HOLDLOCK) ON pt.id = selections.ProductTypeId
+    CROSS APPLY (SELECT COALESCE(so.price_override, pts.default_price) AS UnitPrice) price
+    CROSS APPLY (SELECT CONVERT(decimal(12,3), CASE pts.price_unit WHEN 'M2' THEN COALESCE(selections.CustomerMeasurement, 1) ELSE 1 END) AS Quantity) quantity
+    WHERE so.is_active = 1 AND so.delete_date IS NULL
+      AND pts.is_active = 1 AND pts.delete_date IS NULL
+      AND s.is_active = 1 AND s.delete_date IS NULL
+      AND pt.is_active = 1 AND pt.delete_date IS NULL;
+
+    IF (SELECT COUNT(*) FROM @CheckoutPrices) <> (SELECT COUNT(*) FROM @CartSelections)
+        THROW 51005, 'Cart contains an unavailable or mismatched service.', 1;
+
+    DECLARE @OrderId uniqueidentifier = NEWID();
+    DECLARE @Total decimal(12,2) = (SELECT COALESCE(SUM(Amount), 0) FROM @CheckoutPrices);
     INSERT [ordering].orders (id, source_cart_id, customer_id, store_id, pickup_window_start, pickup_window_end, estimated_total, currency, idempotency_key, version)
     VALUES (@OrderId, @CartId, @CustomerId, @StoreId, @PickupStart, @PickupEnd, @Total, 'TRY', @IdempotencyKey, 0);
 
@@ -82,15 +124,10 @@ BEGIN
     OUTPUT source.id, inserted.id INTO @ItemMap (CartItemId, OrderItemId);
 
     INSERT [ordering].order_item_services (id, order_item_id, product_type_service_id, service_name_snapshot, estimated_unit_price, price_unit_snapshot, estimated_quantity, estimated_price, status)
-    SELECT NEWID(), im.OrderItemId, pts.id, s.name, COALESCE(so.price_override, pts.default_price), pts.price_unit,
-           CASE pts.price_unit WHEN 'M2' THEN COALESCE(ci.customer_measurement, 1) ELSE 1 END,
-           ROUND(COALESCE(so.price_override, pts.default_price) * CASE pts.price_unit WHEN 'M2' THEN COALESCE(ci.customer_measurement, 1) ELSE 1 END, 2), 'REQUESTED'
+    SELECT NEWID(), im.OrderItemId, prices.ProductTypeServiceId, prices.ServiceNameSnapshot,
+           prices.UnitPrice, prices.PriceUnit, prices.Quantity, prices.Amount, 'REQUESTED'
     FROM @ItemMap im
-    JOIN [ordering].cart_items ci ON ci.id = im.CartItemId
-    JOIN [ordering].cart_item_services cis ON cis.cart_item_id = ci.id AND cis.delete_date IS NULL
-    JOIN [catalog].store_offerings so ON so.id = cis.store_offering_id
-    JOIN [catalog].product_type_services pts ON pts.id = so.product_type_service_id
-    JOIN [catalog].services s ON s.id = pts.service_id;
+    JOIN @CheckoutPrices prices ON prices.CartItemId = im.CartItemId;
 
     INSERT [ordering].order_item_photos (id, order_item_id, storage_key, photo_type)
     SELECT NEWID(), im.OrderItemId, cp.storage_key, cp.photo_type

@@ -4,7 +4,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
     DECLARE @OrderId uniqueidentifier;
-    SELECT @OrderId = q.order_id FROM [ordering].price_quotes q
+    SELECT @OrderId = q.order_id FROM [ordering].price_quotes q WITH (UPDLOCK, HOLDLOCK)
     JOIN [ordering].orders o ON o.id = q.order_id
     WHERE q.id = @QuoteId AND q.status = 'DRAFT' AND o.store_id = @StoreId AND o.status = 'AWAITING_STORE_APPROVAL';
     IF @OrderId IS NULL THROW 51053, 'Draft quote is unavailable for submission in this store.', 1;

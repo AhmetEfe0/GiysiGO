@@ -12,6 +12,7 @@ BEGIN
         THROW 51057, 'Quote has no active lines.', 1;
     UPDATE [ordering].price_quotes SET status = 'PUBLISHED', expires_at = DATEADD(day, 7, SYSUTCDATETIME()), update_date = SYSUTCDATETIME()
     WHERE id = @QuoteId AND status = 'PENDING_STORE_APPROVAL';
+    IF @@ROWCOUNT <> 1 THROW 51062, 'Quote status changed concurrently.', 1;
     UPDATE [ordering].orders SET status = 'AWAITING_CUSTOMER_APPROVAL', version = version + 1, update_date = SYSUTCDATETIME()
     WHERE id = @OrderId AND status = 'AWAITING_STORE_APPROVAL';
     IF @@ROWCOUNT <> 1 THROW 51058, 'Order status changed concurrently.', 1;

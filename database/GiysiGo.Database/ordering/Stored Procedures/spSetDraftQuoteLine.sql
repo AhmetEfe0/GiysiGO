@@ -8,7 +8,8 @@ BEGIN
         THROW 51050, 'Quote line values are invalid.', 1;
     DECLARE @OrderId uniqueidentifier, @ServiceName nvarchar(200), @ExpectedPriceUnit nvarchar(20), @VerifiedMeasurement decimal(12,3), @Amount decimal(12,2);
     SELECT @OrderId = q.order_id, @ServiceName = s.service_name_snapshot, @ExpectedPriceUnit = s.price_unit_snapshot, @VerifiedMeasurement = oi.verified_measurement
-    FROM [ordering].price_quotes q JOIN [ordering].orders o ON o.id = q.order_id
+    FROM [ordering].price_quotes q WITH (UPDLOCK, HOLDLOCK)
+    JOIN [ordering].orders o ON o.id = q.order_id
     JOIN [ordering].order_items oi ON oi.order_id = o.id
     JOIN [ordering].order_item_services s ON s.order_item_id = oi.id
     WHERE q.id = @QuoteId AND o.store_id = @StoreId AND q.status = 'DRAFT'

@@ -8,8 +8,13 @@ BEGIN
     SELECT @ExistingId = id FROM [ordering].payment_attempts WITH (UPDLOCK, HOLDLOCK) WHERE provider = @Provider AND idempotency_key = @IdempotencyKey;
     IF @ExistingId IS NOT NULL
     BEGIN
-        IF NOT EXISTS (SELECT 1 FROM [ordering].payment_attempts WHERE id = @ExistingId AND order_id = @OrderId AND price_quote_id = @QuoteId)
-            THROW 51039, 'Payment idempotency key was already used for another order or quote.', 1;
+        IF NOT EXISTS (
+            SELECT 1
+            FROM [ordering].payment_attempts pa
+            JOIN [ordering].orders o ON o.id = pa.order_id
+            WHERE pa.id = @ExistingId AND pa.order_id = @OrderId AND pa.price_quote_id = @QuoteId
+              AND o.customer_id = @CustomerId
+        ) THROW 51039, 'Payment attempt is unavailable to this customer or the key was used for another order or quote.', 1;
         SELECT @ExistingId AS Id;
         RETURN;
     END;
