@@ -1,11 +1,16 @@
-namespace GiysiGo.Modules.Catalog.Domain;
+using GiysiGo.BuildingBlocks.Domain;
 
-public sealed class ProductTypeService
+namespace GiysiGo.Modules.Catalog.Domain
 {
-    public Guid Id { get; init; }
-    public Guid ProductTypeId { get; init; }
-    public Guid ServiceId { get; init; }
-    public bool IsActive { get; init; } = true;
-    public DateTime CreateDate { get; init; }
-    public DateTime? DeleteDate { get; init; }
+    public class ProductTypeService : EntityBase<Guid>
+    {
+        public Guid ProductTypeId { get; set; }
+        public Guid ServiceId { get; set; }
+        public decimal DefaultPrice { get; set; }
+        public string Currency { get; set; } = "TRY";
+        public string PriceUnit { get; set; } = "PIECE";
+        public string SelectionKind { get; set; } = "BASE";
+        public bool IsDefaultSelected { get; set; }
+        public bool IsActive { get; set; } = true;
+    }
 }

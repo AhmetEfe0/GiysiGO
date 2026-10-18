@@ -28,5 +28,5 @@ public interface ICatalogRepository
     Task<StoreOffering?> GetStoreOfferingByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     // Ekleme Metotları (GUID Dönenler)
-    Task<Guid> AddCategoryAsync(string name, string? description, int displayOrder = 0, CancellationToken cancellationToken = default);
+Task<Guid> AddCategoryAsync(string code, string name, int sortOrder = 0, CancellationToken cancellationToken = default);
 }

@@ -86,25 +86,24 @@ public sealed class CatalogRepository : ICatalogRepository
 
     // Sayfalamalı Ürün Listesi
     public async Task<IReadOnlyList<ProductType>> GetProductTypesPagedAsync(Guid? categoryId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
-    {
-        await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
+        {
+            await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
 
-        var parameters = new DynamicParameters();
-        parameters.Add("@CategoryId", categoryId, DbType.Guid);
-        parameters.Add("@PageNumber", pageNumber, DbType.Int32);
-        parameters.Add("@PageSize", pageSize, DbType.Int32);
-        parameters.Add("@IncludeInactive", false, DbType.Boolean);
+            var parameters = new DynamicParameters();
+            parameters.Add("@category_id", categoryId, DbType.Guid);
+            parameters.Add("@include_inactive", false, DbType.Boolean);
+            parameters.Add("@page_number", pageNumber, DbType.Int32);
+            parameters.Add("@page_size", pageSize, DbType.Int32);
 
-        var command = new CommandDefinition(
-            commandText: "catalog.usp_GetProductTypesPaged",
-            parameters: parameters,
-            commandType: CommandType.StoredProcedure,
-            cancellationToken: cancellationToken);
+            var command = new CommandDefinition(
+                commandText: "catalog.usp_GetProductTypesPaged",
+                parameters: parameters,
+                commandType: CommandType.StoredProcedure,
+                cancellationToken: cancellationToken);
 
-        var result = await connection.QueryAsync<ProductType>(command);
-        return result.AsList();
-    }
-
+            var result = await connection.QueryAsync<ProductType>(command);
+            return result.AsList();
+        }
     // Hizmetler
     public async Task<IReadOnlyList<Service>> GetServicesAsync(bool includeInactive = false, CancellationToken cancellationToken = default)
     {
@@ -174,24 +173,23 @@ public sealed class CatalogRepository : ICatalogRepository
     }
 
     // Dükkan Teklifleri
-    public async Task<IReadOnlyList<StoreOffering>> GetStoreOfferingsAsync(Guid? storeId = null, Guid? productTypeServiceId = null, CancellationToken cancellationToken = default)
-    {
-        await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
+   public async Task<IReadOnlyList<StoreOffering>> GetStoreOfferingsAsync(Guid? storeId = null, Guid? productTypeServiceId = null, CancellationToken cancellationToken = default)
+        {
+            await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
 
-        var parameters = new DynamicParameters();
-        parameters.Add("@StoreId", storeId, DbType.Guid);
-        parameters.Add("@ProductTypeServiceId", productTypeServiceId, DbType.Guid);
-        parameters.Add("@IncludeInactive", false, DbType.Boolean);
+            var parameters = new DynamicParameters();
+            parameters.Add("@store_id", storeId, DbType.Guid);
+            parameters.Add("@include_inactive", false, DbType.Boolean);
 
-        var command = new CommandDefinition(
-            commandText: "catalog.usp_GetStoreOfferings",
-            parameters: parameters,
-            commandType: CommandType.StoredProcedure,
-            cancellationToken: cancellationToken);
+            var command = new CommandDefinition(
+                commandText: "catalog.usp_GetStoreOfferings",
+                parameters: parameters,
+                commandType: CommandType.StoredProcedure,
+                cancellationToken: cancellationToken);
 
-        var result = await connection.QueryAsync<StoreOffering>(command);
-        return result.AsList();
-    }
+            var result = await connection.QueryAsync<StoreOffering>(command);
+            return result.AsList();
+        }
 
     public async Task<StoreOffering?> GetStoreOfferingByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -210,21 +208,24 @@ public sealed class CatalogRepository : ICatalogRepository
     }
 
     // Ekleme Metotları (GUID Dönenler)
-    public async Task<Guid> AddCategoryAsync(string name, string? description, int displayOrder = 0, CancellationToken cancellationToken = default)
-    {
-        await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
+        public async Task<Guid> AddCategoryAsync(string code, string name, int sortOrder = 0, CancellationToken cancellationToken = default)
+        {
+            await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
 
-        var parameters = new DynamicParameters();
-        parameters.Add("@Name", name, DbType.String);
-        parameters.Add("@Description", description, DbType.String);
-        parameters.Add("@DisplayOrder", displayOrder, DbType.Int32);
+            var id = Guid.NewGuid();
+            var parameters = new DynamicParameters();
+            parameters.Add("@id", id, DbType.Guid);
+            parameters.Add("@code", code, DbType.String);
+            parameters.Add("@name", name, DbType.String);
+            parameters.Add("@sort_order", sortOrder, DbType.Int32);
+            parameters.Add("@is_active", true, DbType.Boolean);
 
-        var command = new CommandDefinition(
-            commandText: "catalog.usp_CreateCategory",
-            parameters: parameters,
-            commandType: CommandType.StoredProcedure,
-            cancellationToken: cancellationToken);
+            var command = new CommandDefinition(
+                commandText: "catalog.usp_InsertCategory",
+                parameters: parameters,
+                commandType: CommandType.StoredProcedure,
+                cancellationToken: cancellationToken);
 
-        return await connection.ExecuteScalarAsync<Guid>(command);
-    }
+            return await connection.ExecuteScalarAsync<Guid>(command);
+        }
 }

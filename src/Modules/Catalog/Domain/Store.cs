@@ -1,14 +1,15 @@
-namespace GiysiGo.Modules.Catalog.Domain;
+using GiysiGo.BuildingBlocks.Domain;
 
-public sealed class Store
+namespace GiysiGo.Modules.Catalog.Domain
 {
-    public Guid Id { get; init; }
-    public string Name { get; init; } = string.Empty;
-    public string Code { get; init; } = string.Empty;
-    public string? Address { get; init; }
-    public string? PhoneNumber { get; init; }
-    public bool IsActive { get; init; } = true;
-    public DateTime CreateDate { get; init; }
-    public DateTime? UpdateDate { get; init; }
-    public DateTime? DeleteDate { get; init; }
+    public class Store : EntityBase<Guid>
+    {
+        public Guid CorporateId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string AddressText { get; set; } = string.Empty;
+        public decimal Latitude { get; set; }
+        public decimal Longitude { get; set; }
+        public decimal ServiceRadiusKm { get; set; }
+        public bool IsActive { get; set; } = true;
+    }
 }

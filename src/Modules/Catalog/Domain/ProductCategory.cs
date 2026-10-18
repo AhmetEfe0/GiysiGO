@@ -1,13 +1,12 @@
-namespace GiysiGo.Modules.Catalog.Domain;
+using GiysiGo.BuildingBlocks.Domain;
 
-public sealed class ProductCategory
+namespace GiysiGo.Modules.Catalog.Domain
 {
-    public Guid Id { get; init; }
-    public string Code { get; init; } = string.Empty;
-    public string Name { get; init; } = string.Empty;
-    public int SortOrder { get; init; }
-    public bool IsActive { get; init; } = true;
-    public DateTime CreateDate { get; init; }
-    public DateTime? UpdateDate { get; init; }
-    public DateTime? DeleteDate { get; init; }
+    public class ProductCategory : EntityBase<Guid>
+    {
+        public string Code { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public int SortOrder { get; set; }
+        public bool IsActive { get; set; } = true;
+    }
 }
