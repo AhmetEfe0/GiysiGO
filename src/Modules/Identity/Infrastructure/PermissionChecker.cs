@@ -22,7 +22,7 @@ namespace GiysiGo.Modules.Identity.Infrastructure
             {
                 if (storeScopeReader is null)
                 {
-                    return false;
+                    throw new InvalidOperationException("IStoreScopeReader is required to evaluate store permissions.");
                 }
 
                 var store = await storeScopeReader.GetScopeAsync(storeId.Value, connection, transaction, cancellationToken);

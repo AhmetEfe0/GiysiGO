@@ -44,6 +44,8 @@ try {
     $instanceStarted = $true
     & $SqlPackagePath /Action:Publish "/SourceFile:$(Join-Path $repositoryRoot 'database/GiysiGo.Database/bin/Release/GiysiGo.Database.dacpac')" "/TargetConnectionString:$connectionString" /p:BlockOnPossibleDataLoss=true
     if ($LASTEXITCODE -ne 0) { throw 'Test database deployment failed.' }
+    & $sqlcmdTool -S $serverName -d $databaseName -E -b -i (Join-Path $repositoryRoot 'tests/Modules/Identity/Fixtures/PrepareSeedRedeploy.sql')
+    if ($LASTEXITCODE -ne 0) { throw 'Could not prepare Identity seed redeployment test.' }
     & $SqlPackagePath /Action:Publish "/SourceFile:$(Join-Path $repositoryRoot 'database/GiysiGo.Database/bin/Release/GiysiGo.Database.dacpac')" "/TargetConnectionString:$connectionString" /p:BlockOnPossibleDataLoss=true
     if ($LASTEXITCODE -ne 0) { throw 'Repeated deployment failed; Identity seed must be idempotent.' }
     $env:GIYSIGO_IDENTITY_TEST_CONNECTION = $connectionString

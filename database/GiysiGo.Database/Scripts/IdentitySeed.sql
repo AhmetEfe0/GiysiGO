@@ -11,10 +11,6 @@ INSERT @Roles (code, name, scope) VALUES
 IF EXISTS (SELECT 1 FROM @Roles desired JOIN [identity].roles actual ON actual.code = desired.code WHERE actual.scope <> desired.scope)
     THROW 51002, 'Seed role scope conflicts with an existing role.', 1;
 
-UPDATE actual SET name = desired.name, is_active = 1, delete_date = NULL, update_date = SYSUTCDATETIME()
-FROM [identity].roles actual JOIN @Roles desired ON desired.code = actual.code
-WHERE actual.name <> desired.name OR actual.is_active = 0 OR actual.delete_date IS NOT NULL;
-
 INSERT [identity].roles (id, code, name, scope)
 SELECT NEWID(), desired.code, desired.name, desired.scope FROM @Roles desired
 WHERE NOT EXISTS (SELECT 1 FROM [identity].roles actual WITH (UPDLOCK, HOLDLOCK) WHERE actual.code = desired.code);
@@ -30,10 +26,6 @@ INSERT @Permissions (code, description) VALUES
     ('quote.approve', 'Approve and publish a price quote'),
     ('order.process', 'Process paid order items'),
     ('order.fulfill', 'Prepare an order for delivery');
-
-UPDATE actual SET description = desired.description, is_active = 1, delete_date = NULL, update_date = SYSUTCDATETIME()
-FROM [identity].permissions actual JOIN @Permissions desired ON desired.code = actual.code
-WHERE actual.description <> desired.description OR actual.is_active = 0 OR actual.delete_date IS NOT NULL;
 
 INSERT [identity].permissions (id, code, description)
 SELECT NEWID(), desired.code, desired.description FROM @Permissions desired
@@ -60,5 +52,5 @@ JOIN [identity].roles role ON role.code = desired.role_code
 JOIN [identity].permissions permission ON permission.code = desired.permission_code
 WHERE NOT EXISTS (
     SELECT 1 FROM [identity].role_permissions existing WITH (UPDLOCK, HOLDLOCK)
-    WHERE existing.role_id = role.id AND existing.permission_id = permission.id AND existing.delete_date IS NULL
+    WHERE existing.role_id = role.id AND existing.permission_id = permission.id
 );

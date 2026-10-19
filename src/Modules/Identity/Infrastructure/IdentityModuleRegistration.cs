@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using GiysiGo.BuildingBlocks.Application.Contracts;
+using GiysiGo.Modules.Identity.Application.Interfaces.Authorization;
 using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
 using GiysiGo.Modules.Identity.Infrastructure.Repositories;
 
@@ -12,6 +13,7 @@ namespace GiysiGo.Modules.Identity.Infrastructure
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUser, CurrentUser>();
             services.AddScoped<IPermissionChecker, PermissionChecker>();
+            services.AddScoped<IStaffAssignmentAuthorizer, StaffAssignmentAuthorizer>();
             services.AddScoped<ICorporateRepository, CorporateRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IPermissionRepository, PermissionRepository>();
