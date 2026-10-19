@@ -5,13 +5,18 @@ using GiysiGo.Modules.Identity.Infrastructure;
 using GiysiGo.Modules.Catalog.Infrastructure;
 using GiysiGo.Modules.Ordering.Infrastructure;
 using GiysiGo.Modules.Operations.Infrastructure;
+using GiysiGo.API.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Policy;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(PermissionPolicies.AddPermissionPolicies);
+builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ProblemDetailsAuthorizationResultHandler>();
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 builder.Services.AddIdentityModule();

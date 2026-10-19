@@ -30,12 +30,20 @@ atamalar karar vermez. Bu denetim rol hiyerarşisini korur; #15'in grant/revoke
 komutları kullanıcı girdisini doğrudan erişim repository'sine geçirmemelidir.
 
 `ICurrentUser`, kimliği doğrulanmış isteğin `NameIdentifier` veya `sub`
-claim'inden Guid okur. JWT üretimi ve doğrulaması #13'ün işidir. 401/403 Problem
-Details ve personel atama komutları gerçek API akışlarıyla #13/#15 kapsamında
-tamamlanmalıdır; bu repository/checker tek başına
-bir HTTP güvenlik filtresi değildir.
+claim'inden Guid okur. JWT üretimi ve doğrulaması #13'ün işidir. API host,
+`PermissionCodes` değerlerini ASP.NET Core authorization policy olarak kaydeder.
+Korunan controller action'ı `[Authorize(Policy = PermissionCodes.StoreView)]` gibi
+uygun kodu belirtir; `corporateId` ve `storeId` route parametreleri varsa handler
+bunları `IPermissionChecker`'a geçirir. Yanlış/boş Guid kapsamı kabul edilmez.
+Anonim isteğe 401, doğrulanmış fakat izinsiz isteğe 403; her ikisine `code`,
+`traceId`, `instance` içeren Problem Details döner. Body veya kaynak ID'sinden
+çözülen kapsamlar komut/okuma servisinde ayrıca denetlenmelidir; yalnızca route
+politikası veya UI butonunu gizlemek yetki kanıtı değildir. Personel atama
+endpoint'leri #15'te bu temeli ve `IStaffAssignmentAuthorizer`'ı kullanır.
 
 Gerçek MSSQL testi için `./scripts/Test-IdentityData.ps1` DACPAC'i izole
 veritabanına iki kez yayınlar. Bu, seed tekrarını, izin eşleşmelerini ve kapsam
-okumalarını doğrular. Mevcut Linux CI bağlantı değişkeni yoksa DB testlerini
-skipped gösterir; gerçek DB CI entegrasyonu #19 kapsamındadır.
+okumalarını doğrular. API entegrasyon testi test authentication şeması ve
+permission fake'iyle HTTP 401/403/200 ve kapsam aktarımını doğrular. Mevcut
+Linux CI bağlantı değişkeni yoksa DB testlerini skipped gösterir; gerçek DB CI
+entegrasyonu #19 kapsamındadır.
