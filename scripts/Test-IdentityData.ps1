@@ -44,6 +44,8 @@ try {
     $instanceStarted = $true
     & $SqlPackagePath /Action:Publish "/SourceFile:$(Join-Path $repositoryRoot 'database/GiysiGo.Database/bin/Release/GiysiGo.Database.dacpac')" "/TargetConnectionString:$connectionString" /p:BlockOnPossibleDataLoss=true
     if ($LASTEXITCODE -ne 0) { throw 'Test database deployment failed.' }
+    & $SqlPackagePath /Action:Publish "/SourceFile:$(Join-Path $repositoryRoot 'database/GiysiGo.Database/bin/Release/GiysiGo.Database.dacpac')" "/TargetConnectionString:$connectionString" /p:BlockOnPossibleDataLoss=true
+    if ($LASTEXITCODE -ne 0) { throw 'Repeated deployment failed; Identity seed must be idempotent.' }
     $env:GIYSIGO_IDENTITY_TEST_CONNECTION = $connectionString
     & dotnet test (Join-Path $repositoryRoot 'tests/Modules/Identity/GiysiGo.Modules.Identity.Tests.csproj') --configuration Release --verbosity minimal
     if ($LASTEXITCODE -ne 0) { throw 'Identity data tests failed.' }
