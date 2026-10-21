@@ -6,14 +6,79 @@ using GiysiGo.Modules.Catalog.Infrastructure;
 using GiysiGo.Modules.Ordering.Infrastructure;
 using GiysiGo.Modules.Operations.Infrastructure;
 using GiysiGo.API.Authorization;
+using GiysiGo.API.Authentication;
+using GiysiGo.Modules.Identity.Application.Interfaces.Authentication;
+using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
-builder.Services.AddAuthentication();
+builder.Services.Configure<ApiBehaviorOptions>(options => options.InvalidModelStateResponseFactory = context =>
+{
+    var problem = new ValidationProblemDetails(context.ModelState)
+    {
+        Type = "https://httpstatuses.io/400",
+        Title = "Bad Request",
+        Status = StatusCodes.Status400BadRequest,
+        Detail = "Request validation failed.",
+        Instance = context.HttpContext.Request.Path
+    };
+    problem.Extensions["code"] = "validation_error";
+    problem.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
+    var response = new ObjectResult(problem) { StatusCode = StatusCodes.Status400BadRequest };
+    response.ContentTypes.Add("application/problem+json");
+    return response;
+});
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.MapInboundClaims = false;
+        var jwt = builder.Configuration.GetSection("Jwt");
+        var key = jwt["SigningKey"];
+        if (string.IsNullOrWhiteSpace(key) || Encoding.UTF8.GetByteCount(key) < 32)
+            throw new InvalidOperationException("Jwt:SigningKey must be at least 32 UTF-8 bytes.");
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwt["Issuer"],
+            ValidateAudience = true,
+            ValidAudience = jwt["Audience"],
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
+            NameClaimType = "sub"
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                if (!Guid.TryParse(context.Principal?.FindFirstValue("sub"), out var userId)
+                    || userId == Guid.Empty)
+                {
+                    context.Fail("Invalid user identifier.");
+                    return;
+                }
+                var transactions = context.HttpContext.RequestServices.GetRequiredService<ITransactionRunner>();
+                var users = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+                var active = await transactions.ExecuteAsync(async (connection, transaction, token) =>
+                {
+                    var user = await users.GetByIdAsync(userId, connection, transaction, token);
+                    return user is { IsActive: true, DeleteDate: null };
+                }, context.HttpContext.RequestAborted);
+                if (!active) context.Fail("User account is inactive.");
+            }
+        };
+    });
+builder.Services.AddSingleton<IAccessTokenIssuer, JwtAccessTokenIssuer>();
 builder.Services.AddAuthorization(PermissionPolicies.AddPermissionPolicies);
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ProblemDetailsAuthorizationResultHandler>();

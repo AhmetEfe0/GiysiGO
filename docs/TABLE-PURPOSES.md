@@ -7,7 +7,7 @@ atama için alan bulunması, o komutun MVP'de etkin olduğu anlamına gelmez. Ü
 inceleme reddinin telafi/iade kararı henüz açık iş kararıdır; müşteri teklifinin
 tam reddi ise tanımlanmış tam sipariş iade akışıdır.
 
-Bu rehber SQL projesindeki **39 mevcut tabloyu** açıklar: Identity 9, Catalog 6, Ordering 14, Operations 9, building_blocks 1. Amaç, bir geliştiricinin bir kaydın neden ayrı tabloda tutulduğunu, hangi işlemde oluşturulduğunu ve hangi işlemde okunduğunu SQL dosyalarını tek tek çözmeden anlayabilmesidir. Kesin sütun türleri, CHECK/UNIQUE/FK ve indeksler için kaynak dosyalar database/GiysiGo.Database altındadır. Bu belge tasarlanan akışı anlatır; modül iş akışlarının tamamının kodlandığı anlamına gelmez.
+Bu rehber SQL projesindeki **40 mevcut tabloyu** açıklar: Identity 10, Catalog 6, Ordering 14, Operations 9, building_blocks 1. Amaç, bir geliştiricinin bir kaydın neden ayrı tabloda tutulduğunu, hangi işlemde oluşturulduğunu ve hangi işlemde okunduğunu SQL dosyalarını tek tek çözmeden anlayabilmesidir. Kesin sütun türleri, CHECK/UNIQUE/FK ve indeksler için kaynak dosyalar database/GiysiGo.Database altındadır. Bu belge tasarlanan akışı anlatır; modül iş akışlarının tamamının kodlandığı anlamına gelmez.
 
 Bütün tablolarda GUID id ile create_date, update_date ve delete_date bulunur. Zaman alanları uygulamada UTC kabul edilir. delete_date genel yumuşak silme altyapısıdır; sipariş, ödeme, teklif ve geçmiş kayıtları normal kullanıcı CRUD'u ile silinmemelidir. is_active veya status ayrı bir kavramdır: kayıt veritabanında dururken hizmete/işleme açık olup olmadığını belirtir. FK'ler referans bütünlüğünü sağlar; adres sahipliği, dükkân kapsamı, toplam tutar ve izin verilen durum geçişleri ayrıca uygulama transaction'ında doğrulanır.
 
@@ -15,7 +15,7 @@ Bütün tablolarda GUID id ile create_date, update_date ve delete_date bulunur. 
 
 | Aşama | Yazılan veya değişen kayıtlar | Başlıca okumalar |
 | --- | --- | --- |
-| Kayıt/giriş ve personel yetkisi | identity.users, roles, permissions, role_permissions, user_roles, corporate_memberships, store_assignments | Kullanıcı, aktif rol, permission ve corporate/store kapsamı |
+| Kayıt/giriş ve personel yetkisi | identity.users, auth_sessions, roles, permissions, role_permissions, user_roles, corporate_memberships, store_assignments | Kullanıcı, aktif oturum, rol, permission ve corporate/store kapsamı |
 | Adres seçimi ve dükkân keşfi | identity.customer_addresses; dükkân yöneticisi catalog.stores ve store_offerings yönetir | Adres koordinatı, dükkân yarıçapı, ürün-hizmet uygunluğu ve fiyat |
 | Sepet düzenleme | ordering.carts, cart_items, cart_item_services, cart_item_photos | Aktif store_offerings ve product_type_services |
 | Sipariş verme | ordering.orders, order_address_snapshots, order_items, order_item_services, order_item_photos, order_status_history, building_blocks.outbox_messages | Sepet, adres sahipliği, dükkân/hizmet/fiyat; outbox'tan OrderPlaced |
@@ -80,6 +80,12 @@ Bütün tablolarda GUID id ile create_date, update_date ve delete_date bulunur. 
 **Neden var?** Müşterinin düzenlenebilir adres defteridir. user_id sahipliği; label, address_text, latitude/longitude ve contact_name/contact_phone alım/teslim bilgilerini tutar. Aynı müşteri birden fazla adres saklayabilir.
 
 **Ne zaman yazılır/okunur?** Müşteri adres ekler, günceller veya pasifleştirir. Dükkân keşfi mesafeyi, sepet seçili address_id'yi, checkout ise sahiplik ve hizmet yarıçapını buradan kontrol eder. Checkout anında veri order_address_snapshots'a kopyalanır; müşteri bu adresi sonradan değiştirince mevcut sipariş değişmez.
+
+### 9a. identity.auth_sessions
+
+**Neden var?** Refresh token'ın düz metnini değil SHA-256 hash'ini, ait olduğu kullanıcıyı, son kullanım tarihini ve iptal/yenileme bilgisini saklar. Her yenileme yeni bir satırdır; eski satırdaki `replaced_by_id` zinciri denetim için korunur. `token_hash` benzersizdir; erişim JWT'si burada saklanmaz.
+
+**Ne zaman yazılır/okunur?** Başarılı giriş yeni oturum açar. Refresh işlemi eski token hash'ini kilitli transaction içinde kontrol edip aynı işlemde eski satırı iptal eder ve yeni satırı ekler. Aynı refresh token tekrar kullanıldığında yeni oturum oluşmaz. Çıkış ilgili refresh oturumunu iptal eder. Kullanıcı pasif/silinmişse yenileme reddedilir; `delete_date` genel arşiv alanıdır, güvenlik için `revoked_at_utc` ve `expires_at_utc` esas alınır.
 
 ## Catalog: platform sözlüğü, dükkân ve tarife
 

@@ -24,7 +24,7 @@ namespace GiysiGo.Contracts.Tests
                     Assert.Contains(operation.GetProperty("x-owner-module").GetString(), new[] { "Identity", "Catalog", "Ordering", "Operations" });
                     if (operation.TryGetProperty("security", out var security) && security.GetArrayLength() == 0)
                     {
-                        Assert.Equal("/auth/login", path.Name);
+                        Assert.Contains(path.Name, new[] { "/auth/register", "/auth/login", "/auth/refresh", "/auth/logout" });
                     }
 
                     foreach (Match parameter in Regex.Matches(path.Name, @"\{([^}]+)\}"))

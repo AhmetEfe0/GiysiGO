@@ -7,6 +7,9 @@ namespace GiysiGo.Modules.Identity.Infrastructure.Repositories
 {
     public sealed class IdentityAccessRepository : IdentityCommandRepositoryBase, IIdentityAccessRepository
     {
+        public async Task GrantCustomerRoleAsync(Guid userId, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default)
+            => await connection.ExecuteAsync(Procedure("[identity].[spGrantCustomerRole]", new { UserId = userId }, connection, transaction, cancellationToken));
+
         public Task<Guid> GrantRolePermissionAsync(Guid roleId, Guid permissionId, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default)
             => connection.QuerySingleAsync<Guid>(Procedure("[identity].[spGrantRolePermission]", new { RoleId = roleId, PermissionId = permissionId }, connection, transaction, cancellationToken));
 
