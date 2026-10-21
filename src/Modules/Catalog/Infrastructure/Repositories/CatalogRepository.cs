@@ -179,6 +179,7 @@ public sealed class CatalogRepository : ICatalogRepository
 
             var parameters = new DynamicParameters();
             parameters.Add("@store_id", storeId, DbType.Guid);
+            parameters.Add("@product_type_service_id", productTypeServiceId, DbType.Guid);
             parameters.Add("@include_inactive", false, DbType.Boolean);
 
             var command = new CommandDefinition(
@@ -207,6 +208,67 @@ public sealed class CatalogRepository : ICatalogRepository
         return await connection.QuerySingleOrDefaultAsync<StoreOffering>(command);
     }
 
+    // Ürün tipi-hizmet ilişkileri
+    public async Task<IReadOnlyList<ProductTypeService>> GetProductTypeServicesAsync(Guid? productTypeId = null, Guid? serviceId = null, bool includeInactive = false, CancellationToken cancellationToken = default)
+    {
+        await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
+        var parameters = new DynamicParameters();
+        parameters.Add("@ProductTypeId", productTypeId, DbType.Guid);
+        parameters.Add("@ServiceId", serviceId, DbType.Guid);
+        parameters.Add("@IncludeInactive", includeInactive, DbType.Boolean);
+        var command = new CommandDefinition("catalog.usp_GetProductTypeServices", parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken);
+        return (await connection.QueryAsync<ProductTypeService>(command)).AsList();
+    }
+
+    public async Task<ProductTypeService?> GetProductTypeServiceByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
+        var command = new CommandDefinition("catalog.usp_GetProductTypeServiceById", new { Id = id }, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken);
+        return await connection.QuerySingleOrDefaultAsync<ProductTypeService>(command);
+    }
+
+    public async Task<Guid> AddProductTypeServiceAsync(ProductTypeService entity, CancellationToken cancellationToken = default)
+    {
+        await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
+        var command = new CommandDefinition("catalog.usp_InsertProductTypeService", new
+        {
+            Id = entity.Id == Guid.Empty ? (Guid?)null : entity.Id,
+            entity.ProductTypeId,
+            entity.ServiceId,
+            entity.DefaultPrice,
+            entity.Currency,
+            entity.PriceUnit,
+            entity.SelectionKind,
+            entity.IsDefaultSelected,
+            entity.IsActive
+        }, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken);
+        return await connection.QuerySingleAsync<Guid>(command);
+    }
+
+    public async Task UpdateProductTypeServiceAsync(ProductTypeService entity, CancellationToken cancellationToken = default)
+    {
+        await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
+        var command = new CommandDefinition("catalog.usp_UpdateProductTypeService", new
+        {
+            entity.Id,
+            entity.ProductTypeId,
+            entity.ServiceId,
+            entity.DefaultPrice,
+            entity.Currency,
+            entity.PriceUnit,
+            entity.SelectionKind,
+            entity.IsDefaultSelected,
+            entity.IsActive
+        }, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken);
+        await connection.ExecuteAsync(command);
+    }
+
+    public async Task DeleteProductTypeServiceAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
+        var command = new CommandDefinition("catalog.usp_DeleteProductTypeService", new { Id = id }, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken);
+        await connection.ExecuteAsync(command);
+    }
     // Ekleme Metotları (GUID Dönenler)
         public async Task<Guid> AddCategoryAsync(string code, string name, int sortOrder = 0, CancellationToken cancellationToken = default)
         {

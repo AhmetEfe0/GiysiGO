@@ -26,6 +26,12 @@ public interface ICatalogRepository
     // Dükkan Teklifleri
     Task<IReadOnlyList<StoreOffering>> GetStoreOfferingsAsync(Guid? storeId = null, Guid? productTypeServiceId = null, CancellationToken cancellationToken = default);
     Task<StoreOffering?> GetStoreOfferingByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    // Ürün tipi-hizmet ilişkileri
+    Task<IReadOnlyList<ProductTypeService>> GetProductTypeServicesAsync(Guid? productTypeId = null, Guid? serviceId = null, bool includeInactive = false, CancellationToken cancellationToken = default);
+    Task<ProductTypeService?> GetProductTypeServiceByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Guid> AddProductTypeServiceAsync(ProductTypeService entity, CancellationToken cancellationToken = default);
+    Task UpdateProductTypeServiceAsync(ProductTypeService entity, CancellationToken cancellationToken = default);
+    Task DeleteProductTypeServiceAsync(Guid id, CancellationToken cancellationToken = default);
 
     // Ekleme Metotları (GUID Dönenler)
 Task<Guid> AddCategoryAsync(string code, string name, int sortOrder = 0, CancellationToken cancellationToken = default);
