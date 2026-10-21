@@ -65,7 +65,10 @@ namespace GiysiGo.API.IntegrationTests
             using var protectedResponse = await client.GetAsync("/test/authentication");
             Assert.Equal(HttpStatusCode.OK, protectedResponse.StatusCode);
             using (var protectedResult = JsonDocument.Parse(await protectedResponse.Content.ReadAsStringAsync()))
+            {
                 Assert.Equal(userId, protectedResult.RootElement.GetProperty("userId").GetGuid());
+                Assert.Equal(userId, protectedResult.RootElement.GetProperty("currentUserId").GetGuid());
+            }
 
             using var refreshResponse = await client.PostAsJsonAsync("/auth/refresh", new { refreshToken = login.RefreshToken });
             Assert.Equal(HttpStatusCode.OK, refreshResponse.StatusCode);
