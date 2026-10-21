@@ -32,4 +32,9 @@ For 4-person collaboration, use per-module feature branches:
 - `feature/ordering`
 - `feature/operations`
 
+Shared contract work uses a separate branch, such as `feature/shared-contracts`.
+Public interfaces, API ownership and transaction rules are defined in
+`docs/MODULE-CONTRACTS.md`; lifecycle and event rules are in
+`docs/WORKFLOW-CONTRACTS.md`.
+
 See `docs/BRANCHING.md` for team workflow rules.

@@ -2,23 +2,30 @@
 
 ## Main durum özeti
 
-17 Ekim 2026 tarihinde `5fe320e` main commit'i üzerinden doğrulandı:
+21 Ekim 2026 tarihinde `f60442e` main commit'i üzerinden doğrulandı:
 
 - API host, ortak taban sınıflar, dört modülün proje bağlantıları ve DI girişleri var.
-- MSSQL projesinde 39 tablo ve outbox için dört stored procedure var.
-- Public contract arayüzleri ve sekiz integration event tipi var; iş akışı
-  implementasyonları ve event handler'ları henüz yok.
-- Modüllerin iş modelleri/repository'leri, JWT/refresh, gerçek permission kontrolü
-  ve müşteri/dükkân uygulamaları bu referans commit'te uygulanmış değil.
-- Mevcut testler API health ve modül referans sınırlarını doğruluyor. CI ayrıca
-  DACPAC derliyor; bu kontroller gerçek iş akışı/DB entegrasyon testi yerine geçmez.
-- Açık PR #41–#44 bu durum özetine tamamlanmış iş olarak dahil edilmedi.
+- MSSQL projesinde 39 tablo, outbox prosedürleri ve Ordering iş akışı prosedürleri var.
+- #5 ortak modül/iş akışı sözleşmeleri ve on bir integration event tipi var.
+- #8 Ordering modelleri, Dapper repository'leri, sepet/checkout/teklif/ödeme servisleri
+  ve SQL regresyon testleri main'e birleştirildi. SQL testleri ayrılmış SQL Server
+  veritabanı sağlandığında çalışır; bağlantı yoksa atlanır.
+- Identity JWT/refresh, gerçek permission uygulaması, Catalog ve Operations iş
+  akışları ile müşteri/dükkân uygulamaları bu referans commit'te tamamlanmış değil.
+- CI API/modül testlerini ve DACPAC derlemesini kontrol eder; tüm uçtan uca iş
+  akışlarının tamamlandığı anlamına gelmez.
 - Bilinen şema işi: courier_profiles.user_id üzerindeki nullable UNIQUE,
   birden fazla NULL mock kurye kaydını engelliyor. Filtreli benzersiz indeks
   düzeltmesi ve mock seed #12 kapsamındadır; çoklu mock kurye henüz hazır değildir.
 
-Bu tarihli özet özellikler main'e birleştikçe ilgili PR'da güncellenmelidir.
+Bu tarihli özet, sonraki PR'lar main'e birleştikçe güncellenmelidir.
 Belge amaçları ve güncelleme kuralı [dokümantasyon rehberindedir](README.md).
+
+Public sözleşmelerin sahipliği, null/hata/aktiflik ve transaction kuralları
+[MODULE-CONTRACTS.md](MODULE-CONTRACTS.md), aktör ve durum geçişleri
+[WORKFLOW-CONTRACTS.md](WORKFLOW-CONTRACTS.md) içinde tanımlıdır. HTTP örnekleri
+[OpenAPI sözleşmesindedir](openapi/mvp-contracts.json). Bunlar #5 tasarım temelidir;
+her modül gerçek implementasyonunu kendi issue'sunda teslim eder.
 
 ## Modül sahipliği
 
@@ -39,7 +46,7 @@ Repository kullanan entity'lerin beş temel stored procedure sözleşmesi ve iş
 - `ICustomerAddressReader`: Identity sağlar. Müşterinin kendine ait adresini döndürür. Catalog keşif ve Ordering checkout sırasında çağırır.
 - `IStoreCatalogReader`: Catalog sağlar. Aktif ürün-hizmet teklifini, dükkân konumunu ve koordinata göre hizmet alanını doğrular. Ordering checkout sırasında tekrar çağırır; dönen birim fiyat sipariş satırına kopyalanır.
 - `IOrderPickupReader`: Ordering sağlar. Operations, `OrderPlacedEvent` geldiğinde alım görevinin adresini, iletişim bilgisini, ürün kapasitesini ve zaman penceresini okur; varış noktası için Catalog'un dükkân konumunu kullanır.
-- Sekiz olay Ordering ve Operations IntegrationEvents projelerinde tanımlıdır. Olayları başka modülün entity'si yerine kullanın. `EventId` tekrar işleme anahtarıdır. `EventType` sürümlü ve sabittir; yayınlandıktan sonra isim/payload değişikliği yeni sürüm gerektirir.
+- On bir olay Ordering ve Operations IntegrationEvents projelerinde tanımlıdır. Eski sekiz olaya kurye atama, taşıma başlangıcı ve ayrı iade tamamlanması eklenmiştir. Olayları başka modülün entity'si yerine kullanın. `EventId` tekrar işleme anahtarıdır. `EventType` sürümlü ve sabittir; yayınlandıktan sonra isim/payload değişikliği yeni sürüm gerektirir.
 - `ITransactionRunner` tek SQL bağlantısı ve transaction açar. Çok tablolı iş akışında Dapper komutlarına verilen connection ve transaction aynı olmalıdır. `IOutboxWriter` iş verisiyle **aynı transaction** içinde olay satırını ekler. `RepositoryBase` metotları kendi bağlantısını açtığından bu akışlarda kullanılmaz.
 
 `IOutboxDispatcher.DispatchNextAsync` bir bekleyen olayı kilitler, kayıtlı `IOutboxEventHandler` uygulamalarını çalıştırır ve aynı transaction içinde işlendi olarak işaretler. Handler'lar modül sahiplerince yazılıp DI'ya eklenecek; ardından dağıtıcı bir zamanlayıcı/hosted service ile çağrılacak. Henüz otomatik arka plan çalıştırması yoktur. DB değişiklikleri aynı transaction içinde atomiktir. Harici ödeme gibi transaction dışı etkiler kendi idempotency anahtarını (`EventId`) kullanmalıdır.
@@ -47,6 +54,7 @@ Repository kullanan entity'lerin beş temel stored procedure sözleşmesi ve iş
 ## Başlangıç ve doğrulama
 
 ```powershell
+dotnet test tests/Contracts/GiysiGo.Contracts.Tests.csproj --configuration Release
 dotnet test tests/API/GiysiGo.API.IntegrationTests/GiysiGo.API.IntegrationTests.csproj --configuration Release
 dotnet test tests/Modules/Identity/GiysiGo.Modules.Identity.Tests.csproj --configuration Release
 dotnet test tests/Modules/Catalog/GiysiGo.Modules.Catalog.Tests.csproj --configuration Release
