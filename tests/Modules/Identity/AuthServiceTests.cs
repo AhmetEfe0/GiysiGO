@@ -34,7 +34,7 @@ namespace GiysiGo.Modules.Identity.Tests
 
             var rotations = await Task.WhenAll(auth.RefreshAsync(login.RefreshToken),
                 auth.RefreshAsync(login.RefreshToken));
-            var rotated = Assert.Single(rotations.Where(result => result is not null));
+            var rotated = Assert.Single(rotations, result => result is not null);
             Assert.NotNull(rotated);
             Assert.NotEqual(login.RefreshToken, rotated.RefreshToken);
             Assert.Null(await auth.RefreshAsync(login.RefreshToken));

@@ -1,15 +1,14 @@
-using GiysiGo.BuildingBlocks.Application.Contracts;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using GiysiGo.API.Controllers;
 
 namespace GiysiGo.API.IntegrationTests
 {
     [ApiController]
     [Route("test/authentication")]
-    public sealed class TestAuthenticationController(ICurrentUser currentUser) : ControllerBase
+    public sealed class TestAuthenticationController : AuthenticatedApiControllerBase
     {
         [HttpGet]
-        [Authorize]
-        public IActionResult Get() => Ok(new { UserId = currentUser.UserId });
+        public IActionResult Get() => TryGetUserId(out var userId)
+            ? Ok(new { UserId = userId }) : Unauthorized();
     }
 }

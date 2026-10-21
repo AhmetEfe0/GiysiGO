@@ -19,7 +19,20 @@ namespace GiysiGo.API.Controllers.Identity
             }
             catch (ArgumentException exception)
             {
-                return Failure(400, "validation_error", exception.Message);
+                var field = exception.ParamName is "email" or "password" ? exception.ParamName : string.Empty;
+                var problem = new ValidationProblemDetails(new Dictionary<string, string[]> { [field] = [exception.Message] })
+                {
+                    Type = "https://httpstatuses.io/400",
+                    Title = "Bad Request",
+                    Status = StatusCodes.Status400BadRequest,
+                    Detail = "Request validation failed.",
+                    Instance = HttpContext.Request.Path
+                };
+                problem.Extensions["code"] = "validation_error";
+                problem.Extensions["traceId"] = HttpContext.TraceIdentifier;
+                var response = new ObjectResult(problem) { StatusCode = StatusCodes.Status400BadRequest };
+                response.ContentTypes.Add("application/problem+json");
+                return response;
             }
             catch (SqlException exception) when (exception.Number is 2601 or 2627)
             {

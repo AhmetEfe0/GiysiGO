@@ -74,7 +74,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     var user = await users.GetByIdAsync(userId, connection, transaction, token);
                     return user is { IsActive: true, DeleteDate: null };
                 }, context.HttpContext.RequestAborted);
-                if (!active) context.Fail("User account is inactive.");
+                if (!active)
+                {
+                    context.Fail("User account is inactive.");
+                    return;
+                }
+                if (context.Principal?.Identity is not ClaimsIdentity identity)
+                {
+                    context.Fail("Invalid identity.");
+                    return;
+                }
+                var nameIdentifier = identity.FindFirst(ClaimTypes.NameIdentifier);
+                if (nameIdentifier is not null && nameIdentifier.Value != userId.ToString())
+                {
+                    context.Fail("Conflicting user identifier.");
+                    return;
+                }
+                if (nameIdentifier is null)
+                    identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
             }
         };
     });

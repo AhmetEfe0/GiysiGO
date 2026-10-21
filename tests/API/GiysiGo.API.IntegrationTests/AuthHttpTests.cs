@@ -46,6 +46,8 @@ namespace GiysiGo.API.IntegrationTests
             Assert.Equal(HttpStatusCode.BadRequest, invalidRegister.StatusCode);
             var invalidProblem = await invalidRegister.Content.ReadFromJsonAsync<ProblemDetails>();
             Assert.Equal("validation_error", invalidProblem?.Extensions["code"]?.ToString());
+            var validationErrors = Assert.IsType<JsonElement>(invalidProblem?.Extensions["errors"]);
+            Assert.True(validationErrors.TryGetProperty("password", out _));
             using var register = await client.PostAsJsonAsync("/auth/register", new { email, password = "a-very-long-password" });
             Assert.Equal(HttpStatusCode.Created, register.StatusCode);
             using var registration = JsonDocument.Parse(await register.Content.ReadAsStringAsync());
@@ -62,6 +64,8 @@ namespace GiysiGo.API.IntegrationTests
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login.AccessToken);
             using var protectedResponse = await client.GetAsync("/test/authentication");
             Assert.Equal(HttpStatusCode.OK, protectedResponse.StatusCode);
+            using (var protectedResult = JsonDocument.Parse(await protectedResponse.Content.ReadAsStringAsync()))
+                Assert.Equal(userId, protectedResult.RootElement.GetProperty("userId").GetGuid());
 
             using var refreshResponse = await client.PostAsJsonAsync("/auth/refresh", new { refreshToken = login.RefreshToken });
             Assert.Equal(HttpStatusCode.OK, refreshResponse.StatusCode);
