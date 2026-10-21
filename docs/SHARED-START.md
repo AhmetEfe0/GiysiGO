@@ -1,10 +1,33 @@
 # Dört modül için ortak başlangıç
 
+## Main durum özeti
+
+21 Ekim 2026 tarihinde `f60442e` main commit'i üzerinden doğrulandı:
+
+- API host, ortak taban sınıflar, dört modülün proje bağlantıları ve DI girişleri var.
+- MSSQL projesinde 39 tablo, outbox prosedürleri ve Ordering iş akışı prosedürleri var.
+- #5 ortak modül/iş akışı sözleşmeleri ve on bir integration event tipi var.
+- #8 Ordering modelleri, Dapper repository'leri, sepet/checkout/teklif/ödeme servisleri
+  ve SQL regresyon testleri main'e birleştirildi. SQL testleri ayrılmış SQL Server
+  veritabanı sağlandığında çalışır; bağlantı yoksa atlanır.
+- Identity JWT/refresh, gerçek permission uygulaması, Catalog ve Operations iş
+  akışları ile müşteri/dükkân uygulamaları bu referans commit'te tamamlanmış değil.
+- CI API/modül testlerini ve DACPAC derlemesini kontrol eder; tüm uçtan uca iş
+  akışlarının tamamlandığı anlamına gelmez.
+- Bilinen şema işi: courier_profiles.user_id üzerindeki nullable UNIQUE,
+  birden fazla NULL mock kurye kaydını engelliyor. Filtreli benzersiz indeks
+  düzeltmesi ve mock seed #12 kapsamındadır; çoklu mock kurye henüz hazır değildir.
+
+Bu tarihli özet, sonraki PR'lar main'e birleştikçe güncellenmelidir.
+Belge amaçları ve güncelleme kuralı [dokümantasyon rehberindedir](README.md).
+
 Public sözleşmelerin sahipliği, null/hata/aktiflik ve transaction kuralları
 [MODULE-CONTRACTS.md](MODULE-CONTRACTS.md), aktör ve durum geçişleri
 [WORKFLOW-CONTRACTS.md](WORKFLOW-CONTRACTS.md) içinde tanımlıdır. HTTP örnekleri
 [OpenAPI sözleşmesindedir](openapi/mvp-contracts.json). Bunlar #5 tasarım temelidir;
 her modül gerçek implementasyonunu kendi issue'sunda teslim eder.
+
+## Modül sahipliği
 
 | Modül | Sahip | C# alanı | SQL alanı | Test projesi |
 | --- | --- | --- | --- | --- |

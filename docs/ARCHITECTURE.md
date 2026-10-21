@@ -6,12 +6,16 @@ GiysiGO is intentionally implemented as a **Modular Monolith**:
 - **Single deployable application host** (`src/API/GiysiGo.API`)
 - **Multiple business modules** with explicit boundaries
 
+The agreed backend stack is ASP.NET Core / .NET 10, MSSQL and Dapper. Database objects live in the SSDT SQL project; repositories call stored procedures. Planned clients are Flutter for customers and React + TypeScript for stores.
+
+These are module responsibilities, not a completion checklist. See [the documentation guide](README.md) and [shared implementation status](SHARED-START.md).
+
 ## Modules and responsibilities
 
 - **Identity**: users, roles, authentication, addresses
 - **Catalog**: garment types, services, pricing, active/passive visibility
 - **Ordering**: cart, checkout, order and order items
-- **Operations**: QR/media/status workflow after ordering
+- **Operations**: item inspection, service execution, delivery tasks and assignment using mock couriers in the MVP
 
 ## Boundary rules
 
