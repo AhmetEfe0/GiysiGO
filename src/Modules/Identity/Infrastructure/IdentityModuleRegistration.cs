@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using GiysiGo.BuildingBlocks.Application.Contracts;
 using GiysiGo.Modules.Identity.Application.Interfaces.Authorization;
+using GiysiGo.Modules.Identity.Application.Interfaces;
 using GiysiGo.Modules.Identity.Application.Interfaces.Authentication;
 using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
 using GiysiGo.Modules.Identity.Domain.Entities;
@@ -26,6 +27,10 @@ namespace GiysiGo.Modules.Identity.Infrastructure
             services.AddScoped<IPermissionRepository, PermissionRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
+            services.AddScoped<ICustomerSelfService, CustomerSelfService>();
+            services.AddScoped<CustomerAddressReader>();
+            services.AddScoped<ICustomerAddressReader>(provider => provider.GetRequiredService<CustomerAddressReader>());
+            services.AddScoped<ITransactionalCustomerAddressReader>(provider => provider.GetRequiredService<CustomerAddressReader>());
             services.AddScoped<IIdentityAccessRepository, IdentityAccessRepository>();
             return services;
         }

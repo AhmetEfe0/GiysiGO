@@ -1,6 +1,7 @@
 using System.Data.Common;
 using Dapper;
 using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
+using GiysiGo.Modules.Identity.Application.Models;
 using GiysiGo.Modules.Identity.Domain.Entities;
 
 namespace GiysiGo.Modules.Identity.Infrastructure.Repositories
@@ -17,6 +18,15 @@ namespace GiysiGo.Modules.Identity.Infrastructure.Repositories
         {
             var rows = await connection.QueryAsync<CustomerAddress>(Procedure("[identity].[spGetCustomerAddressesByUser]", new { UserId = userId }, connection, transaction, cancellationToken));
             return rows.AsList();
+        }
+
+        public async Task<CustomerAddressPage> GetOwnedPageAsync(Guid userId, int page, int pageSize, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default)
+        {
+            using var results = await connection.QueryMultipleAsync(Procedure("[identity].[spGetCustomerAddressPage]",
+                new { UserId = userId, Page = page, PageSize = pageSize }, connection, transaction, cancellationToken));
+            var totalCount = await results.ReadSingleAsync<int>();
+            var items = (await results.ReadAsync<CustomerAddress>()).AsList();
+            return new CustomerAddressPage(items, totalCount);
         }
 
         public Task UpdateOwnedAsync(Guid userId, CustomerAddress address, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default)

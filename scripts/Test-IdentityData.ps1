@@ -1,7 +1,9 @@
 param(
     [string]$SqlPackagePath,
     [string]$MSBuildPath,
-    [string]$VisualStudioVersion
+    [string]$VisualStudioVersion,
+    [ValidateSet('Debug', 'Release')]
+    [string]$ApiConfiguration = 'Release'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -51,7 +53,7 @@ try {
     $env:GIYSIGO_IDENTITY_TEST_CONNECTION = $connectionString
     & dotnet test (Join-Path $repositoryRoot 'tests/Modules/Identity/GiysiGo.Modules.Identity.Tests.csproj') --configuration Release --verbosity minimal
     if ($LASTEXITCODE -ne 0) { throw 'Identity data tests failed.' }
-    & dotnet test (Join-Path $repositoryRoot 'tests/API/GiysiGo.API.IntegrationTests/GiysiGo.API.IntegrationTests.csproj') --configuration Release --verbosity minimal
+    & dotnet test (Join-Path $repositoryRoot 'tests/API/GiysiGo.API.IntegrationTests/GiysiGo.API.IntegrationTests.csproj') --configuration $ApiConfiguration --verbosity minimal
     if ($LASTEXITCODE -ne 0) { throw 'Identity API integration tests failed.' }
 }
 finally {

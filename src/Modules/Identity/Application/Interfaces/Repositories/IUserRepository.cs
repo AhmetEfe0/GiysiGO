@@ -9,6 +9,7 @@ namespace GiysiGo.Modules.Identity.Application.Interfaces.Repositories
         Task<User?> GetByIdAsync(Guid id, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
         Task<User?> GetByEmailAsync(string email, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
         Task SetPasswordHashAsync(Guid userId, string passwordHash, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
+        Task SetOwnEmailAsync(Guid userId, string email, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
         Task SetActiveAsync(Guid userId, bool isActive, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
         Task DeleteAsync(Guid userId, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
     }

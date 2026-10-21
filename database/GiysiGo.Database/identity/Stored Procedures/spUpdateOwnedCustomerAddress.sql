@@ -22,7 +22,7 @@ BEGIN
     IF NULLIF(LTRIM(RTRIM(@ContactName)), '') IS NULL THROW 51000, 'ContactName is required.', 1;
     IF NULLIF(LTRIM(RTRIM(@ContactPhone)), '') IS NULL THROW 51000, 'ContactPhone is required.', 1;
     UPDATE [identity].customer_addresses SET label = @Label, address_text = @AddressText, latitude = @Latitude, longitude = @Longitude, contact_name = @ContactName, contact_phone = @ContactPhone, is_active = @IsActive, update_date = SYSUTCDATETIME()
-    WHERE id = @AddressId AND user_id = @UserId AND delete_date IS NULL;
+    WHERE id = @AddressId AND user_id = @UserId AND delete_date IS NULL AND is_active = 1;
     IF @@ROWCOUNT = 0 THROW 51001, 'Address was not found for the user.', 1;
 END;
 GO
