@@ -1,20 +1,17 @@
-using System.Security.Claims;
 using GiysiGo.BuildingBlocks.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GiysiGo.API.Authorization
 {
-    public sealed class PermissionAuthorizationHandler(IPermissionChecker permissionChecker)
+    public sealed class PermissionAuthorizationHandler(ICurrentUser currentUser,
+        IPermissionChecker permissionChecker)
         : AuthorizationHandler<PermissionRequirement>
     {
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
             PermissionRequirement requirement)
         {
-            if (context.User.Identity?.IsAuthenticated != true
-                || !Guid.TryParse(context.User.FindFirstValue(ClaimTypes.NameIdentifier)
-                    ?? context.User.FindFirstValue("sub"), out var userId)
-                || userId == Guid.Empty
-                || context.Resource is not HttpContext httpContext)
+            if (context.Resource is not HttpContext httpContext
+                || !currentUser.IsAuthenticated || currentUser.UserId is not { } userId)
             {
                 return;
             }

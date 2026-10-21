@@ -93,5 +93,66 @@ namespace GiysiGo.Modules.Identity.Tests
             });
             Assert.False(await checker.HasPermissionAsync(user, PermissionCodes.QuotePrepare, storeId: store));
         }
+
+        [SqlServerFact]
+        public async Task Scoped_permission_stops_after_assignment_role_permission_or_corporate_is_disabled()
+        {
+            using var db = new IdentityDatabase();
+            var userId = await db.CreateUserAsync();
+            var corporateId = await db.Get<ICorporateRepository>().InsertAsync(
+                new Corporate { Name = "Revocation test" });
+            var storeId = await db.CreateStoreAsync(corporateId);
+            var roleId = await db.CreateRoleAsync("STORE");
+            var permissionCode = $"test.{Guid.NewGuid():N}";
+            var permissionId = await db.Get<IPermissionRepository>().InsertAsync(new Permission
+            {
+                Code = permissionCode,
+                Description = "Test scoped permission"
+            });
+            var access = db.Get<IIdentityAccessRepository>();
+            var checker = new PermissionChecker(db.Factory,
+                new FixtureStoreScopeReader(storeId, corporateId));
+
+            await db.Transactions.ExecuteAsync(async (connection, transaction, token) =>
+            {
+                await access.GrantRolePermissionAsync(roleId, permissionId, connection, transaction, token);
+                await access.GrantStoreAssignmentAsync(userId, storeId, roleId, connection, transaction, token);
+                return true;
+            });
+            Assert.True(await checker.HasPermissionAsync(userId, permissionCode, storeId: storeId));
+
+            await db.Transactions.ExecuteAsync(async (connection, transaction, token) =>
+            {
+                await access.RevokeStoreAssignmentAsync(userId, storeId, roleId, connection, transaction, token);
+                return true;
+            });
+            Assert.False(await checker.HasPermissionAsync(userId, permissionCode, storeId: storeId));
+
+            await db.Transactions.ExecuteAsync(async (connection, transaction, token) =>
+                await access.GrantStoreAssignmentAsync(userId, storeId, roleId, connection, transaction, token));
+            Assert.True(await checker.HasPermissionAsync(userId, permissionCode, storeId: storeId));
+
+            var role = await db.Get<IRoleRepository>().GetByIdAsync(roleId);
+            Assert.NotNull(role);
+            role.IsActive = false;
+            await db.Get<IRoleRepository>().UpdateAsync(role);
+            Assert.False(await checker.HasPermissionAsync(userId, permissionCode, storeId: storeId));
+            role.IsActive = true;
+            await db.Get<IRoleRepository>().UpdateAsync(role);
+
+            var permission = await db.Get<IPermissionRepository>().GetByIdAsync(permissionId);
+            Assert.NotNull(permission);
+            permission.IsActive = false;
+            await db.Get<IPermissionRepository>().UpdateAsync(permission);
+            Assert.False(await checker.HasPermissionAsync(userId, permissionCode, storeId: storeId));
+            permission.IsActive = true;
+            await db.Get<IPermissionRepository>().UpdateAsync(permission);
+
+            var corporate = await db.Get<ICorporateRepository>().GetByIdAsync(corporateId);
+            Assert.NotNull(corporate);
+            corporate.IsActive = false;
+            await db.Get<ICorporateRepository>().UpdateAsync(corporate);
+            Assert.False(await checker.HasPermissionAsync(userId, permissionCode, storeId: storeId));
+        }
     }
 }

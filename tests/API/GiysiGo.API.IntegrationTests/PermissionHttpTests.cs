@@ -37,8 +37,11 @@ namespace GiysiGo.API.IntegrationTests
             Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
             Assert.Equal("application/problem+json", anonymous.Content.Headers.ContentType?.MediaType);
             var anonymousProblem = await anonymous.Content.ReadFromJsonAsync<ProblemDetails>();
-            Assert.Equal(401, anonymousProblem?.Status);
-            Assert.Equal(path, anonymousProblem?.Instance);
+            Assert.NotNull(anonymousProblem);
+            Assert.Equal(401, anonymousProblem.Status);
+            Assert.Equal(path, anonymousProblem.Instance);
+            Assert.Equal("unauthorized", anonymousProblem.Extensions["code"]?.ToString());
+            Assert.False(string.IsNullOrWhiteSpace(anonymousProblem.Extensions["traceId"]?.ToString()));
             Assert.Null(checker.SeenUserId);
 
             client.DefaultRequestHeaders.Add("X-Test-User", userId.ToString());
@@ -46,8 +49,11 @@ namespace GiysiGo.API.IntegrationTests
             Assert.Equal(HttpStatusCode.Forbidden, forbidden.StatusCode);
             Assert.Equal("application/problem+json", forbidden.Content.Headers.ContentType?.MediaType);
             var forbiddenProblem = await forbidden.Content.ReadFromJsonAsync<ProblemDetails>();
-            Assert.Equal(403, forbiddenProblem?.Status);
-            Assert.Equal(path, forbiddenProblem?.Instance);
+            Assert.NotNull(forbiddenProblem);
+            Assert.Equal(403, forbiddenProblem.Status);
+            Assert.Equal(path, forbiddenProblem.Instance);
+            Assert.Equal("forbidden", forbiddenProblem.Extensions["code"]?.ToString());
+            Assert.False(string.IsNullOrWhiteSpace(forbiddenProblem.Extensions["traceId"]?.ToString()));
             Assert.Equal(userId, checker.SeenUserId);
             Assert.Equal(PermissionCodes.StoreView, checker.SeenPermission);
             Assert.Equal(corporateId, checker.SeenCorporateId);
