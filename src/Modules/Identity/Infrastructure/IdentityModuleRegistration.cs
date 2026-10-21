@@ -14,6 +14,7 @@ namespace GiysiGo.Modules.Identity.Infrastructure
             services.AddScoped<ICurrentUser, CurrentUser>();
             services.AddScoped<IPermissionChecker, PermissionChecker>();
             services.AddScoped<IStaffAssignmentAuthorizer, StaffAssignmentAuthorizer>();
+            services.AddScoped<IIdentityAuthorizationRepository, IdentityAuthorizationRepository>();
             services.AddScoped<ICorporateRepository, CorporateRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IPermissionRepository, PermissionRepository>();

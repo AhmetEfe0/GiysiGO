@@ -24,6 +24,12 @@ Gerçek okuyucu DI'ya kaydedilene kadar mağaza kapsamlı istekler üretimde
 çalıştırılamaz. Entegrasyon geldiğinde aynı yetki testleri gerçek okuyucuyla da
 doğrulanmalıdır.
 
+Yetki kararındaki iki amaç-özel SQL prosedürünü `IIdentityAuthorizationRepository`
+üzerinden `IdentityAuthorizationRepository` çağırır. `PermissionChecker` ve
+`StaffAssignmentAuthorizer` kapsamı/iş kuralını denetler, Dapper çağrısını yapmaz.
+Repository, verilen açık bağlantı ve transaction'ı kullanır; `RepositoryBase<TEntity>`
+beş CRUD işlemi için olduğundan bu karar okumalarında kullanılmaz.
+
 `IStaffAssignmentAuthorizer.CanManageAsync`, #15'teki personel atama komutunun
 rol verme/iptal etme işleminden önce aynı SQL bağlantısı ve transaction içinde
 çağrılır. PlatformAdmin aktif bir corporate'a CorporateOwner ve aktif mağazasına

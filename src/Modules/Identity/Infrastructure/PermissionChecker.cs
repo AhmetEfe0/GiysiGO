@@ -1,11 +1,11 @@
-using System.Data;
-using Dapper;
 using GiysiGo.BuildingBlocks.Application.Contracts;
 using GiysiGo.BuildingBlocks.Infrastructure;
+using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
 
 namespace GiysiGo.Modules.Identity.Infrastructure
 {
-    public sealed class PermissionChecker(SqlConnectionFactory connectionFactory, IStoreScopeReader? storeScopeReader = null) : IPermissionChecker
+    public sealed class PermissionChecker(SqlConnectionFactory connectionFactory,
+        IIdentityAuthorizationRepository authorizationRepository, IStoreScopeReader? storeScopeReader = null) : IPermissionChecker
     {
         public async Task<bool> HasPermissionAsync(Guid userId, string permissionCode, Guid? corporateId = null, Guid? storeId = null, CancellationToken cancellationToken = default)
         {
@@ -35,10 +35,8 @@ namespace GiysiGo.Modules.Identity.Infrastructure
                 corporateId = store.CorporateId;
             }
 
-            var command = new CommandDefinition("[identity].[spHasPermission]",
-                new { UserId = userId, PermissionCode = permissionCode, CorporateId = corporateId, StoreId = storeId },
-                transaction, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken);
-            var allowed = await connection.QuerySingleAsync<bool>(command);
+            var allowed = await authorizationRepository.HasPermissionAsync(userId, permissionCode,
+                corporateId, storeId, connection, transaction, cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return allowed;
         }

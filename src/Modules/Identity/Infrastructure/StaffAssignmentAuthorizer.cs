@@ -1,14 +1,12 @@
-using System.Data;
 using System.Data.Common;
-using Dapper;
 using GiysiGo.BuildingBlocks.Application.Contracts;
 using GiysiGo.Modules.Identity.Application.Interfaces.Authorization;
-using GiysiGo.Modules.Identity.Infrastructure.Repositories;
+using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
 
 namespace GiysiGo.Modules.Identity.Infrastructure
 {
-    public sealed class StaffAssignmentAuthorizer(IStoreScopeReader? storeScopeReader = null)
-        : IdentityCommandRepositoryBase, IStaffAssignmentAuthorizer
+    public sealed class StaffAssignmentAuthorizer(IIdentityAuthorizationRepository authorizationRepository,
+        IStoreScopeReader? storeScopeReader = null) : IStaffAssignmentAuthorizer
     {
         public async Task<bool> CanManageAsync(Guid actorUserId, Guid targetUserId, Guid targetRoleId,
             Guid? corporateId, Guid? storeId, DbConnection connection, DbTransaction transaction,
@@ -39,9 +37,8 @@ namespace GiysiGo.Modules.Identity.Infrastructure
                 corporateId = scope.CorporateId;
             }
 
-            return await connection.QuerySingleAsync<bool>(Procedure("[identity].[spCanManageStaffAssignment]",
-                new { ActorUserId = actorUserId, TargetUserId = targetUserId, TargetRoleId = targetRoleId,
-                    CorporateId = corporateId, StoreId = storeId }, connection, transaction, cancellationToken));
+            return await authorizationRepository.CanManageStaffAssignmentAsync(actorUserId, targetUserId,
+                targetRoleId, corporateId, storeId, connection, transaction, cancellationToken);
         }
     }
 }
