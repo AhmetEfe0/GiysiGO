@@ -25,11 +25,42 @@ jobs:
       - name: Test API and modules
         run: |
           dotnet test tests/API/GiysiGo.API.IntegrationTests/GiysiGo.API.IntegrationTests.csproj --no-restore --configuration Release
-          for project in tests/Modules/*/*.csproj; do dotnet test "$project" --no-restore --configuration Release; done
+          for project in tests/Modules/*/*.csproj; do
+            if [[ "$project" != tests/Modules/Catalog/* ]]; then
+              dotnet test "$project" --no-restore --configuration Release
+            fi
+          done
   sql-project:
     runs-on: windows-2022
+    env:
+      GIYSIGO_CATALOG_TEST_CONNECTION: 'Server=(localdb)\MSSQLLocalDB;Initial Catalog=GiysiGoCatalogTestCodex;Integrated Security=True;TrustServerCertificate=True'
     steps:
       - uses: actions/checkout@v4
       - uses: microsoft/setup-msbuild@v3
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
       - name: Build DACPAC
         run: msbuild database/GiysiGo.Database/GiysiGo.Database.sqlproj /p:Configuration=Release /p:VisualStudioVersion=17.0 /p:Platform=AnyCPU /m
+      - name: Start LocalDB
+        shell: pwsh
+        run: |
+          $instances = sqllocaldb info
+          if ($instances -notcontains 'MSSQLLocalDB') {
+            sqllocaldb create MSSQLLocalDB
+          }
+          sqllocaldb start MSSQLLocalDB
+      - name: Install SqlPackage
+        shell: pwsh
+        run: dotnet tool install --tool-path "$env:RUNNER_TEMP\sqlpackage-tool" Microsoft.SqlPackage --version 170.5.96
+      - name: Publish DACPAC to LocalDB
+        shell: pwsh
+        run: |
+          & "$env:RUNNER_TEMP\sqlpackage-tool\sqlpackage.exe" `
+            /Action:Publish `
+            /SourceFile:"database/GiysiGo.Database/bin/Release/GiysiGo.Database.dacpac" `
+            /TargetConnectionString:"$env:GIYSIGO_CATALOG_TEST_CONNECTION" `
+            /p:BlockOnPossibleDataLoss=True `
+            /p:AllowIncompatiblePlatform=True
+      - name: Test Catalog against LocalDB
+        run: dotnet test tests/Modules/Catalog/GiysiGo.Modules.Catalog.Tests.csproj --configuration Release --verbosity minimal

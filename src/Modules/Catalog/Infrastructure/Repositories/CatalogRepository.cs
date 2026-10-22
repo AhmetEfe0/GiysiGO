@@ -49,16 +49,18 @@ namespace GiysiGo.Modules.Catalog.Infrastructure.Repositories
             return await connection.QuerySingleOrDefaultAsync<ProductCategory>(command);
         }
 
-        public async Task<IReadOnlyList<ProductType>> GetProductTypesAsync(Guid? categoryId = null, bool includeInactive = false, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<ProductType>> GetProductTypesAsync(Guid? categoryId = null, bool includeInactive = false, int pageNumber = 1, int pageSize = 50, CancellationToken cancellationToken = default)
         {
             await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
 
             var parameters = new DynamicParameters();
-            parameters.Add("@CategoryId", categoryId, DbType.Guid);
-            parameters.Add("@IncludeInactive", includeInactive, DbType.Boolean);
+            parameters.Add("@category_id", categoryId, DbType.Guid);
+            parameters.Add("@include_inactive", includeInactive, DbType.Boolean);
+            parameters.Add("@page_number", pageNumber, DbType.Int32);
+            parameters.Add("@page_size", pageSize, DbType.Int32);
 
             var command = new CommandDefinition(
-                commandText: "catalog.usp_GetProductTypes",
+                commandText: "catalog.usp_GetProductTypesPaged",
                 parameters: parameters,
                 commandType: CommandType.StoredProcedure,
                 cancellationToken: cancellationToken);
@@ -85,22 +87,7 @@ namespace GiysiGo.Modules.Catalog.Infrastructure.Repositories
 
         public async Task<IReadOnlyList<ProductType>> GetProductTypesPagedAsync(Guid? categoryId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
-
-            var parameters = new DynamicParameters();
-            parameters.Add("@category_id", categoryId, DbType.Guid);
-            parameters.Add("@include_inactive", false, DbType.Boolean);
-            parameters.Add("@page_number", pageNumber, DbType.Int32);
-            parameters.Add("@page_size", pageSize, DbType.Int32);
-
-            var command = new CommandDefinition(
-                commandText: "catalog.usp_GetProductTypesPaged",
-                parameters: parameters,
-                commandType: CommandType.StoredProcedure,
-                cancellationToken: cancellationToken);
-
-            var result = await connection.QueryAsync<ProductType>(command);
-            return result.AsList();
+            return await GetProductTypesAsync(categoryId, pageNumber: pageNumber, pageSize: pageSize, cancellationToken: cancellationToken);
         }
 
         public async Task<IReadOnlyList<Service>> GetServicesAsync(bool includeInactive = false, CancellationToken cancellationToken = default)
@@ -136,12 +123,14 @@ namespace GiysiGo.Modules.Catalog.Infrastructure.Repositories
             return await connection.QuerySingleOrDefaultAsync<Service>(command);
         }
 
-        public async Task<IReadOnlyList<Store>> GetStoresAsync(bool includeInactive = false, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<Store>> GetStoresAsync(bool includeInactive = false, int pageNumber = 1, int pageSize = 50, CancellationToken cancellationToken = default)
         {
             await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
 
             var parameters = new DynamicParameters();
-            parameters.Add("@IncludeInactive", includeInactive, DbType.Boolean);
+            parameters.Add("@include_inactive", includeInactive, DbType.Boolean);
+            parameters.Add("@page_number", pageNumber, DbType.Int32);
+            parameters.Add("@page_size", pageSize, DbType.Int32);
 
             var command = new CommandDefinition(
                 commandText: "catalog.usp_GetStores",
@@ -169,7 +158,7 @@ namespace GiysiGo.Modules.Catalog.Infrastructure.Repositories
             return await connection.QuerySingleOrDefaultAsync<Store>(command);
         }
 
-        public async Task<IReadOnlyList<StoreOffering>> GetStoreOfferingsAsync(Guid? storeId = null, Guid? productTypeServiceId = null, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<StoreOffering>> GetStoreOfferingsAsync(Guid? storeId = null, Guid? productTypeServiceId = null, int pageNumber = 1, int pageSize = 50, CancellationToken cancellationToken = default)
         {
             await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
 
@@ -177,6 +166,8 @@ namespace GiysiGo.Modules.Catalog.Infrastructure.Repositories
             parameters.Add("@store_id", storeId, DbType.Guid);
             parameters.Add("@product_type_service_id", productTypeServiceId, DbType.Guid);
             parameters.Add("@include_inactive", false, DbType.Boolean);
+            parameters.Add("@page_number", pageNumber, DbType.Int32);
+            parameters.Add("@page_size", pageSize, DbType.Int32);
 
             var command = new CommandDefinition(
                 commandText: "catalog.usp_GetStoreOfferings",
@@ -204,13 +195,15 @@ namespace GiysiGo.Modules.Catalog.Infrastructure.Repositories
             return await connection.QuerySingleOrDefaultAsync<StoreOffering>(command);
         }
 
-        public async Task<IReadOnlyList<ProductTypeService>> GetProductTypeServicesAsync(Guid? productTypeId = null, Guid? serviceId = null, bool includeInactive = false, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<ProductTypeService>> GetProductTypeServicesAsync(Guid? productTypeId = null, Guid? serviceId = null, bool includeInactive = false, int pageNumber = 1, int pageSize = 50, CancellationToken cancellationToken = default)
         {
             await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
             var parameters = new DynamicParameters();
             parameters.Add("@ProductTypeId", productTypeId, DbType.Guid);
             parameters.Add("@ServiceId", serviceId, DbType.Guid);
             parameters.Add("@IncludeInactive", includeInactive, DbType.Boolean);
+            parameters.Add("@page_number", pageNumber, DbType.Int32);
+            parameters.Add("@page_size", pageSize, DbType.Int32);
             var command = new CommandDefinition("catalog.usp_GetProductTypeServices", parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken);
             return (await connection.QueryAsync<ProductTypeService>(command)).AsList();
         }
