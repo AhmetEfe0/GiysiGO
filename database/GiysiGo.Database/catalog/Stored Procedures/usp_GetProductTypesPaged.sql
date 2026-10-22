@@ -11,7 +11,7 @@ BEGIN
     IF @page_size < 1 SET @page_size = 20;
     IF @page_size > 100 SET @page_size = 100;
 
-    DECLARE @offset INT = (@page_number - 1) * @page_size;
+    DECLARE @offset BIGINT = (CONVERT(BIGINT, @page_number) - 1) * CONVERT(BIGINT, @page_size);
 
     SELECT
         [id] AS Id,
