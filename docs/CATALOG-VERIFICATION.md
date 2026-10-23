@@ -1,6 +1,6 @@
 # Katalog #11 doğrulama raporu
 
-Tarih: 23 Ekim 2026. Branch: `feature/catalog-models-repo`. Kontroller OneDrive içindeki GiysiGO çalışma ağacında yapıldı; Downloads kopyası kullanılmadı. Değişiklikler yereldir; push veya merge yapılmadı.
+Tarih: 24 Ekim 2026. Branch: `feature/catalog-models-repo`. Kontroller OneDrive içindeki GiysiGO çalışma ağacında yapıldı; Downloads kopyası kullanılmadı. İlk #11 teslimi `33e8d2f` ile pushlandı; bu rapordaki seed sadeleştirmesi onu izleyen ayrı bir düzenlemedir. Merge yapılmadı.
 
 ## Değişiklikler
 
@@ -20,13 +20,13 @@ Tarih: 23 Ekim 2026. Branch: `feature/catalog-models-repo`. Kontroller OneDrive 
 | Kontrol | Sonuç |
 | --- | --- |
 | DACPAC Release derlemesi ve ayrılmış LocalDB'ye yükleme | Başarılı |
-| Catalog testleri | 8 geçti, 0 başarısız, 0 atlandı |
+| Catalog testleri | 9 geçti, 0 başarısız, 0 atlandı |
 | HTTP/API testleri | 20 geçti, 0 başarısız, 0 atlandı |
 | Identity testleri | 11 geçti, 0 başarısız, 0 atlandı |
 | Ordering testleri | 9 geçti, 0 başarısız, 0 atlandı |
 | Operations testleri | 1 geçti, 0 başarısız, 0 atlandı |
 | Ortak sözleşme testleri | 19 geçti, 0 başarısız, 0 atlandı |
-| Toplam | 68 geçti, 0 başarısız, 0 atlandı |
+| Toplam | 69 geçti, 0 başarısız, 0 atlandı |
 | Seed dosyasını yeniden üretme | SHA256 değeri değişmedi |
 | `git diff --check` | Hata yok |
 
@@ -57,7 +57,7 @@ Tarih: 23 Ekim 2026. Branch: `feature/catalog-models-repo`. Kontroller OneDrive 
 
 #11'in bu çalışma ağacındaki backend kabul ölçütleri incelemeye hazırdır. Giriş, token üretimi, refresh ve çıkış ayrı #13 kapsamındadır. Üretim JWT ayarları ve ilk yönetici ataması yetkilendirme belgesindeki şekilde hazırlanmalıdır. Bu sonuç tüm uygulamanın hatasız olduğuna dair bir garanti değildir; listelenen testlerle doğrulanan kapsamı ifade eder.
 
-Nihai SQL 2022 günlüğü `database/GiysiGo.Database/bin/Release/catalog-sql2022-final-review.log`, altı TRX sonucu aynı klasörün `CatalogVerification/` altındadır. Önceki SQL 2022 günlüğü `catalog-sql2022-verification.log`, SQL 2019 günlüğü `catalog-security-final.log` olarak korunur. Bunlar yerel derleme çıktılarıdır. İlk hata enjeksiyonu denemesinde Windows EventLog yazma izni nedeniyle test altyapısı başarısız oldu; yalnız o test host'unda günlük sağlayıcıları kaldırıldı. Ardından ilgili iki test ve nihai tam tur yeniden çalıştırıldı. Uzak CI çalıştırılmadı; push/merge yapılmadı.
+Nihai SQL 2022 günlüğü `database/GiysiGo.Database/bin/Release/catalog-seed-compaction.log`, altı TRX sonucu aynı klasörün `CatalogVerification/` altındadır. Önceki SQL 2022 günlükleri `catalog-sql2022-final-review.log` ve `catalog-sql2022-verification.log`, SQL 2019 günlüğü `catalog-security-final.log` olarak korunur. Bunlar yerel derleme çıktılarıdır. İlk hata enjeksiyonu denemesinde Windows EventLog yazma izni nedeniyle test altyapısı başarısız oldu; yalnız o test host'unda günlük sağlayıcıları kaldırıldı. Ardından ilgili iki test ve nihai tam tur yeniden çalıştırıldı. Bu rapordaki sonuçlar yerel doğrulamalardır; uzak CI sonucu olarak sunulmaz.
 
 İstemci durumunun GitHub kanıtları: [Flutter uygulaması #18](https://github.com/DOU-SEProjects/GiysiGO/issues/18), [React paneli #22](https://github.com/DOU-SEProjects/GiysiGO/issues/22). İkisi de ayrı M4 geliştirme işidir; #11 mevcut backend seed/API kapsamındadır. Bu kontrolde istemci uygulaması oluşturulmadı; mevcut API tüketimi gerçek HTTP testleriyle doğrulandı.
 
@@ -72,3 +72,13 @@ Kullanıcının kapsam kararı: #11'in mevcut teslimi doğrulanır; diğer sahip
 - Operations kaydı boştur; olay işleyicisi ve otomatik outbox worker yoktur. Dispatcher altyapısı vardır; siparişten kurye/teslimata kadar otomatik akışın tamamlandığı iddia edilmez. Bunlar `MODULE-CONTRACTS.md` ve `SHARED-START.md` içinde ayrı teslimler olarak tanımlıdır.
 - Giriş/refresh/çıkış ve Flutter/React istemcileri önceki kapsam sınırlarıyla aynıdır.
 - `dotnet build GiysiGo.sln` denemesi, klasik SSDT SQL projesinin dotnet CLI tarafından yüklenememesi nedeniyle `MSB4278` verdi. C# projeleri ilgili test komutlarıyla, SQL projesi Visual Studio MSBuild/SSDT ile doğrulanır; doğru iki araçla yapılan kontroller yukarıdadır. Bu araç sınırı uygulama testi hatası olarak gizlenmedi.
+
+## Seed sadeleştirmesi — 24 Ekim 2026
+
+- `CatalogSeed.sql` 5.800 satırdan 431 satıra indi (yaklaşık %93 azalma). Tekrarlanan kayıt başına SQL blokları yerine tek satırlık veri kayıtları ve tablo başına ortak `UPDATE`/`INSERT` sorguları kullanılır. Kaynak JSON, kullanıcı kararları, UUIDv5 ad alanı ve GUID üretimi değişmedi.
+- Üretici doğrulamaları `generate-catalog-seed.mjs` içinde, veri tabloları ve ortak SQL mantığı `catalog-seed-sql.mjs` içindedir. Her VALUES grubu SQL Server'ın 1.000 satırlık sınırına uygun bölünür.
+- `.gitattributes`, katalog ve Identity seed dosyalarını `linguist-generated=true` ile işaretler. GitHub'da üretilen SQL daraltılabilir; kaynaklar ve üretim mantığı incelemeye açıktır. Dosyalar DACPAC'e dahil olmaya devam eder.
+- Eski seed, Git'teki `33e8d2f` commit'inden derleme klasörüne alındı. `Test-CatalogData.ps1 -BaselineCatalogSeedPath ...` ile aynı ayrılmış SQL 2022 veritabanında eski/yeni sonuçlar karşılaştırıldı: kategori/ürün/hizmet adları, sıralama, kod/GUID ilişkileri, fiyatlar, birimler ve seçim türleri birebir eşleşti.
+- `Seed_rejects_changed_stable_ids_without_partial_updates` kategori, ürün, hizmet ve çift için ayrı GUID uyuşmazlıklarını dener. Her deneme `51020` verir; önceki veri korunur ve açık transaction kalmaz.
+- Mevcut tekrar testi, `DisturbCatalogSeed.sql` ile değiştirilen ad/fiyat/birim/seçim ve pasif/silinmiş durumların yeniden düzeltildiğini de doğrular. Kapsam dışı çift hâlâ pasifleştirilir.
+- İlk eski/yeni karşılaştırması eski seed'in SQLCMD bağlantısında `QUOTED_IDENTIFIER` kapalı olduğu için durdu. Karşılaştırmaya `-I`, yeni seed'e açık SET ayarları eklendi; eski/yeni karşılaştırması ve test turu yeniden çalıştırıldı.

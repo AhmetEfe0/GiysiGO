@@ -7,6 +7,28 @@ namespace GiysiGo.Modules.Catalog.Tests.IntegrationTests
     public sealed class CatalogSeedSqlServerTests
     {
         [CatalogSqlServerFact]
+        public async Task Seed_rejects_changed_stable_ids_without_partial_updates()
+        {
+            var factory = new SqlConnectionFactory(Environment.GetEnvironmentVariable("GIYSIGO_CATALOG_TEST_CONNECTION")!);
+            await using var connection = await factory.OpenAsync();
+            var seed = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Catalog", "CatalogSeed.sql"));
+            var snapshotSql = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "IntegrationTests", "VerifyCatalogSeed.sql"));
+            var before = (await connection.QueryAsync<string>(snapshotSql)).ToArray();
+            foreach (var table in new[] { "SeedCategories", "SeedProducts", "SeedServices", "SeedPairs" })
+            {
+                var id = System.Text.RegularExpressions.Regex.Match(seed,
+                    $@"INSERT @{table} [^\r\n]+ VALUES\s+\(N'(?<id>[a-f0-9-]{{36}})'").Groups["id"];
+                Assert.True(id.Success);
+                var invalidSeed = seed.Remove(id.Index, id.Length).Insert(id.Index, Guid.NewGuid().ToString());
+                var error = await Assert.ThrowsAsync<Microsoft.Data.SqlClient.SqlException>(() => connection.ExecuteAsync(invalidSeed));
+                Assert.Equal(51020, error.Number);
+                var after = (await connection.QueryAsync<string>(snapshotSql)).ToArray();
+                Assert.Equal(before, after);
+                Assert.Equal(0, await connection.ExecuteScalarAsync<int>("SELECT @@TRANCOUNT;"));
+            }
+        }
+
+        [CatalogSqlServerFact]
         public async Task Identity_seed_preserves_ids_and_does_not_restore_revoked_permissions_or_disabled_roles()
         {
             var factory = new SqlConnectionFactory(Environment.GetEnvironmentVariable("GIYSIGO_CATALOG_TEST_CONNECTION")!);
@@ -66,6 +88,8 @@ namespace GiysiGo.Modules.Catalog.Tests.IntegrationTests
                 var before = await SnapshotAsync();
                 var excludedFixture = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "IntegrationTests", "CreateExcludedCatalogPair.sql"));
                 await ExecuteAsync(excludedFixture);
+                var disturbedFixture = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "IntegrationTests", "DisturbCatalogSeed.sql"));
+                await ExecuteAsync(disturbedFixture);
                 await ExecuteAsync(seed);
                 var after = await SnapshotAsync();
                 Assert.Equal(before, after);

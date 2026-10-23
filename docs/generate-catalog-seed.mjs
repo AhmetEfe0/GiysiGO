@@ -3,6 +3,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { buildCatalogSeed } from './catalog-seed-sql.mjs';
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const draft = JSON.parse(readFileSync(resolve(root, 'docs/catalog-draft.json'), 'utf8'));
 const decisions = JSON.parse(readFileSync(resolve(root, 'docs/catalog-decisions.json'), 'utf8'));
@@ -15,7 +17,6 @@ if (decisions.initialServiceSelection !== 'none'
   throw new Error('Seed üretilmeden önce hizmet seçimi kararları onaylanmalıdır.');
 }
 
-const quote = value => `N'${String(value).replaceAll("'", "''")}'`;
 const guidFor = value => {
   const digest = createHash('sha1').update(Buffer.concat([namespace, Buffer.from(value, 'utf8')])).digest();
   digest[6] = (digest[6] & 0x0f) | 0x50;
@@ -96,91 +97,28 @@ for (const product of draft.products) {
   if (primary.length !== 1) throw new Error(`${product.id} tam olarak bir BASE hizmetine sahip olmalıdır.`);
 }
 
-const emitEntity = ({ table, code, id, values, columns }) => {
-  const columnList = ['id', ...columns.map(([column]) => column)].join(', ');
-  const valueList = [`CONVERT(uniqueidentifier, '${id}')`, ...columns.map(([, value]) => value)].join(', ');
-  return `IF EXISTS (SELECT 1 FROM ${table} WHERE code = ${quote(code)})\nBEGIN\n    IF EXISTS (SELECT 1 FROM ${table} WHERE code = ${quote(code)} AND id <> CONVERT(uniqueidentifier, '${id}'))\n        THROW 51020, N'Sabit katalog kimliği uyuşmazlığı: ${code}.', 1;\n    UPDATE ${table}\n    SET ${values.map(([column, value]) => `${column} = ${value}`).join(',\n        ')},\n        is_active = 1, delete_date = NULL, update_date = SYSUTCDATETIME()\n    WHERE code = ${quote(code)};\nEND\nELSE\nBEGIN\n    INSERT ${table} (${columnList})\n    VALUES (${valueList});\nEND;\n`;
-};
-
-const statements = [
-  '-- docs/generate-catalog-seed.mjs tarafından üretilmiştir. Bu dosyayı doğrudan düzenlemeyin.',
-  '-- Kimlikler sabit kaynak kodlarından türetilir; kapsam dışı veya karar bekleyen çiftler aktif sunulmaz.',
-  'SET NOCOUNT ON;',
-  'SET XACT_ABORT ON;',
-  'BEGIN TRY',
-  '    BEGIN TRANSACTION;',
-  ''
-];
-
-for (const exclusion of decisions.excludedTailoringEntries) {
-  statements.push(`-- Kapsam dışı terzi kalemi ${exclusion.tailoringEntryIndex + 1}: ${exclusion.reason.replaceAll(/[\r\n]+/g, ' ')}`);
-}
-if (decisions.excludedTailoringEntries.length > 0) statements.push('');
-
-draft.categories.forEach((row, index) => {
-  const id = guidFor(`category:${row.code}`);
-  statements.push(emitEntity({
-    table: '[catalog].[product_categories]',
-    code: row.code,
-    id,
-    columns: [['code', quote(row.code)], ['name', quote(row.name)], ['sort_order', String(index)], ['is_active', '1']],
-    values: [['name', quote(row.name)], ['sort_order', String(index)]]
-  }));
-});
-
-draft.products.forEach(row => {
-  const id = guidFor(`product:${row.id}`);
-  const categoryId = guidFor(`category:${row.categoryCode}`);
-  statements.push(`IF EXISTS (SELECT 1 FROM [catalog].[product_types] WHERE code = ${quote(row.id)})\nBEGIN\n    IF EXISTS (SELECT 1 FROM [catalog].[product_types] WHERE code = ${quote(row.id)} AND id <> CONVERT(uniqueidentifier, '${id}'))\n        THROW 51020, N'Sabit katalog kimliği uyuşmazlığı: ${row.id}.', 1;\n    UPDATE [catalog].[product_types]\n    SET category_id = CONVERT(uniqueidentifier, '${categoryId}'), name = ${quote(row.name)}, base_unit = ${quote(row.baseUnit)},\n        is_active = 1, delete_date = NULL, update_date = SYSUTCDATETIME()\n    WHERE code = ${quote(row.id)};\nEND\nELSE\nBEGIN\n    INSERT [catalog].[product_types] (id, category_id, code, name, base_unit, is_active)\n    VALUES (CONVERT(uniqueidentifier, '${id}'), CONVERT(uniqueidentifier, '${categoryId}'), ${quote(row.id)}, ${quote(row.name)}, ${quote(row.baseUnit)}, 1);\nEND;\n`);
-});
-
-draft.services.forEach(row => {
-  const id = guidFor(`service:${row.id}`);
-  statements.push(emitEntity({
-    table: '[catalog].[services]',
-    code: row.id,
-    id,
-    columns: [['code', quote(row.id)], ['name', quote(row.name)], ['is_active', '1']],
-    values: [['name', quote(row.name)]]
-  }));
-});
-
-let seededCombinations = 0;
+const pairs = [];
+const excluded = [];
 for (const row of draft.productServices) {
   const pair = `${row.productId}/${row.serviceId}`;
+  if (!productsById.has(row.productId) || !servicesById.has(row.serviceId)) {
+    throw new Error(`Bilinmeyen ürün/hizmet referansı: ${pair}.`);
+  }
   if (pendingPairs.has(pair)) {
     const decision = [...decisions.pendingProductServices, ...decisions.excludedProductServices]
       .find(item => `${item.productId}/${item.serviceId}` === pair);
-    statements.push(`-- Kapsam dışında ${pair}: ${decision.reason}\n`);
-    statements.push(`UPDATE pts\nSET is_active = 0, is_default_selected = 0, update_date = SYSUTCDATETIME()\nFROM [catalog].[product_type_services] pts\nJOIN [catalog].[product_types] pt ON pt.id = pts.product_type_id\nJOIN [catalog].[services] s ON s.id = pts.service_id\nWHERE pt.code = ${quote(row.productId)} AND s.code = ${quote(row.serviceId)};\n`);
+    excluded.push({ ...row, reason: decision.reason });
     continue;
-  }
-  if (!productsById.has(row.productId) || !servicesById.has(row.serviceId)) {
-    throw new Error(`Bilinmeyen ürün/hizmet referansı: ${pair}.`);
   }
   const priceUnit = unitOverrides.get(pair) ?? row.priceUnit;
   const selectionKind = kindOverrides.get(pair) ?? row.kind;
   if (!['PIECE', 'M2'].includes(priceUnit)) throw new Error(`${pair} için onaylanmış fiyat birimi yok.`);
-  const id = guidFor(`product-service:${row.productId}:${row.serviceId}`);
-  const productId = guidFor(`product:${row.productId}`);
-  const serviceId = guidFor(`service:${row.serviceId}`);
+  if (!Number.isFinite(row.defaultPriceTry) || row.defaultPriceTry < 0) throw new Error(`${pair} için fiyat geçersiz.`);
   const tailoringNote = tailoringMappingsByPair.has(pair)
     ? `; terzi kalemi ${tailoringMappingsByPair.get(pair).map(index => index + 1).join(', ')}`
     : '';
-  statements.push(`-- Seed çifti ${pair} (${priceUnit}, ${selectionKind}${tailoringNote})\n`);
-  statements.push(`IF EXISTS (SELECT 1 FROM [catalog].[product_type_services] WHERE product_type_id = CONVERT(uniqueidentifier, '${productId}') AND service_id = CONVERT(uniqueidentifier, '${serviceId}'))\nBEGIN\n    IF EXISTS (SELECT 1 FROM [catalog].[product_type_services] WHERE product_type_id = CONVERT(uniqueidentifier, '${productId}') AND service_id = CONVERT(uniqueidentifier, '${serviceId}') AND id <> CONVERT(uniqueidentifier, '${id}'))\n        THROW 51020, N'Sabit katalog kimliği uyuşmazlığı: ${pair}.', 1;\n    UPDATE [catalog].[product_type_services]\n    SET default_price = ${row.defaultPriceTry.toFixed(2)}, currency = 'TRY', price_unit = ${quote(priceUnit)},\n        selection_kind = ${quote(selectionKind)}, is_default_selected = 0, is_active = 1,\n        delete_date = NULL, update_date = SYSUTCDATETIME()\n    WHERE product_type_id = CONVERT(uniqueidentifier, '${productId}') AND service_id = CONVERT(uniqueidentifier, '${serviceId}');\nEND\nELSE\nBEGIN\n    INSERT [catalog].[product_type_services]\n        (id, product_type_id, service_id, default_price, currency, price_unit, selection_kind, is_default_selected, is_active)\n    VALUES\n        (CONVERT(uniqueidentifier, '${id}'), CONVERT(uniqueidentifier, '${productId}'), CONVERT(uniqueidentifier, '${serviceId}'), ${row.defaultPriceTry.toFixed(2)}, 'TRY', ${quote(priceUnit)}, ${quote(selectionKind)}, 0, 1);\nEND;\n`);
-  seededCombinations += 1;
+  pairs.push({ ...row, priceUnit, selectionKind, tailoringNote });
 }
 
-statements.push(
-  '    COMMIT TRANSACTION;',
-  'END TRY',
-  'BEGIN CATCH',
-  '    IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;',
-  '    THROW;',
-  'END CATCH;',
-  ''
-);
-
-writeFileSync(outputPath, `${statements.join('\n').trimEnd()}\n`, 'utf8');
-console.log(`${outputPath} üretildi: ${draft.categories.length} kategori, ${draft.products.length} ürün, ${draft.services.length} hizmet, ${seededCombinations} aktif ürün/hizmet çifti.`);
+writeFileSync(outputPath, buildCatalogSeed({ draft, decisions, pairs, excluded, guidFor }), 'utf8');
+console.log(`${outputPath} üretildi: ${draft.categories.length} kategori, ${draft.products.length} ürün, ${draft.services.length} hizmet, ${pairs.length} aktif ürün/hizmet çifti.`);

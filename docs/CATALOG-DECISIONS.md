@@ -49,12 +49,15 @@ Yeni veya yinelenen hizmet oluşturulmaz. Mevcut ürün/hizmet çiftleri ve bu �
 - Aynı kod veya çift farklı bir GUID ile kayıtlıysa işlem durdurulur ve geri alınır; ilişkiler sessizce değiştirilmez.
 - Kapsam dışı veya karar bekleyen çiftler aktif sunulmaz. Önceden mevcutlarsa pasifleştirilir.
 - Üretim: `node docs/generate-catalog-seed.mjs`. Üretilen `CatalogSeed.sql` doğrudan düzenlenmez.
+- Üretici kaynak ve karar doğrulamasını yapar; `catalog-seed-sql.mjs` okunabilir veri tablolarını ve ortak `UPDATE`/`INSERT` sorgularını üretir. GUID üretimi ve kullanıcı kararları değişmez. `.gitattributes` iki üretilen seed dosyasını GitHub incelemesinde daraltılmak üzere işaretler; kaynak ve SQL üreticisi açıkça incelenebilir.
 
 ## Yerel doğrulama
 
 `powershell -ExecutionPolicy Bypass -File scripts/Test-CatalogData.ps1` komutu kurulu Visual Studio araçlarını otomatik bulur; kalıcı PATH değişikliği gerektirmez. Node.js ve .NET SDK komutları terminalden erişilebilir olmalıdır. SQL Server 2022 LocalDB (16.x) gereklidir; script bu sürümü açıkça seçer, sunucudan ana sürümü doğrular ve uyumsuz platform yüklemesini kapatır. Eski sürüme otomatik geçmez.
 
 Script seed'i üretir, DACPAC'i derler ve yalnız bu çalıştırma için oluşturulan ayrı bir LocalDB örneğine yükler. Katalog testleri seed'i iki kez çalıştırıp kimliklerin, ilişkilerin ve fiyatların korunduğunu, kapsam dışı çiftin pasifleştirildiğini denetler. Gerçek checkout prosedüründe boş seçim ve yalnız ek hizmet seçimi reddedilir; BASE veya ALTERNATIVE ile ek hizmetin birlikte kabul edildiği sınanır. Ardından gerçek HTTP okumaları, API yazma sınırları, Ordering regresyonları ve ortak sözleşme testleri çalışır. Test veritabanı ve ayrılmış LocalDB örneği sonunda temizlenir.
+
+Seed düzenlemesi karşılaştırılırken `-BaselineCatalogSeedPath <eski-seed.sql>` verilebilir. Script önce belirtilen eski sürümü, sonra güncel sürümü aynı ayrılmış veritabanında çalıştırır; kimlik, ilişki, ad, fiyat, birim ve seçim verilerini karşılaştırır. Eski dosya güvenilen Git commit'inden alınmalı ve derleme çıktılarında tutulmalıdır; ikinci bir seed kopyası repoya eklenmez. SQLCMD için `-I` kullanılır; filtreli indekslerin gerektirdiği `QUOTED_IDENTIFIER` ayarı etkin olur.
 
 ## Yönetim ve yetkilendirme entegrasyonu
 

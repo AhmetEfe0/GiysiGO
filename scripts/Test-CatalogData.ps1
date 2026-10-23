@@ -1,7 +1,10 @@
-param()
+param([string]$BaselineCatalogSeedPath)
 
 $ErrorActionPreference = 'Stop'
 $repositoryRoot = Split-Path $PSScriptRoot
+if ($BaselineCatalogSeedPath -and -not (Test-Path -LiteralPath $BaselineCatalogSeedPath -PathType Leaf)) {
+    throw 'Karşılaştırılacak eski seed dosyası bulunamadı.'
+}
 $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
 if (-not (Test-Path -LiteralPath $vswhere)) { throw 'Visual Studio kurulum bulucusu (vswhere) bulunamadı.' }
 $installation = (& $vswhere -latest -products '*' -format json | ConvertFrom-Json) | Select-Object -First 1
@@ -62,6 +65,20 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'SQL Server 2022 çalışma zamanı doğrulanamadı.' }
     & $sqlPackageTool /Action:Publish "/SourceFile:$(Join-Path $repositoryRoot 'database/GiysiGo.Database/bin/Release/GiysiGo.Database.dacpac')" "/TargetConnectionString:$connectionString" /p:BlockOnPossibleDataLoss=true /p:AllowIncompatiblePlatform=false
     if ($LASTEXITCODE -ne 0) { throw 'DACPAC test veritabanına yüklenemedi.' }
+    if ($BaselineCatalogSeedPath) {
+        # Aynı ayrılmış veritabanında eski ve yeni seed'in tüm iş verilerini karşılaştırır.
+        $snapshotSql = Join-Path $repositoryRoot 'tests/Modules/Catalog/IntegrationTests/VerifyCatalogSeed.sql'
+        & $sqlcmdTool -S $serverName -d $databaseName -E -I -b -i $BaselineCatalogSeedPath
+        if ($LASTEXITCODE -ne 0) { throw 'Eski seed karşılaştırma için çalıştırılamadı.' }
+        $baselineSnapshot = & $sqlcmdTool -S $serverName -d $databaseName -E -I -b -h -1 -W -w 4000 -i $snapshotSql
+        if ($LASTEXITCODE -ne 0) { throw 'Eski seed veri kopyası okunamadı.' }
+        & $sqlcmdTool -S $serverName -d $databaseName -E -I -b -i (Join-Path $repositoryRoot 'database/GiysiGo.Database/Scripts/CatalogSeed.sql')
+        if ($LASTEXITCODE -ne 0) { throw 'Yeni seed karşılaştırma için çalıştırılamadı.' }
+        $currentSnapshot = & $sqlcmdTool -S $serverName -d $databaseName -E -I -b -h -1 -W -w 4000 -i $snapshotSql
+        if ($LASTEXITCODE -ne 0) { throw 'Yeni seed veri kopyası okunamadı.' }
+        if (Compare-Object $baselineSnapshot $currentSnapshot) { throw 'Eski ve yeni seed iş verileri eşleşmiyor.' }
+        Write-Output 'Eski ve yeni seed kimlik, ilişki, fiyat, birim ve seçim verileri birebir eşleşiyor.'
+    }
     $env:GIYSIGO_CATALOG_TEST_CONNECTION = $connectionString
     $env:GIYSIGO_ORDERING_TEST_CONNECTION_STRING = $connectionString
     $env:GIYSIGO_IDENTITY_TEST_CONNECTION = $connectionString
