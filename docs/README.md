@@ -15,6 +15,10 @@ olarak planlanır. MVP'de kurye paneli yerine mock kurye verileri kullanılır.
 | [DATABASE-DRAFT.md](DATABASE-DRAFT.md) | İş kuralları, model taslağı ve açık kararlar |
 | [TABLE-PURPOSES.md](TABLE-PURPOSES.md) | Tabloların amacı ve planlanan operasyondaki yeri |
 | [STORED-PROCEDURE-CONVENTIONS.md](STORED-PROCEDURE-CONVENTIONS.md) | Repository/SP sözleşmesi |
+| [MODULE-CONTRACTS.md](MODULE-CONTRACTS.md) | Modüller arası public arayüzler, sahiplik ve transaction kuralları |
+| [WORKFLOW-CONTRACTS.md](WORKFLOW-CONTRACTS.md) | Sipariş, teklif, ödeme ve operasyon durum geçişleri |
+| [IDENTITY-DATA.md](IDENTITY-DATA.md) | Identity modelleri, repository'leri, prosedürleri ve SQL test kurulumu |
+| [IDENTITY-PERMISSIONS.md](IDENTITY-PERMISSIONS.md) | Rol seed'i, kapsamlı yetki denetimi ve 401/403 davranışı |
 | [Veritabanı kurulumu](../database/README.md) | SSDT, DACPAC ve yerel yayınlama |
 
 Kesin tablo, sütun ve kısıt tanımları SQL projesindedir. Derlenen C# arayüzleri
