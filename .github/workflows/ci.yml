@@ -78,6 +78,21 @@ jobs:
             /p:BlockOnPossibleDataLoss=True `
             /p:AllowIncompatiblePlatform=True
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify Identity seed redeployment
+        shell: pwsh
+        env:
+          GIYSIGO_IDENTITY_TEST_CONNECTION: 'Server=(localdb)\MSSQLLocalDB;Initial Catalog=GiysiGo_IdentityTest_CI;Integrated Security=True;TrustServerCertificate=True'
+        run: |
+          & sqlcmd -S '(localdb)\MSSQLLocalDB' -d GiysiGo_IdentityTest_CI -E -b `
+            -i tests/Modules/Identity/Fixtures/PrepareSeedRedeploy.sql
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & "$env:RUNNER_TEMP\sqlpackage-tool\sqlpackage.exe" `
+            /Action:Publish `
+            /SourceFile:"database/GiysiGo.Database/bin/Release/GiysiGo.Database.dacpac" `
+            /TargetConnectionString:"$env:GIYSIGO_IDENTITY_TEST_CONNECTION" `
+            /p:BlockOnPossibleDataLoss=True `
+            /p:AllowIncompatiblePlatform=True
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Test Identity against LocalDB
         env:
           GIYSIGO_IDENTITY_TEST_CONNECTION: 'Server=(localdb)\MSSQLLocalDB;Initial Catalog=GiysiGo_IdentityTest_CI;Integrated Security=True;TrustServerCertificate=True'
