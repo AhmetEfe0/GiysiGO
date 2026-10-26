@@ -35,6 +35,8 @@ namespace GiysiGo.API.IntegrationTests
 
             using var anonymous = await client.GetAsync(path);
             Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
+            Assert.Equal("Test realm=\"GiysiGo\"", anonymous.Headers.WwwAuthenticate.ToString());
+            Assert.Equal("invoked", anonymous.Headers.GetValues("X-Test-Challenge").Single());
             Assert.Equal("application/problem+json", anonymous.Content.Headers.ContentType?.MediaType);
             var anonymousProblem = await anonymous.Content.ReadFromJsonAsync<ProblemDetails>();
             Assert.NotNull(anonymousProblem);
@@ -47,6 +49,7 @@ namespace GiysiGo.API.IntegrationTests
             client.DefaultRequestHeaders.Add("X-Test-User", userId.ToString());
             using var forbidden = await client.GetAsync(path);
             Assert.Equal(HttpStatusCode.Forbidden, forbidden.StatusCode);
+            Assert.Equal("invoked", forbidden.Headers.GetValues("X-Test-Forbid").Single());
             Assert.Equal("application/problem+json", forbidden.Content.Headers.ContentType?.MediaType);
             var forbiddenProblem = await forbidden.Content.ReadFromJsonAsync<ProblemDetails>();
             Assert.NotNull(forbiddenProblem);

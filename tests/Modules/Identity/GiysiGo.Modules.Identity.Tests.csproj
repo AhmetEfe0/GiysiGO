@@ -19,5 +19,6 @@
     <ProjectReference Include="../../../src/Modules/Identity/Application/GiysiGo.Modules.Identity.Application.csproj" />
     <ProjectReference Include="../../../src/Modules/Identity/Infrastructure/GiysiGo.Modules.Identity.Infrastructure.csproj" />
     <ProjectReference Include="../../../src/Modules/Identity/IntegrationEvents/GiysiGo.Modules.Identity.IntegrationEvents.csproj" />
+    <ProjectReference Include="../../../src/Modules/Catalog/Infrastructure/GiysiGo.Modules.Catalog.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

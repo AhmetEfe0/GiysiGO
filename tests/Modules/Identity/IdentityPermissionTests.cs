@@ -57,7 +57,7 @@ namespace GiysiGo.Modules.Identity.Tests
             var store = await db.CreateStoreAsync(corporate);
             var authorizationRepository = db.Get<IIdentityAuthorizationRepository>();
             var checker = new PermissionChecker(db.Factory, authorizationRepository,
-                new FixtureStoreScopeReader(store, corporate));
+                db.Get<IStoreScopeReader>());
             Assert.NotNull(db.Get<IPermissionChecker>());
             var access = db.Get<IIdentityAccessRepository>();
 
@@ -75,9 +75,8 @@ namespace GiysiGo.Modules.Identity.Tests
             Assert.True(await checker.HasPermissionAsync(user, PermissionCodes.QuoteApprove, storeId: store));
             Assert.False(await checker.HasPermissionAsync(user, PermissionCodes.QuoteApprove, otherCorporate, store));
             Assert.False(await checker.HasPermissionAsync(user, "unknown.permission", corporate));
-            await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                new PermissionChecker(db.Factory, authorizationRepository)
-                    .HasPermissionAsync(user, PermissionCodes.QuoteApprove, storeId: store));
+            Assert.False(await checker.HasPermissionAsync(user, PermissionCodes.QuoteApprove,
+                storeId: Guid.NewGuid()));
 
             await db.Transactions.ExecuteAsync(async (connection, transaction, token) =>
             {

@@ -98,9 +98,10 @@ değişkeni yalnızca test süresince ayarlar ve önceki değeri geri yükler. T
 başka isimli veritabanlarını reddeder. SQL fixture'ı yalnızca StoreAssignment
 FK'sini test etmek için sentetik bir Catalog mağazası oluşturur; üretim seed'i değildir.
 
-Mevcut Linux CI bu DB testlerini skipped olarak gösterir, SQL projesi Windows
-job'ında derlenir. Gerçek DB testlerinin CI'a bağlanması #19'daki ortam/fixture
-çalışmasında yapılacaktır; #6 için yukarıdaki Windows komutu gerçek DB doğrulamasıdır.
+Linux CI bağlantı değişkeni olmadığı için bu DB testlerini skipped olarak gösterir.
+Windows SQL job'u DACPAC'i LocalDB'ye yayımlar ve Identity DB testlerini çalıştırır;
+#19 daha geniş oturum ve tenant izolasyonu API+DB testlerini ekleyecektir. Yerel
+doğrulama için yukarıdaki Windows komutu kullanılabilir.
 
 Kontroller: dokuz modelin gerçek veri erişimi, Unicode/decimal/tarih/Guid eşlemesi,
 case-insensitive e-posta benzersizliği, adres sahipliği, geçersiz koordinat, aktif

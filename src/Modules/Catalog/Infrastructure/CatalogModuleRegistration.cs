@@ -1,3 +1,4 @@
+using GiysiGo.BuildingBlocks.Application.Contracts;
 using GiysiGo.Modules.Catalog.Application.Repositories;
 using GiysiGo.Modules.Catalog.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,7 @@ namespace GiysiGo.Modules.Catalog.Infrastructure
         public static IServiceCollection AddCatalogModule(this IServiceCollection services)
         {
             services.AddScoped<ICatalogRepository, CatalogRepository>();
+            services.AddScoped<IStoreScopeReader, StoreScopeRepository>();
 
             return services;
         }

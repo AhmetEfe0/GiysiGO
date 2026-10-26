@@ -5,7 +5,7 @@ using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
 namespace GiysiGo.Modules.Identity.Infrastructure
 {
     public sealed class PermissionChecker(SqlConnectionFactory connectionFactory,
-        IIdentityAuthorizationRepository authorizationRepository, IStoreScopeReader? storeScopeReader = null) : IPermissionChecker
+        IIdentityAuthorizationRepository authorizationRepository, IStoreScopeReader storeScopeReader) : IPermissionChecker
     {
         public async Task<bool> HasPermissionAsync(Guid userId, string permissionCode, Guid? corporateId = null, Guid? storeId = null, CancellationToken cancellationToken = default)
         {
@@ -20,11 +20,6 @@ namespace GiysiGo.Modules.Identity.Infrastructure
 
             if (storeId.HasValue)
             {
-                if (storeScopeReader is null)
-                {
-                    throw new InvalidOperationException("IStoreScopeReader is required to evaluate store permissions.");
-                }
-
                 var store = await storeScopeReader.GetScopeAsync(storeId.Value, connection, transaction, cancellationToken);
                 if (store is null || store.StoreId != storeId.Value || !store.IsActive || store.CorporateId == Guid.Empty
                     || (corporateId.HasValue && corporateId.Value != store.CorporateId))

@@ -5,23 +5,43 @@ namespace GiysiGo.API.Authorization
 {
     public sealed class ProblemDetailsAuthorizationResultHandler : IAuthorizationMiddlewareResultHandler
     {
-        public Task HandleAsync(RequestDelegate next, HttpContext context,
+        private readonly AuthorizationMiddlewareResultHandler defaultHandler = new();
+
+        public async Task HandleAsync(RequestDelegate next, HttpContext context,
             AuthorizationPolicy policy, PolicyAuthorizationResult authorizeResult)
         {
+            await defaultHandler.HandleAsync(next, context, policy, authorizeResult);
+
+            if (context.Response.HasStarted)
+            {
+                return;
+            }
+
             if (authorizeResult.Challenged)
             {
-                return Results.Problem(statusCode: StatusCodes.Status401Unauthorized,
+                if (context.Response.StatusCode != StatusCodes.Status401Unauthorized)
+                {
+                    return;
+                }
+
+                await Results.Problem(statusCode: StatusCodes.Status401Unauthorized,
                     title: "Unauthorized", type: "https://httpstatuses.io/401",
                     detail: "Authentication is required.", instance: context.Request.Path,
                     extensions: new Dictionary<string, object?>
                     {
                         ["code"] = "unauthorized", ["traceId"] = context.TraceIdentifier
                     }).ExecuteAsync(context);
+                return;
             }
 
             if (authorizeResult.Forbidden)
             {
-                return Results.Problem(statusCode: StatusCodes.Status403Forbidden,
+                if (context.Response.StatusCode != StatusCodes.Status403Forbidden)
+                {
+                    return;
+                }
+
+                await Results.Problem(statusCode: StatusCodes.Status403Forbidden,
                     title: "Forbidden", type: "https://httpstatuses.io/403",
                     detail: "You do not have permission for this resource.", instance: context.Request.Path,
                     extensions: new Dictionary<string, object?>
@@ -29,8 +49,6 @@ namespace GiysiGo.API.Authorization
                         ["code"] = "forbidden", ["traceId"] = context.TraceIdentifier
                     }).ExecuteAsync(context);
             }
-
-            return next(context);
         }
     }
 }

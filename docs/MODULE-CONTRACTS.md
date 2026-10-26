@@ -16,7 +16,7 @@ durum ve olay matrisi `WORKFLOW-CONTRACTS.md` dosyasıdır.
 | `ITransactionalCustomerAddressReader` | Identity #16 | Ordering checkout adres snapshot'ı |
 | `IStoreCatalogReader` | Catalog #21 | Liste/önizleme fiyat ve konum kontrolü |
 | `ITransactionalStoreCatalogReader` | Catalog #21 | Checkout fiyatı ve görev başlangıcında dükkân konumu |
-| `IStoreScopeReader` | Catalog #14/#21 | Identity #10/#15: dükkânın şirketi ve aktifliği |
+| `IStoreScopeReader` | Catalog temel okuyucu #10 entegrasyonu; yönetim #14/#21 | Identity #10/#15: dükkânın şirketi ve aktifliği |
 | `IOrderPickupReader` | Ordering #26/#28 | Alım bilgisi önizlemesi |
 | `ITransactionalOrderPickupReader` | Ordering #26/#28 | Operations #29: alım, teslim ve iade adres kopyaları |
 | `IOrderOperationsReader` | Ordering #28 | Operations #31/#38: ürün inceleme ve ödenmiş hizmet listesi |

@@ -16,13 +16,13 @@ roller değerlendirilir. Store ID verildiğinde `IStoreScopeReader`, mağazanın
 aktifliğini ve corporate kimliğini aynı bağlantı/transaction içinde doğrular;
 corporate rolü başka mağazaya taşınmaz. Store kapsamı istendiğinde okuyucu DI'da
 yoksa yapılandırma hatası fırlatılır; bilinmeyen veya pasif mağaza `false`
-döndürür. #10, `IStoreScopeReader` sözleşmesini tüketir ve mağazanın şirket/aktiflik
-bilgisiyle verilecek yetki kararını test okuyucusuyla doğrular. Okuyucunun gerçek
-Catalog uygulaması, `MODULE-CONTRACTS.md` uyarınca Catalog #14/#21 sahibinin
-teslimidir; #10'un bağımlılığı veya Identity sahibinin geliştirme görevi değildir.
-Gerçek okuyucu DI'ya kaydedilene kadar mağaza kapsamlı istekler üretimde
-çalıştırılamaz. Entegrasyon geldiğinde aynı yetki testleri gerçek okuyucuyla da
-doğrulanmalıdır.
+döndürür. #10, `IStoreScopeReader` sözleşmesini tüketir. Catalog Infrastructure
+içindeki `StoreScopeRepository`, mevcut `catalog.usp_GetStoreById` prosedürünü
+çağırıp mağazanın şirket/aktiflik bilgisini aynı bağlantı ve transaction içinde
+döndürür; API host'u bu okuyucuyu `AddCatalogModule` ile kaydeder. Yetki testi
+gerçek Catalog okuyucusuyla mağaza kapsamını, ayrıca test okuyucusuyla pasif
+mağaza durumunu doğrular. Catalog #14/#21 mağaza yönetimi ve tarife okumalarını
+bu temel sözleşmenin üstünde tamamlar.
 
 Yetki kararındaki iki amaç-özel SQL prosedürünü `IIdentityAuthorizationRepository`
 üzerinden `IdentityAuthorizationRepository` çağırır. `PermissionChecker` ve
@@ -56,7 +56,8 @@ Gerçek MSSQL testi için `./scripts/Test-IdentityData.ps1` DACPAC'i izole
 veritabanına iki kez yayınlar. Bu, seed tekrarını, izin eşleşmelerini ve kapsam
 okumalarını doğrular. API entegrasyon testi test authentication şeması ve
 permission fake'iyle HTTP 401/403/200 ve kapsam aktarımını doğrular. Mevcut
-Linux CI bağlantı değişkeni yoksa DB testlerini skipped gösterir; gerçek DB CI
-entegrasyonu #19 kapsamındadır. Bu testlerdeki `FixtureStoreScopeReader`, #10'un
-Catalog'dan bağımsız geliştirilebilmesi içindir; canlı Catalog verisi okuduğu
-iddiası taşımaz.
+Linux CI bağlantı değişkeni yoksa DB testlerini skipped gösterir; Windows SQL
+job'u ayrı LocalDB veritabanında Identity testlerini gerçekten çalıştırır.
+#19, JWT/oturum ve tenant izolasyonu için daha geniş gerçek API+DB testlerini
+tamamlar. `FixtureStoreScopeReader` yalnızca pasif mağaza gibi kontrollü durumları
+test etmek içindir.

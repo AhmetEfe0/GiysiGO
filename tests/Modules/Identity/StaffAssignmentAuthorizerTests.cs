@@ -1,3 +1,4 @@
+using GiysiGo.BuildingBlocks.Application.Contracts;
 using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
 using GiysiGo.Modules.Identity.Infrastructure;
 
@@ -19,7 +20,7 @@ namespace GiysiGo.Modules.Identity.Tests
             var target = await db.CreateUserAsync();
             var authorizationRepository = db.Get<IIdentityAuthorizationRepository>();
             var authorizer = new StaffAssignmentAuthorizer(authorizationRepository,
-                new FixtureStoreScopeReader(store, corporate));
+                db.Get<IStoreScopeReader>());
             var access = db.Get<IIdentityAccessRepository>();
 
             await db.Transactions.ExecuteAsync(async (connection, transaction, token) =>
@@ -44,11 +45,6 @@ namespace GiysiGo.Modules.Identity.Tests
                 Assert.False(await Can(manager, target, "StoreStaff", otherCorporate, store));
                 Assert.False(await Can(manager, target, "StoreStaff", corporate, Guid.NewGuid()));
                 Assert.False(await Can(target, owner, "StoreStaff", corporate, store));
-                await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                    new StaffAssignmentAuthorizer(authorizationRepository)
-                        .CanManageAsync(owner, target, roles["StoreStaff"].Id,
-                        corporate, store, connection, transaction, token));
-
                 await db.Get<IUserRepository>().SetActiveAsync(manager, false, connection, transaction, token);
                 Assert.False(await Can(manager, target, "StoreStaff", corporate, store));
                 await db.Get<IUserRepository>().SetActiveAsync(target, false, connection, transaction, token);
