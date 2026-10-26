@@ -55,6 +55,7 @@ namespace GiysiGo.Modules.Identity.Tests
             var otherCorporate = await db.Get<ICorporateRepository>().InsertAsync(new Corporate { Name = "Other corporate" });
             var corporate = await db.Get<ICorporateRepository>().InsertAsync(new Corporate { Name = "Permission test" });
             var store = await db.CreateStoreAsync(corporate);
+            var otherStore = await db.CreateStoreAsync(otherCorporate);
             var authorizationRepository = db.Get<IIdentityAuthorizationRepository>();
             var checker = new PermissionChecker(db.Factory, authorizationRepository,
                 db.Get<IStoreScopeReader>());
@@ -85,6 +86,7 @@ namespace GiysiGo.Modules.Identity.Tests
                 return true;
             });
             Assert.True(await checker.HasPermissionAsync(user, PermissionCodes.QuotePrepare, storeId: store));
+            Assert.False(await checker.HasPermissionAsync(user, PermissionCodes.QuotePrepare, storeId: otherStore));
             Assert.False(await checker.HasPermissionAsync(user, PermissionCodes.QuoteApprove, storeId: store));
             Assert.False(await checker.HasPermissionAsync(user, PermissionCodes.QuotePrepare, corporate));
             Assert.False(await new PermissionChecker(db.Factory, authorizationRepository,
