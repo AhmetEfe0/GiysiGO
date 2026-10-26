@@ -6,7 +6,7 @@ using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
 namespace GiysiGo.Modules.Identity.Infrastructure
 {
     public sealed class StaffAssignmentAuthorizer(IIdentityAuthorizationRepository authorizationRepository,
-        IStoreScopeReader storeScopeReader) : IStaffAssignmentAuthorizer
+        IStoreScopeReader? storeScopeReader = null) : IStaffAssignmentAuthorizer
     {
         public async Task<bool> CanManageAsync(Guid actorUserId, Guid targetUserId, Guid targetRoleId,
             Guid? corporateId, Guid? storeId, DbConnection connection, DbTransaction transaction,
@@ -21,6 +21,11 @@ namespace GiysiGo.Modules.Identity.Infrastructure
 
             if (storeId.HasValue)
             {
+                if (storeScopeReader is null)
+                {
+                    throw new InvalidOperationException("IStoreScopeReader is required to manage store staff.");
+                }
+
                 var scope = await storeScopeReader.GetScopeAsync(storeId.Value, connection, transaction, cancellationToken);
                 if (scope is null || scope.StoreId != storeId.Value || !scope.IsActive
                     || scope.CorporateId == Guid.Empty

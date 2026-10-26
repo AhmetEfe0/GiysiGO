@@ -3,7 +3,6 @@ using GiysiGo.BuildingBlocks.Infrastructure;
 using GiysiGo.Modules.Identity.Infrastructure;
 using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
 using GiysiGo.Modules.Identity.Domain.Entities;
-using GiysiGo.Modules.Catalog.Infrastructure;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,7 +25,6 @@ namespace GiysiGo.Modules.Identity.Tests
             var services = new ServiceCollection();
             services.AddSingleton(Factory);
             services.AddIdentityModule();
-            services.AddCatalogModule();
             provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
             scope = provider.CreateScope();
         }
