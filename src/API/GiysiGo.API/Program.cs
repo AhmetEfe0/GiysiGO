@@ -6,6 +6,7 @@ using GiysiGo.Modules.Catalog.Infrastructure;
 using GiysiGo.Modules.Ordering.Infrastructure;
 using GiysiGo.Modules.Operations.Infrastructure;
 using GiysiGo.API.Authorization;
+using GiysiGo.API.Errors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,26 +18,12 @@ builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
         {
             Status = 400, Title = "İstek bilgileri geçersiz.", Instance = context.HttpContext.Request.Path
         };
-        problem.Extensions["code"] = "validation_failed";
-        problem.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
+        ApiProblem.Complete(context.HttpContext, problem);
         return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(problem);
     };
 });
 builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = context =>
-{
-    var status = context.ProblemDetails.Status ?? 500;
-    context.ProblemDetails.Extensions.TryAdd("traceId", context.HttpContext.TraceIdentifier);
-    context.ProblemDetails.Extensions.TryAdd("code", status switch
-    {
-        400 => "validation_failed", 401 => "authentication_required", 403 => "permission_denied",
-        404 => "resource_not_found", 405 => "method_not_allowed", 409 => "state_conflict", _ => "unexpected_error"
-    });
-    if (status >= 500)
-    {
-        context.ProblemDetails.Title = "Beklenmeyen bir hata oluştu.";
-        context.ProblemDetails.Detail = "İşlem tamamlanamadı. Takip kimliğiyle destek isteyebilirsiniz.";
-    }
-});
+    ApiProblem.Complete(context.HttpContext, context.ProblemDetails));
 builder.Services.AddIdentityAuthentication(builder.Configuration);
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();

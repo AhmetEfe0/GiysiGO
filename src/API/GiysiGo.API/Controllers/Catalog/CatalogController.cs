@@ -1,6 +1,7 @@
 using GiysiGo.Modules.Catalog.Application.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using GiysiGo.API.Errors;
 
 namespace GiysiGo.API.Controllers.Catalog
 {
@@ -37,42 +38,42 @@ namespace GiysiGo.API.Controllers.Catalog
         }
 
         [HttpGet("categories")]
-        public async Task<ActionResult<IReadOnlyList<CatalogCategoryDto>>> GetCategories(CancellationToken cancellationToken)
+        public async Task<ActionResult<CatalogPageDto<CatalogCategoryDto>>> GetCategories(
+            [FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
         {
+            if (page < 1 || pageSize is < 1 or > 100) return InvalidPagination();
             var categories = await catalogRepository.GetCategoriesAsync(cancellationToken: cancellationToken);
-            return Ok(categories.Select(category => new CatalogCategoryDto(
+            // Kategori sözlüğü küçük bir referans kümesidir; taşan sayfada int çarpımı yapılmaz.
+            var offset = ((long)page - 1) * pageSize;
+            CatalogCategoryDto[] items = offset >= categories.Count ? [] : categories.Skip((int)offset).Take(pageSize).Select(category => new CatalogCategoryDto(
                 category.Id,
                 category.Code,
                 category.Name,
-                category.SortOrder)).ToArray());
+                category.SortOrder)).ToArray();
+            return Ok(new CatalogPageDto<CatalogCategoryDto>(items, page, pageSize, categories.Count));
         }
 
         [HttpGet("product-types")]
-        public async Task<ActionResult<IReadOnlyList<CatalogProductTypeDto>>> GetProductTypes(
+        public async Task<ActionResult<CatalogPageDto<CatalogProductTypeDto>>> GetProductTypes(
             [FromQuery] Guid? categoryId,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 50,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20,
             CancellationToken cancellationToken = default)
         {
-            if (pageNumber < 1 || pageSize is < 1 or > 100)
-                return BadRequest(new ProblemDetails
-                {
-                    Title = "Geçersiz sayfalama parametreleri.",
-                    Detail = "pageNumber pozitif, pageSize ise 1 ile 100 arasında olmalıdır."
-                });
+            if (page < 1 || pageSize is < 1 or > 100) return InvalidPagination();
 
-            var productTypes = await catalogRepository.GetProductTypesPagedAsync(
+            var productTypes = await catalogRepository.GetProductTypePageAsync(
                 categoryId,
-                pageNumber,
+                page,
                 pageSize,
                 cancellationToken);
 
-            return Ok(productTypes.Select(productType => new CatalogProductTypeDto(
+            return Ok(new CatalogPageDto<CatalogProductTypeDto>(productTypes.Items.Select(productType => new CatalogProductTypeDto(
                 productType.Id,
                 productType.CategoryId,
                 productType.Code,
                 productType.Name,
-                productType.BaseUnit)).ToArray());
+                productType.BaseUnit)).ToArray(), page, pageSize, productTypes.TotalCount));
         }
 
         [HttpGet("product-types/{productTypeId:guid}/services")]
@@ -125,5 +126,8 @@ namespace GiysiGo.API.Controllers.Catalog
                 AddOnsCountTowardMinimum: false,
                 options));
         }
+
+        private BadRequestObjectResult InvalidPagination() => BadRequest(ApiProblem.Create(HttpContext, 400,
+            "Geçersiz sayfalama parametreleri.", "page pozitif, pageSize ise 1 ile 100 arasında olmalıdır."));
     }
 }

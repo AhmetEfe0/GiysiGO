@@ -4,6 +4,7 @@ using GiysiGo.BuildingBlocks.Infrastructure;
 
 namespace GiysiGo.Modules.Catalog.Tests.IntegrationTests
 {
+    [Collection("Catalog SQL")]
     public sealed class CatalogSeedSqlServerTests
     {
         [CatalogSqlServerFact]

@@ -114,11 +114,7 @@ namespace GiysiGo.API.IntegrationTests
 
         private static async Task AssertProblemAsync(HttpResponseMessage response, HttpStatusCode expected, string code)
         {
-            Assert.Equal(expected, response.StatusCode);
-            Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
-            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-            Assert.Equal(code, json.RootElement.GetProperty("code").GetString());
-            Assert.False(string.IsNullOrWhiteSpace(json.RootElement.GetProperty("traceId").GetString()));
+            await ProblemResponseAssertions.AssertAsync(response, expected, code);
         }
     }
 }

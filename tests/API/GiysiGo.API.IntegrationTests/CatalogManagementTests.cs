@@ -101,6 +101,9 @@ namespace GiysiGo.API.IntegrationTests
         {
             using var response = await request;
             Assert.True(response.StatusCode == status, $"Beklenen: {(int)status}; dönen: {(int)response.StatusCode}; {await response.Content.ReadAsStringAsync()}");
+            if ((int)status >= 400)
+                await ProblemResponseAssertions.AssertAsync(response, status,
+                    status switch { HttpStatusCode.BadRequest => "validation_failed", HttpStatusCode.NotFound => "resource_not_found", _ => "state_conflict" });
         }
     }
 }

@@ -92,6 +92,9 @@ namespace GiysiGo.API.IntegrationTests
             public Task<IReadOnlyList<ProductType>> GetProductTypesPagedAsync(Guid? categoryId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
                 => Task.FromResult<IReadOnlyList<ProductType>>([]);
 
+            public Task<ProductTypePage> GetProductTypePageAsync(Guid? categoryId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+                => Task.FromResult(new ProductTypePage([], 0));
+
             public Task<IReadOnlyList<Service>> GetServicesAsync(bool includeInactive = false, CancellationToken cancellationToken = default)
                 => Task.FromResult<IReadOnlyList<Service>>(new Service[] {
                     new Service { Id = FirstServiceId, Code = "S001", Name = "Kuru Temizleme", IsActive = true },

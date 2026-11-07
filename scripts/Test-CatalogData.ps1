@@ -1,21 +1,34 @@
-param([string]$BaselineCatalogSeedPath)
+param(
+    [string]$BaselineCatalogSeedPath,
+    [string]$VisualStudioPath,
+    [string]$MSBuildPath,
+    [string]$SqlPackagePath,
+    [string]$LocalDbPath,
+    [string]$SqlCmdPath
+)
 
 $ErrorActionPreference = 'Stop'
 $repositoryRoot = Split-Path $PSScriptRoot
+& (Join-Path $PSScriptRoot 'Test-CatalogBuildTools.ps1')
 if ($BaselineCatalogSeedPath -and -not (Test-Path -LiteralPath $BaselineCatalogSeedPath -PathType Leaf)) {
     throw 'Karşılaştırılacak eski seed dosyası bulunamadı.'
 }
-$vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
-if (-not (Test-Path -LiteralPath $vswhere)) { throw 'Visual Studio kurulum bulucusu (vswhere) bulunamadı.' }
-$installation = (& $vswhere -latest -products '*' -format json | ConvertFrom-Json) | Select-Object -First 1
-if (-not $installation) { throw 'Visual Studio veya Build Tools kurulumu bulunamadı.' }
-$msbuildTool = Join-Path $installation.installationPath 'MSBuild\Current\Bin\MSBuild.exe'
-$visualStudioVersion = ([version]$installation.installationVersion).Major.ToString() + '.0'
-$sqlPackageTool = Join-Path $installation.installationPath 'Common7\IDE\Extensions\Microsoft\SQLDB\DAC\SqlPackage.exe'
-$localDbTool = (Get-Command SqlLocalDB -ErrorAction SilentlyContinue).Source
+. (Join-Path $PSScriptRoot 'Resolve-CatalogBuildTools.ps1')
+$installations = @()
+if (-not $VisualStudioPath) {
+    $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+    if (-not (Test-Path -LiteralPath $vswhere)) { throw 'vswhere bulunamadı; -VisualStudioPath ile SSDT kurulumunu belirtin.' }
+    $installations = @(& $vswhere -products Microsoft.VisualStudio.Product.Community Microsoft.VisualStudio.Product.Professional Microsoft.VisualStudio.Product.Enterprise Microsoft.VisualStudio.Product.BuildTools -format json | ConvertFrom-Json)
+    if ($LASTEXITCODE -ne 0) { throw 'Visual Studio kurulumları sorgulanamadı.' }
+}
+$buildTools = Resolve-CatalogBuildTools -Installations $installations -VisualStudioPath $VisualStudioPath -MSBuildPath $MSBuildPath -SqlPackagePath $SqlPackagePath
+$msbuildTool = $buildTools.MSBuildPath
+$visualStudioVersion = $buildTools.VisualStudioVersion
+$sqlPackageTool = $buildTools.SqlPackagePath
+$localDbTool = if ($LocalDbPath) { $LocalDbPath } else { (Get-Command SqlLocalDB -ErrorAction SilentlyContinue).Source }
 $localDb2022Tool = Join-Path $env:ProgramFiles 'Microsoft SQL Server\160\Tools\Binn\SqlLocalDB.exe'
-if (Test-Path -LiteralPath $localDb2022Tool) { $localDbTool = $localDb2022Tool }
-$sqlcmdTool = (Get-Command sqlcmd -ErrorAction SilentlyContinue).Source
+if (-not $LocalDbPath -and (Test-Path -LiteralPath $localDb2022Tool)) { $localDbTool = $localDb2022Tool }
+$sqlcmdTool = if ($SqlCmdPath) { $SqlCmdPath } else { (Get-Command sqlcmd -ErrorAction SilentlyContinue).Source }
 if (-not $localDbTool) {
     $localDbTool = Get-ChildItem (Join-Path $env:ProgramFiles 'Microsoft SQL Server') -Filter SqlLocalDB.exe -Recurse | Select-Object -First 1 -ExpandProperty FullName
 }
@@ -23,7 +36,7 @@ if (-not $sqlcmdTool) {
     $sqlcmdTool = Get-ChildItem (Join-Path $env:ProgramFiles 'Microsoft SQL Server') -Filter SQLCMD.EXE -Recurse | Select-Object -First 1 -ExpandProperty FullName
 }
 foreach ($tool in @($msbuildTool, $sqlPackageTool, $localDbTool, $sqlcmdTool)) {
-    if (-not $tool -or -not (Test-Path -LiteralPath $tool)) { throw 'MSBuild/SSDT, SqlPackage, SqlLocalDB ve sqlcmd kurulu olmalıdır.' }
+    if (-not $tool -or -not (Test-Path -LiteralPath $tool -PathType Leaf)) { throw "Gerekli araç bulunamadı: $tool. MSBuild/SSDT, SqlPackage, SqlLocalDB ve sqlcmd kurulu olmalıdır." }
 }
 $localDbVersions = & $localDbTool versions
 if ($LASTEXITCODE -ne 0 -or -not ($localDbVersions -match '16\.0\.')) {
@@ -34,7 +47,10 @@ if ($LASTEXITCODE -ne 0 -or -not ($localDbVersions -match '16\.0\.')) {
 if ($LASTEXITCODE -ne 0) { throw 'Katalog seed üretimi başarısız.' }
 & node (Join-Path $repositoryRoot 'docs/generate-identity-permission-seed.mjs')
 if ($LASTEXITCODE -ne 0) { throw 'Identity permission seed üretimi başarısız.' }
-& $msbuildTool (Join-Path $repositoryRoot 'database/GiysiGo.Database/GiysiGo.Database.sqlproj') /p:Configuration=Release "/p:VisualStudioVersion=$visualStudioVersion" /p:Platform=AnyCPU /m /verbosity:minimal
+Write-Output "MSBuild: $msbuildTool"
+Write-Output "SSDT: $($buildTools.MSBuildExtensionsPath), VisualStudioVersion=$visualStudioVersion"
+Write-Output "SqlPackage: $sqlPackageTool"
+& $msbuildTool (Join-Path $repositoryRoot 'database/GiysiGo.Database/GiysiGo.Database.sqlproj') /p:Configuration=Release "/p:VisualStudioVersion=$visualStudioVersion" "/p:MSBuildExtensionsPath=$($buildTools.MSBuildExtensionsPath)" /p:Platform=AnyCPU /m /verbosity:minimal
 if ($LASTEXITCODE -ne 0) { throw 'DACPAC derlemesi başarısız.' }
 
 $suffix = [Guid]::NewGuid().ToString('N')

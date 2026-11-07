@@ -19,6 +19,7 @@
   <ItemGroup>
     <Using Include="Xunit" />
     <Content Include="Fixtures/*.sql" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../../docs/openapi/mvp-contracts.json" Link="mvp-contracts.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

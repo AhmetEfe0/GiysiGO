@@ -53,4 +53,6 @@ Seed kullanıcı oluşturmaz, parola belirlemez ve kullanıcıya yönetici rolü
 
 ## Doğrulama
 
+Ortak OpenAPI belgesi `docs/openapi/mvp-contracts.json`, altı anonim katalog okumasını ve `catalog.manage`/GLOBAL kapsamıyla korunan 12 yazmayı içerir. Hata yanıtları `type`, `title`, `status`, `detail`, `instance`, `code`, `traceId` alanlarını; 400 doğrulama yanıtları ayrıca `errors` alanını taşır. SQL ve beklenmeyen sunucu hatalarında iç ayrıntılar istemciye verilmez. Controller yolları/izinleri ve DTO alanları belgeyle otomatik karşılaştırılır.
+
 `scripts/Test-CatalogData.ps1` gerçek SQL, gerçek JWT doğrulayıcısı ve gerçek HTTP host'u kullanır. Testlerde üretim permission sağlayıcısı veya authentication handler sahte bir sağlayıcıyla değiştirilmez. Müşteri/personel/şirket sahibi için `403`, anonim/geçersiz token için `401`, yönetici için yazma başarısı, kapsam taşması, iptal ve pasiflik senaryoları denetlenir.

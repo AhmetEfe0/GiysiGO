@@ -1,6 +1,6 @@
 # Katalog #11 doğrulama raporu
 
-Tarih: 24 Ekim 2026. Branch: `feature/catalog-models-repo`. Kontroller OneDrive içindeki GiysiGO çalışma ağacında yapıldı; Downloads kopyası kullanılmadı. İlk #11 teslimi `33e8d2f` ile pushlandı; bu rapordaki seed sadeleştirmesi onu izleyen ayrı bir düzenlemedir. Merge yapılmadı.
+İlk rapor: 24 Ekim 2026; son tarama 7 Kasım 2026 tarihinde reviewer düzeltmelerini de kapsar. Branch: `feature/catalog-models-repo`. Kontroller OneDrive içindeki GiysiGO çalışma ağacında yapıldı; Downloads kopyası kullanılmadı. İlk #11 teslimi `33e8d2f`, seed sadeleştirmesi `71c6b61` ile pushlandı. Reviewer düzeltmeleri henüz commit/push edilmedi. Merge yapılmadı.
 
 ## Değişiklikler
 
@@ -21,12 +21,13 @@ Tarih: 24 Ekim 2026. Branch: `feature/catalog-models-repo`. Kontroller OneDrive 
 | --- | --- |
 | DACPAC Release derlemesi ve ayrılmış LocalDB'ye yükleme | Başarılı |
 | Catalog testleri | 9 geçti, 0 başarısız, 0 atlandı |
-| HTTP/API testleri | 20 geçti, 0 başarısız, 0 atlandı |
+| HTTP/API testleri | 30 geçti, 0 başarısız, 0 atlandı |
 | Identity testleri | 11 geçti, 0 başarısız, 0 atlandı |
 | Ordering testleri | 9 geçti, 0 başarısız, 0 atlandı |
 | Operations testleri | 1 geçti, 0 başarısız, 0 atlandı |
-| Ortak sözleşme testleri | 19 geçti, 0 başarısız, 0 atlandı |
-| Toplam | 69 geçti, 0 başarısız, 0 atlandı |
+| Ortak sözleşme testleri | 20 geçti, 0 başarısız, 0 atlandı |
+| Toplam | 80 geçti, 0 başarısız, 0 atlandı |
+| PowerShell araç keşfi | 10 senaryo geçti; .NET toplamına dahil değildir |
 | Seed dosyasını yeniden üretme | SHA256 değeri değişmedi |
 | `git diff --check` | Hata yok |
 
@@ -57,7 +58,7 @@ Tarih: 24 Ekim 2026. Branch: `feature/catalog-models-repo`. Kontroller OneDrive 
 
 #11'in bu çalışma ağacındaki backend kabul ölçütleri incelemeye hazırdır. Giriş, token üretimi, refresh ve çıkış ayrı #13 kapsamındadır. Üretim JWT ayarları ve ilk yönetici ataması yetkilendirme belgesindeki şekilde hazırlanmalıdır. Bu sonuç tüm uygulamanın hatasız olduğuna dair bir garanti değildir; listelenen testlerle doğrulanan kapsamı ifade eder.
 
-Nihai SQL 2022 günlüğü `database/GiysiGo.Database/bin/Release/catalog-seed-compaction.log`, altı TRX sonucu aynı klasörün `CatalogVerification/` altındadır. Önceki SQL 2022 günlükleri `catalog-sql2022-final-review.log` ve `catalog-sql2022-verification.log`, SQL 2019 günlüğü `catalog-security-final.log` olarak korunur. Bunlar yerel derleme çıktılarıdır. İlk hata enjeksiyonu denemesinde Windows EventLog yazma izni nedeniyle test altyapısı başarısız oldu; yalnız o test host'unda günlük sağlayıcıları kaldırıldı. Ardından ilgili iki test ve nihai tam tur yeniden çalıştırıldı. Bu rapordaki sonuçlar yerel doğrulamalardır; uzak CI sonucu olarak sunulmaz.
+Nihai SQL 2022 günlüğü `database/GiysiGo.Database/bin/Release/catalog-contract-completion.log`, altı TRX sonucu aynı klasörün `CatalogVerification/` altındadır. Önceki seed karşılaştırması `catalog-seed-compaction.log`, SQL 2022 günlükleri `catalog-sql2022-final-review.log` ve `catalog-sql2022-verification.log`, SQL 2019 günlüğü `catalog-security-final.log` olarak korunur. Bunlar yerel derleme çıktılarıdır. İlk hata enjeksiyonu denemesinde Windows EventLog yazma izni nedeniyle test altyapısı başarısız oldu; yalnız o test host'unda günlük sağlayıcıları kaldırıldı. Ardından ilgili iki test ve nihai tam tur yeniden çalıştırıldı. Bu rapordaki sonuçlar yerel doğrulamalardır; uzak CI sonucu olarak sunulmaz.
 
 İstemci durumunun GitHub kanıtları: [Flutter uygulaması #18](https://github.com/DOU-SEProjects/GiysiGO/issues/18), [React paneli #22](https://github.com/DOU-SEProjects/GiysiGO/issues/22). İkisi de ayrı M4 geliştirme işidir; #11 mevcut backend seed/API kapsamındadır. Bu kontrolde istemci uygulaması oluşturulmadı; mevcut API tüketimi gerçek HTTP testleriyle doğrulandı.
 
@@ -82,3 +83,24 @@ Kullanıcının kapsam kararı: #11'in mevcut teslimi doğrulanır; diğer sahip
 - `Seed_rejects_changed_stable_ids_without_partial_updates` kategori, ürün, hizmet ve çift için ayrı GUID uyuşmazlıklarını dener. Her deneme `51020` verir; önceki veri korunur ve açık transaction kalmaz.
 - Mevcut tekrar testi, `DisturbCatalogSeed.sql` ile değiştirilen ad/fiyat/birim/seçim ve pasif/silinmiş durumların yeniden düzeltildiğini de doğrular. Kapsam dışı çift hâlâ pasifleştirilir.
 - İlk eski/yeni karşılaştırması eski seed'in SQLCMD bağlantısında `QUOTED_IDENTIFIER` kapalı olduğu için durdu. Karşılaştırmaya `-I`, yeni seed'e açık SET ayarları eklendi; eski/yeni karşılaştırması ve test turu yeniden çalıştırıldı.
+
+## PR #52 reviewer düzeltmeleri
+
+| Bulgu | Düzeltme | Kanıt |
+| --- | --- | --- |
+| Pasif/silinmiş kategorinin aktif ürünleri listeleniyordu | `catalog.usp_GetProductTypesPaged` kategoriyle join yapar; silinmiş kategorileri ve normal okumada pasif kategorileri eler. Sayfa ve toplam aynı filtrelenmiş geçici tablodan döner. | `Product_lists_exclude_active_children_of_inactive_and_deleted_categories_with_and_without_filter` gerçek SQL üzerinde dört aktif çocuk ürün oluşturur. Kategori pasifken ve yalnız soft-delete edilmişken, hem `categoryId` verilmiş hem verilmemiş HTTP listeleri ve toplam sayıları kontrol edilir. Ürünlerin hâlâ aktif kaldığı SQL'den ayrıca doğrulanır. |
+| HTTP sayfalama ortak sözleşmeyle uyuşmuyordu | `GET /catalog/product-types?page=1&pageSize=20` artık `{ items, page, pageSize, totalCount }` DTO'su döndürür. Üst sınır 100'dür; iç repository adları değişmez. Yeni repository metodu SP'nin satır ve toplam sonuçlarını birlikte okur; eski liste metotları korunur. | `Product_pagination_uses_shared_defaults_second_page_total_and_empty_page_contract`: varsayılanlar, ikinci sayfanın doğru/dışlayıcı kayıtları, toplam 48, çok ileri boş sayfa ve bilinmeyen kategori. `Invalid_pagination_is_rejected_before_database_access`: sıfır/negatif sayfa, sıfır/negatif/100 üzeri boyut için 400. |
+| vswhere en yeni SSMS kurulumunu seçebiliyordu | Sorgu Community/Professional/Enterprise/Build Tools ürünleriyle sınırlanır. `Resolve-CatalogBuildTools.ps1` adayları sürüme göre dener; MSBuild, SSDT hedefi ve SqlPackage dosyalarını doğrular. Açık kurulum/araç yolu parametreleri eklendi. SQL 2022 zorunluluğu ayrı kontrol olarak korunur. | `Test-CatalogBuildTools.ps1`: SSMS daha yeni ve araç dosyaları mevcutken bile seçilmez; eksik SSDT adayı atlanır; dört uygun VS ürün ailesi, kurulum dışındaki açık araç yolları, yanlış yol ve uygun kurulum yokluğu sınanır. 10 senaryo geçti. Windows CI'ya eklendi. Gerçek tur Community 2022/SSDT'yi seçti; yollar günlüğe yazıldı ve DACPAC başarıyla derlenip yayınlandı. |
+
+Bu düzeltme turu SQL Server 2022 LocalDB `16.0.1000.6` üzerinde, `AllowIncompatiblePlatform=false` ile yapıldı. Reviewer'ın 17.x doğrulamasıyla karıştırılmamalıdır. #14/#17/#20/#21, istemciler, Identity repository yeniden düzenlemesi ve #46 merge işleri bu düzeltmeye eklenmedi.
+
+## Tekrar tarama ve test kapsamının güçlendirilmesi
+
+- Ortak hata sözleşmesinin eksik alanları `ApiProblem` üzerinden tamamlandı. Elle üretilen sayfalama/SQL hataları, model binding, yetki, bulunamayan kaynak ve beklenmeyen hata yanıtları `type/title/status/detail/instance/code/traceId` alanlarıyla doğrulanır; 400 yanıtlarında `errors` bulunur. SQL/stack ayrıntısı sızmaması da denetlenir.
+- Ortak OpenAPI dosyasına altı okuma ve 12 yetkili yazma eklendi. `CatalogOpenApiTests`, gerçek MVC action descriptor'larını belgeyle karşılaştırır; 18 metod/yol, anonimlik, izin ve başarı durumunu denetler. 12 DTO/istek tipinin alanları da şemalarla karşılaştırılır. Ortak sözleşme testi sayfalama varsayılanlarını, GLOBAL yazma iznini, zorunlu fiyatı ve yedi hata alanını denetler.
+- İlk tam turda seed testi ile repository fixture temizliği aynı veritabanında paralel çalışırken SQL deadlock oluştu. Bu iki SQL test sınıfı aynı xUnit collection'a alındı; paylaşılan veriyi değiştiren testler sırayla çalışır. Hata tekrar denemeyle gizlenmedi; tam tur yeniden başlatıldı.
+
+- Ortak liste sözleşmesi kategori endpoint'ine de uygulandı. Kategori ve ürün listeleri aynı `CatalogPageDto<T>` tipini kullanır. `Category_pagination_uses_the_same_shared_contract_and_safe_empty_page` varsayılanları, ikinci sayfayı, taşan boş sayfayı ve iki endpoint'in ham JSON alanlarının tam olarak `items/page/pageSize/totalCount` olduğunu doğrular. Kategori sıralamasına son eşitlik bozucu olarak GUID eklendi. Küçük kategori sözlüğü bellekte sayfalanır; ürünler SQL'de sayfalanır.
+- Aralık dışı sayfalama testleri artık iki listeye de uygulanır. `Malformed_pagination_is_rejected_before_database_access` sayfa/boyut alanlarında metni ve int aralığını aşan sayfayı 400 ile reddeder.
+- Araç keşfi testleri, eksik MSBuild ve eksik SqlPackage bulunan daha yeni kurulumdan sağlam kuruluma geçmeyi ve birden fazla sağlam kurulumda en yenisinin seçilmesini de kapsar. Simüle edilmiş kurulumlarla toplam 10 senaryo doğrulanır; gerçek kurulum üzerinden derleme/yayın doğrulaması ayrı olarak tam script'te yapılır.
+- Önceki testler ürün endpoint'inin eski `pageNumber/50/dizi` davranışını kabul ediyordu; ortak HTTP sözleşmesini sınamıyordu. Önceki kategori testi de aktif çocuk ürün varken kategoriyi SQL'de pasifleştirme/silme durumunu kapsamıyordu. Tek makinede başarılı script çalıştırmak ise SSMS'nin daha yeni olduğu çoklu kurulum seçimini doğrulamıyordu. Yeni testler bu üç boşluğu açık senaryolarla kapatır; test sayısının artması tüm uygulamanın hatasız olduğu anlamına gelmez.

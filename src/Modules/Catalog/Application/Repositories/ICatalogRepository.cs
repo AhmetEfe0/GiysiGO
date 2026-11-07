@@ -12,6 +12,7 @@ namespace GiysiGo.Modules.Catalog.Application.Repositories
         Task<ProductType?> GetProductTypeByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
         Task<IReadOnlyList<ProductType>> GetProductTypesPagedAsync(Guid? categoryId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+        Task<ProductTypePage> GetProductTypePageAsync(Guid? categoryId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
         Task<IReadOnlyList<Service>> GetServicesAsync(bool includeInactive = false, CancellationToken cancellationToken = default);
         Task<Service?> GetServiceByIdAsync(Guid id, CancellationToken cancellationToken = default);
