@@ -89,6 +89,9 @@ namespace GiysiGo.Modules.Identity.Tests
                 return true;
             });
             Assert.True(await checker.HasPermissionAsync(user, PermissionCodes.QuotePrepare, storeId: store));
+            Assert.False(await db.Transactions.ExecuteAsync((connection, transaction, token) =>
+                authorizationRepository.HasPermissionAsync(user, PermissionCodes.QuotePrepare,
+                    null, store, connection, transaction, token)));
             Assert.False(await checker.HasPermissionAsync(user, PermissionCodes.QuotePrepare, storeId: otherStore));
             Assert.False(await checker.HasPermissionAsync(user, PermissionCodes.QuoteApprove, storeId: store));
             Assert.False(await checker.HasPermissionAsync(user, PermissionCodes.QuotePrepare, corporate));

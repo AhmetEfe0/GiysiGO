@@ -1,8 +1,6 @@
 using System.Net;
-using System.Net.Http.Json;
 using GiysiGo.BuildingBlocks.Application.Contracts;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -34,29 +32,15 @@ namespace GiysiGo.API.IntegrationTests
             var path = $"/test/permissions/corporates/{corporateId}/stores/{storeId}";
 
             using var anonymous = await client.GetAsync(path);
-            Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
+            await ProblemResponseAssertions.AssertAsync(anonymous, HttpStatusCode.Unauthorized, "authentication_required");
             Assert.Equal("Test realm=\"GiysiGo\"", anonymous.Headers.WwwAuthenticate.ToString());
             Assert.Equal("invoked", anonymous.Headers.GetValues("X-Test-Challenge").Single());
-            Assert.Equal("application/problem+json", anonymous.Content.Headers.ContentType?.MediaType);
-            var anonymousProblem = await anonymous.Content.ReadFromJsonAsync<ProblemDetails>();
-            Assert.NotNull(anonymousProblem);
-            Assert.Equal(401, anonymousProblem.Status);
-            Assert.Equal(path, anonymousProblem.Instance);
-            Assert.Equal("unauthorized", anonymousProblem.Extensions["code"]?.ToString());
-            Assert.False(string.IsNullOrWhiteSpace(anonymousProblem.Extensions["traceId"]?.ToString()));
             Assert.Null(checker.SeenUserId);
 
             client.DefaultRequestHeaders.Add("X-Test-User", userId.ToString());
             using var forbidden = await client.GetAsync(path);
-            Assert.Equal(HttpStatusCode.Forbidden, forbidden.StatusCode);
+            await ProblemResponseAssertions.AssertAsync(forbidden, HttpStatusCode.Forbidden, "permission_denied");
             Assert.Equal("invoked", forbidden.Headers.GetValues("X-Test-Forbid").Single());
-            Assert.Equal("application/problem+json", forbidden.Content.Headers.ContentType?.MediaType);
-            var forbiddenProblem = await forbidden.Content.ReadFromJsonAsync<ProblemDetails>();
-            Assert.NotNull(forbiddenProblem);
-            Assert.Equal(403, forbiddenProblem.Status);
-            Assert.Equal(path, forbiddenProblem.Instance);
-            Assert.Equal("forbidden", forbiddenProblem.Extensions["code"]?.ToString());
-            Assert.False(string.IsNullOrWhiteSpace(forbiddenProblem.Extensions["traceId"]?.ToString()));
             Assert.Equal(userId, checker.SeenUserId);
             Assert.Equal(PermissionCodes.StoreView, checker.SeenPermission);
             Assert.Equal(corporateId, checker.SeenCorporateId);

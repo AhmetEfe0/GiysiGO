@@ -20,15 +20,17 @@ corporate rolü başka mağazaya taşınmaz. Store kapsamı istendiğinde okuyuc
 yoksa yapılandırma hatası fırlatılır; bilinmeyen veya pasif mağaza `false`
 döndürür. #10, `IStoreScopeReader` sözleşmesini tüketir. #52'de Catalog sahibinin
 eklediği gerçek `StoreScopeReader` ve DI kaydı korunur; Identity bu sağlayıcıyı
-kendi repository'si üzerinden verdiği yetki kararıyla birleştirir. Identity birim
-testleri kontrollü okuyucuyu, Catalog HTTP testleri gerçek sağlayıcıyı kullanır.
+kendi repository'si üzerinden verdiği yetki kararıyla birleştirir. Identity MSSQL
+testleri kontrollü okuyucuyu, Catalog yetki testleri gerçek sağlayıcıyı kullanır.
 Mağaza yönetimi ve tarife contract'larının kalan işleri #14/#21 kapsamındadır.
 
 Yetki kararındaki iki amaç-özel SQL prosedürünü `IIdentityAuthorizationRepository`
 üzerinden `IdentityAuthorizationRepository` çağırır. `PermissionChecker` ve
 `StaffAssignmentAuthorizer` kapsamı/iş kuralını denetler, Dapper çağrısını yapmaz.
-Repository, verilen açık bağlantı ve transaction'ı kullanır; `RepositoryBase<TEntity>`
-beş CRUD işlemi için olduğundan bu karar okumalarında kullanılmaz.
+Repository, verilen açık bağlantı ve transaction'ı kullanır. Yetki prosedürü,
+store kimliğiyle birlikte corporate kapsamı verilmediğinde erişimi reddeder.
+`RepositoryBase<TEntity>` beş CRUD işlemi için olduğundan bu karar okumalarında
+kullanılmaz.
 
 `IStaffAssignmentAuthorizer.CanManageAsync`, #15'teki personel atama komutunun
 rol verme/iptal etme işleminden önce aynı SQL bağlantısı ve transaction içinde
@@ -47,9 +49,11 @@ oturum/refresh akışı #13'ün işidir. API host,
 Korunan controller action'ı `[Authorize(Policy = PermissionCodes.StoreView)]` gibi
 uygun kodu belirtir; `corporateId` ve `storeId` route parametreleri varsa handler
 bunları `IPermissionChecker`'a geçirir. Yanlış/boş Guid kapsamı kabul edilmez.
-Anonim isteğe 401, doğrulanmış fakat izinsiz isteğe 403; her ikisine `code`,
-`traceId`, `instance` içeren Problem Details döner. Body veya kaynak ID'sinden
-çözülen kapsamlar komut/okuma servisinde ayrıca denetlenmelidir; yalnızca route
+Anonim isteğe 401 ve `authentication_required`, doğrulanmış fakat izinsiz isteğe
+403 ve `permission_denied` döner. İki yanıt da ortak Problem Details alanlarını
+taşır ve mevcut authentication şemasının Challenge/Forbid davranışını korur.
+Body veya kaynak ID'sinden çözülen kapsamlar komut/okuma servisinde ayrıca
+denetlenmelidir; yalnızca route
 politikası veya UI butonunu gizlemek yetki kanıtı değildir. Personel atama
 endpoint'leri #15'te bu temeli ve `IStaffAssignmentAuthorizer`'ı kullanır.
 
