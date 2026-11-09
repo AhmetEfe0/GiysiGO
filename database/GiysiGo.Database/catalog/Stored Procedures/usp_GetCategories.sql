@@ -16,6 +16,6 @@ BEGIN
     FROM [catalog].[product_categories]
     WHERE [delete_date] IS NULL
       AND (@IncludeInactive = 1 OR [is_active] = 1)
-    ORDER BY [sort_order] ASC, [name] ASC;
+    ORDER BY [sort_order] ASC, [name] ASC, [id] ASC;
 END
 GO

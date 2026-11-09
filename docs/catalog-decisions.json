@@ -1,0 +1,48 @@
+{
+  "initialServiceSelection": "none",
+  "serviceSelectionRequired": true,
+  "minimumPrimarySelection": true,
+  "productServiceUnitOverrides": [
+    { "productId": "P040", "serviceId": "S028", "priceUnit": "M2" },
+    { "productId": "P040", "serviceId": "S105", "priceUnit": "M2" },
+    { "productId": "P041", "serviceId": "S013", "priceUnit": "M2" }
+  ],
+  "tailoringEntryPolicy": "map-to-existing-product-service",
+  "tailoringEntryMappings": [
+    { "tailoringEntryIndex": 0, "productId": "P006", "serviceId": "S023" },
+    { "tailoringEntryIndex": 2, "productId": "P006", "serviceId": "S024" },
+    { "tailoringEntryIndex": 3, "productId": "P006", "serviceId": "S025" },
+    { "tailoringEntryIndex": 4, "productId": "P006", "serviceId": "S019" },
+    { "tailoringEntryIndex": 4, "productId": "P007", "serviceId": "S030" },
+    { "tailoringEntryIndex": 5, "productId": "P014", "serviceId": "S046" },
+    { "tailoringEntryIndex": 6, "productId": "P009", "serviceId": "S030" },
+    { "tailoringEntryIndex": 6, "productId": "P028", "serviceId": "S030" },
+    { "tailoringEntryIndex": 7, "productId": "P012", "serviceId": "S038" },
+    { "tailoringEntryIndex": 8, "productId": "P012", "serviceId": "S039" },
+    { "tailoringEntryIndex": 9, "productId": "P001", "serviceId": "S003" },
+    { "tailoringEntryIndex": 10, "productId": "P007", "serviceId": "S028" },
+    { "tailoringEntryIndex": 10, "productId": "P009", "serviceId": "S028" },
+    { "tailoringEntryIndex": 10, "productId": "P027", "serviceId": "S028" },
+    { "tailoringEntryIndex": 11, "productId": "P001", "serviceId": "S004" },
+    { "tailoringEntryIndex": 11, "productId": "P002", "serviceId": "S009" },
+    { "tailoringEntryIndex": 12, "productId": "P012", "serviceId": "S009" },
+    { "tailoringEntryIndex": 14, "productId": "P002", "serviceId": "S010" },
+    { "tailoringEntryIndex": 14, "productId": "P003", "serviceId": "S014" },
+    { "tailoringEntryIndex": 14, "productId": "P012", "serviceId": "S040" },
+    { "tailoringEntryIndex": 14, "productId": "P014", "serviceId": "S047" },
+    { "tailoringEntryIndex": 14, "productId": "P015", "serviceId": "S049" },
+    { "tailoringEntryIndex": 15, "productId": "P001", "serviceId": "S005" },
+    { "tailoringEntryIndex": 15, "productId": "P013", "serviceId": "S045" }
+  ],
+  "excludedTailoringEntries": [
+    { "tailoringEntryIndex": 1, "reason": "Ayrı bir mevcut ürün/hizmet çifti yok; P006/S023 zaten 120 TL ile eşlenmiştir." },
+    { "tailoringEntryIndex": 13, "reason": "Kullanıcı ağ aşınması/yama onarımını kapsam dışında bıraktı; pantolonda bu işlemin mevcut çifti yok." }
+  ],
+  "productServiceKindOverrides": [
+    { "productId": "P044", "serviceId": "S112", "selectionKind": "ALTERNATIVE" }
+  ],
+  "excludedProductServices": [
+    { "productId": "P039", "serviceId": "S102", "reason": "Boncuklu/taşlı/güpürlü yatak örtüsünde hassas işlem farkı çift ücret oluşturabilir." }
+  ],
+  "pendingProductServices": []
+}

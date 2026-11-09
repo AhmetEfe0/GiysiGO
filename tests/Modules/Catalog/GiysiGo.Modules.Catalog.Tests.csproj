@@ -16,6 +16,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="IntegrationTests\*.sql" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../../docs/catalog-draft.json" Link="Catalog\catalog-draft.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../../docs/catalog-decisions.json" Link="Catalog\catalog-decisions.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../../database/GiysiGo.Database/Scripts/CatalogSeed.sql" Link="Catalog\CatalogSeed.sql" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../../database/GiysiGo.Database/Scripts/IdentityPermissionsSeed.sql" Link="Catalog\IdentityPermissionsSeed.sql" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../../src/Modules/Catalog/Application/GiysiGo.Modules.Catalog.Application.csproj" />
