@@ -7,6 +7,7 @@ using GiysiGo.Modules.Catalog.Infrastructure.Repositories;
 namespace GiysiGo.Modules.Catalog.Tests.IntegrationTests
 {
 
+    [Collection("Catalog SQL")]
     public sealed class CatalogSqlServerMappingTests
     {
         [CatalogSqlServerFact]
