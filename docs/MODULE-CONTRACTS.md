@@ -16,7 +16,7 @@ durum ve olay matrisi `WORKFLOW-CONTRACTS.md` dosyasıdır.
 | `ITransactionalCustomerAddressReader` | Identity #16 | Ordering checkout adres snapshot'ı |
 | `IStoreCatalogReader` | Catalog #21 | Liste/önizleme fiyat ve konum kontrolü |
 | `ITransactionalStoreCatalogReader` | Catalog #21 | Checkout fiyatı ve görev başlangıcında dükkân konumu |
-| `IStoreScopeReader` | Catalog #14/#21 | Identity #10/#15: dükkânın şirketi ve aktifliği; #14 uygulaması için `STORE-MANAGEMENT.md` |
+| `IStoreScopeReader` | Catalog #14/#21 | Identity #10/#15: dükkânın şirketi ve aktifliği |
 | `IOrderPickupReader` | Ordering #26/#28 | Alım bilgisi önizlemesi |
 | `ITransactionalOrderPickupReader` | Ordering #26/#28 | Operations #29: alım, teslim ve iade adres kopyaları |
 | `IOrderOperationsReader` | Ordering #28 | Operations #31/#38: ürün inceleme ve ödenmiş hizmet listesi |
@@ -192,8 +192,8 @@ handler girişini kullanıcı komutundan ayırır. #32 otomatik worker/retry,
 #40 gerçek modüller arası teslim/iade testlerini tamamlar.
 
 OpenAPI dosyası bütün MVP endpoint'lerinin listesi değildir. Dört modülü kapsayan 16
-planlanan örneğe, #14 kapsamında uygulanmış beş dükkân yönetimi işlemi eklenmiştir.
-Yeni endpoint'ler aynı kurallarla
+planlanan örneğin bağlayıcı başlangıç sözleşmesine, #11 kapsamında uygulanmış 18
+Catalog işlemi ve #14 kapsamında beş dükkân yönetimi işlemi eklenmiştir. Yeni endpoint'ler aynı kurallarla
 modül PR'ında eklenir. Örneklerin `x-implementation-status=planned` değeri mevcut
 API'de çalıştıkları izlenimi verilmesini önler. `x-required-permission` ve
 `x-environments` runtime güvenlik uygulaması değildir; controller/host bunları

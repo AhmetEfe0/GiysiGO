@@ -1,18 +1,37 @@
 # Dükkân yönetimi #14 doğrulama takibi
 
 Branch: `codex/catalog-store-management`. Başlangıç: #10 / PR #46 commit `7dc8764`.
-#11 değişiklikleri bu branch'e alınmadı. Kullanıcı 9 Kasım 2026'da mevcut çalışmanın commit/push edilerek, #10 sonrası tekrar doğrulama notuyla taslak PR açılmasını onayladı. Ayrı GitHub yorumu veya merge için onay verilmedi.
+Güncel #10 `a02fa0f` ve onun içerdiği #11 değişiklikleriyle uyumlandırıldı. Güncel JWT doğrulaması, ortak API hata yanıtları ve iki teslimin Catalog kayıtları korundu. PR, #10 birleşene kadar `feature/identity-issue-10` branch'ini hedefler.
+
+## Güncel branch doğrulaması — 10 Kasım 2026
+
+İnceleme kopyasında doğrulanan dokuz çakışma çözümü asıl branch'e aktarıldı. `StoreJwtTests` kalıcı test paketine eklendi. `scripts/Test-StoreManagementData.ps1` asıl kaynaklarla yeniden çalıştırıldı: SQL Server 2022 LocalDB `16.0.1000.6`, SQL160 DACPAC hedefi, `AllowIncompatiblePlatform=false`; Release derleme ve iki kez yayın başarılı.
+
+| Paket | Geçen | Başarısız | Atlanan |
+| --- | ---: | ---: | ---: |
+| Catalog | 9 | 0 | 0 |
+| API | 51 | 0 | 0 |
+| Identity | 15 | 0 | 0 |
+| Ordering | 9 | 0 | 0 |
+| Operations | 1 | 0 | 0 |
+| Ortak sözleşmeler | 20 | 0 | 0 |
+| **Toplam** | **105** | **0** | **0** |
+
+Yerel günlük: `database/GiysiGo.Database/bin/Release/store-management-current-verification.log`. Altı TRX: aynı klasördeki `StoreVerification/`. Test veritabanı ve `GGST_563a70bfef70` örneği çalışma sonunda temizlendi. Bunlar yerel sonuçlardır; GitHub CI sonucu olarak sunulmaz. Aşağıdaki 67 testlik bölüm eski teslimin tarihsel kaydıdır.
 
 ## Kapatmadan önce zorunlu tekrar kontrolü
 
 - [x] Kullanıcının isteği: son inceleme öncesinde tekrar eden kodları ortaklaştır, dosya ve sorguları incelemesi kolay olacak şekilde sadeleştir; davranışın korunduğunu testleri yeniden çalıştırarak doğrula. Altı okuma prosedürünün ortak görünürlük filtresi `catalog.v_VisibleStores` görünümüne taşındı; son kaynaklarla tam test turu yeniden geçti.
 
-- [ ] #10 sahibinin seed atomikliği düzeltmesini güncel commit üzerinden incele.
-- [ ] Gerçek SQL Server üzerinde seed'in rol/izin yazımı ortasında kontrollü hata oluştur; önceki durumun aynen korunduğunu, kısmi rol/izin/eşleşme kalmadığını ve açık transaction bırakılmadığını doğrula.
-- [ ] Düzeltilmiş #10 seed'iyle başarılı tekrarın kayıt çoğaltmadığını, pasif izinleri ve iptal edilmiş eşleşmeleri yeniden açmadığını yeniden doğrula.
-- [ ] Düzeltilmiş #10 ile #14'ün gerçek Identity/Catalog entegrasyon testlerini yeniden çalıştır.
+- [x] #10 sahibinin seed atomikliği düzeltmesini `a02fa0f` üzerinden incele.
+- [x] SQL Server 2022 üzerinde seed'in rol/izin yazımı ortasında kontrollü hata oluştur; dış transaction varken/yokken dört yetki tablosunda kısmi kayıt ve açık transaction kalmadığını doğrula. Başarılı seed'in dış transaction'ı erken kapatmadığı ve dış rollback ile değişikliklerin geri alındığı da doğrulandı.
+- [x] Düzeltilmiş #10 seed'iyle başarılı tekrarın kayıt çoğaltmadığını, pasif izinleri ve iptal edilmiş eşleşmeleri yeniden açmadığını doğrula.
+- [x] Düzeltilmiş #10 ile #14'ün gerçek Identity/Catalog entegrasyon testlerini inceleme kopyasında çalıştır: 105 geçti, başarısız/atlanan yok.
+- [ ] #10 sahibinin ortak test hazırlığı düzeltmesinden sonra iki teslimin son commit'lerini birlikte doğrula ve inceleme onaylarını tamamla. Bu son kontrol ekip arkadaşı tarafından yapılabilir.
 
-8 Kasım 2026 incelemesinde eski seed için hata sonrasında 5 rol kaldığı doğrulandı. Bu bulgu düzeltilip yeniden test edilene kadar yukarıdaki maddeler açık kalır. Geliştirme testlerinin başarılı olması bu açık kontrolün yerine geçmez.
+8 Kasım 2026 incelemesinde eski seed için hata sonrasında 5 rol kaldığı doğrulandı. Güncel #10, transaction kullanan `IdentityPermissionsSeed.sql` dosyasına geçti; kontrollü hata senaryoları yeniden çalıştırılarak bu bulgu kapatıldı.
+
+Kalan test hazırlığı bulgusu: `IdentityPermissionTests.cs` içindeki seed testi, `order.fulfill` izninin önceden pasifleştirilmesini bekler. `Test-IdentityData.ps1` ve #14'ün `Test-StoreManagementData.ps1` script'i `PrepareSeedRedeploy.sql` ile bu hazırlığı yapar; `Test-CatalogData.ps1` yapmadığı için güncel #10'da bir Identity testi başarısız olur. Testin kendi hazırlığını yapması #10 sahibinden istendi. Bu, uygulamada yetki ihlali olduğu anlamına gelmez; ortak test çalıştırmasının dış hazırlık bağımlılığıdır.
 
 ## #14 mevcut kaynaklarının doğrulaması — 8 Kasım 2026
 
@@ -58,8 +77,8 @@ Yerel günlük `database/GiysiGo.Database/bin/Release/store-management-verificat
 4. `StoreScopeReader` / `StoreCatalogReader`: gerçek Identity entegrasyonu ve public okuyucular.
 5. HTTP/SQL testleri ve `mvp-contracts.json`: kanıtlar ve ortak sözleşme.
 
-Identity Domain/Infrastructure'a Catalog tarafından referans eklenmedi; #10'un checker/authorizer veya IdentitySeed kaynakları değiştirilmedi. `store.manage` ortak permission sabiti ve #14'e özel seed eklendi. #11'in seed/karar/yönetim değişiklikleri bu branch'e taşınmadı.
+Identity Domain/Infrastructure'a Catalog tarafından referans eklenmedi. `store.manage` ortak permission sabiti ve #14'e özel seed, güncel #10 ve #11 altyapısıyla birlikte çalışır. #10'un checker/authorizer iş kurallarına #14 tarafından yeni davranış eklenmedi.
 
-Gerçek JWT bağlaması #13 kapsamındadır; HTTP testlerinde authentication test şeması, izin/kapsam kararlarında gerçek Identity kullanılır. İstemci projesi bu branch'te bulunmadığından istemci testi yoktur. DB CI altyapısı #19 sınırındadır. #10 seed düzeltmesi ve birleşim sonrası tekrar kontrolü açıkken #10/#14 birlikte kapanmaya hazır ilan edilmez.
+Güncel JWT doğrulaması korunur; `StoreJwtTests` gerçek JWT, Identity ve SQL ile sahip/personel erişimini ve aktiflik sınırlarını birlikte doğrular. Diğer yönetim HTTP testlerinde authentication test şeması, izin/kapsam kararlarında gerçek Identity kullanılır. Giriş/refresh/token üretimi #13 kapsamındadır. İstemci projesi bu branch'te bulunmadığından istemci testi yoktur. DB CI altyapısı #19 sınırındadır.
 
-Taslak PR, yalnız #14 farkının incelenmesi için başlangıçta `feature/identity-issue-10` branch'ini hedefler. #10 kontrolü ve birleşiminden sonra hedef `main` olarak güncellenmeli, kaynaklar uzlaştırılmalı ve bu doğrulama turu yeniden çalıştırılmalıdır. Bu maddeler tamamlanana kadar merge'e hazır kabul edilmez. Ayrı GitHub yorumu ve merge yapılmaz.
+PR, yalnız #14 farkının incelenmesi için başlangıçta `feature/identity-issue-10` branch'ini hedefler. #10 test hazırlığı düzeltmesi ve son ortak doğrulama ile inceleme onayları tamamlandıktan sonra önce #10 birleştirilir. Ardından #14 hedefi `main` olarak güncellenip son fark ve kontroller değerlendirilir. İncelemeye hazır olması, merge onayının tamamlandığı anlamına gelmez.

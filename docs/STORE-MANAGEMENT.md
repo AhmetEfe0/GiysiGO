@@ -1,6 +1,6 @@
 # Şirkete bağlı dükkân yönetimi — #14
 
-Bu çalışma #10'un `7dc8764` commit'inden açılan `codex/catalog-store-management` branch'indedir. #11 değişikliklerini içermez. #10 merge edilmeden ana dala yönelik bağımsız fark olarak değerlendirilmemelidir; bağımlılık birleşince başlangıç ve entegrasyon yeniden kontrol edilir.
+Bu çalışma #10'un `7dc8764` commit'inden açılan `codex/catalog-store-management` branch'indedir. Güncel #10 `a02fa0f` ve onun içerdiği #11 değişiklikleriyle uyumlandırılmıştır. PR, #10 birleşene kadar `feature/identity-issue-10` branch'ini hedefler; #10 birleşince hedef `main` olarak güncellenir.
 
 ## HTTP ve yetki
 
@@ -60,8 +60,8 @@ Ana ticari Word belgesi ekspres işlem ve 24 saat/aynı gün teslimi sayar. Mevc
 
 400 doğrulama, 401 kimliksiz, 403 izinsiz, 404 şirket kapsamında bulunamayan dükkân, 409 veri durumu çatışması; beklenmeyen hatalar güvenli 500'dür. Problem Details yedi ortak alanı ve 400 için errors alanını taşır. SQL iç ayrıntıları istemciye verilmez.
 
-`StoreManagementPermissionsSeed.sql` yalnız #14 iznini/eşleşmelerini atomik ekler; mevcut kimlikleri, pasif izni ve iptal edilmiş eşleşmeleri değiştirmez. #10'un `IdentitySeed.sql` dosyası değiştirilmedi. Oradaki hata atomikliği bulgusu kapatma öncesi [zorunlu doğrulama takibinde](STORE-MANAGEMENT-VERIFICATION.md) açıktır.
+`StoreManagementPermissionsSeed.sql` yalnız #14 iznini/eşleşmelerini atomik ekler; mevcut kimlikleri, pasif izni ve iptal edilmiş eşleşmeleri değiştirmez. Güncel #10, eski `IdentitySeed.sql` yerine transaction kullanan `IdentityPermissionsSeed.sql` dosyasını çalıştırır. Önceki hata atomikliği bulgusu SQL Server 2022'de yeniden doğrulanarak kapatılmıştır; ortak test hazırlığına ilişkin kalan madde [doğrulama takibinde](STORE-MANAGEMENT-VERIFICATION.md) açıklanır.
 
-API host'un gerçek JWT bağlaması #13'ün teslimidir. #14 HTTP testlerinde yalnız authentication test şemasıdır; gerçek Identity checker/repository, SQL prosedürleri ve Catalog okuyucuları değiştirilmez. Bu sonuç giriş/refresh/JWT üretiminin veya tüm MVP'nin uçtan uca tamamlandığı iddiası değildir. Flutter/React istemci projesi bu branch'te bulunmaz; ekran testi yapılmış sayılmaz.
+API host'unda #11 ile gelen JWT doğrulaması korunur. #14 HTTP testleri gerçek Identity checker/repository, SQL prosedürleri ve Catalog okuyucularını kullanır. Yönetim senaryolarında authentication test şeması, `StoreJwtTests` içinde ise gerçek JWT doğrulaması kullanılır. JWT testi sahip/personel erişimini, pasifleştirme/yeniden açmayı, pasif kullanıcıyı ve yanlış imzayı kapsar. Giriş/refresh/token üretimi #13 kapsamındadır. Flutter/React istemci projesi bu branch'te bulunmaz; ekran testi yapılmış sayılmaz.
 
-Çalıştırma: `pwsh -NoProfile -File scripts/Test-StoreManagementData.ps1`. Script SSDT araçlarını doğrular, ayrılmış SQL 2022 örneğinde DACPAC'i iki kez yayımlar, altı test paketinin TRX sonuçlarını yazar ve yalnız kendi veritabanı/örneğini temizler. Ana dala merge, GitHub yorumu, commit ve push kullanıcı onayı bekler.
+Çalıştırma: `pwsh -NoProfile -File scripts/Test-StoreManagementData.ps1`. Script SSDT araçlarını doğrular, ayrılmış SQL 2022 örneğinde DACPAC'i iki kez yayımlar, altı test paketinin TRX sonuçlarını yazar ve yalnız kendi veritabanı/örneğini temizler. Son test ve inceleme onaylarından sonra önce #10, ardından #14 birleştirilir.

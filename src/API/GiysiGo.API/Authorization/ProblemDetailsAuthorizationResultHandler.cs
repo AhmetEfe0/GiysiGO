@@ -1,3 +1,4 @@
+using GiysiGo.API.Errors;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
 
@@ -17,37 +18,11 @@ namespace GiysiGo.API.Authorization
                 return;
             }
 
-            if (authorizeResult.Challenged)
+            var statusCode = context.Response.StatusCode;
+            if ((authorizeResult.Challenged && statusCode == StatusCodes.Status401Unauthorized)
+                || (authorizeResult.Forbidden && statusCode == StatusCodes.Status403Forbidden))
             {
-                if (context.Response.StatusCode != StatusCodes.Status401Unauthorized)
-                {
-                    return;
-                }
-
-                await Results.Problem(statusCode: StatusCodes.Status401Unauthorized,
-                    title: "Unauthorized", type: "https://httpstatuses.io/401",
-                    detail: "Authentication is required.", instance: context.Request.Path,
-                    extensions: new Dictionary<string, object?>
-                    {
-                        ["code"] = "unauthorized", ["traceId"] = context.TraceIdentifier
-                    }).ExecuteAsync(context);
-                return;
-            }
-
-            if (authorizeResult.Forbidden)
-            {
-                if (context.Response.StatusCode != StatusCodes.Status403Forbidden)
-                {
-                    return;
-                }
-
-                await Results.Problem(statusCode: StatusCodes.Status403Forbidden,
-                    title: "Forbidden", type: "https://httpstatuses.io/403",
-                    detail: "You do not have permission for this resource.", instance: context.Request.Path,
-                    extensions: new Dictionary<string, object?>
-                    {
-                        ["code"] = "forbidden", ["traceId"] = context.TraceIdentifier
-                    }).ExecuteAsync(context);
+                await Results.Problem(ApiProblem.Create(context, statusCode)).ExecuteAsync(context);
             }
         }
     }

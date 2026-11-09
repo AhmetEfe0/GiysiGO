@@ -90,6 +90,18 @@ namespace GiysiGo.Modules.Catalog.Infrastructure.Repositories
             return await GetProductTypesAsync(categoryId, pageNumber: pageNumber, pageSize: pageSize, cancellationToken: cancellationToken);
         }
 
+        public async Task<ProductTypePage> GetProductTypePageAsync(Guid? categoryId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);
+            using var results = await connection.QueryMultipleAsync(new CommandDefinition(
+                "catalog.usp_GetProductTypesPaged",
+                new { category_id = categoryId, include_inactive = false, page_number = pageNumber, page_size = pageSize },
+                commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));
+            var items = (await results.ReadAsync<ProductType>()).AsList();
+            var totalCount = await results.ReadSingleAsync<int>();
+            return new ProductTypePage(items, totalCount);
+        }
+
         public async Task<IReadOnlyList<Service>> GetServicesAsync(bool includeInactive = false, CancellationToken cancellationToken = default)
         {
             await using var connection = await _sqlConnectionFactory.OpenAsync(cancellationToken);

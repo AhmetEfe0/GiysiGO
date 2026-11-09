@@ -42,6 +42,9 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+      - name: Visual Studio ve SSDT araç keşfi testleri
+        shell: pwsh
+        run: ./scripts/Test-CatalogBuildTools.ps1
       - name: Build DACPAC
         run: msbuild database/GiysiGo.Database/GiysiGo.Database.sqlproj /p:Configuration=Release /p:VisualStudioVersion=17.0 /p:Platform=AnyCPU /m
       - name: Start LocalDB
@@ -66,3 +69,9 @@ jobs:
             /p:AllowIncompatiblePlatform=True
       - name: Test Catalog against LocalDB
         run: dotnet test tests/Modules/Catalog/GiysiGo.Modules.Catalog.Tests.csproj --configuration Release --verbosity minimal
+      - name: Katalog HTTP ve yazma sınırı testleri
+        run: dotnet test tests/API/GiysiGo.API.IntegrationTests/GiysiGo.API.IntegrationTests.csproj --configuration Release --verbosity minimal
+      - name: Ordering SQL uyum testleri
+        env:
+          GIYSIGO_ORDERING_TEST_CONNECTION_STRING: ${{ env.GIYSIGO_CATALOG_TEST_CONNECTION }}
+        run: dotnet test tests/Modules/Ordering/GiysiGo.Modules.Ordering.Tests.csproj --configuration Release --verbosity minimal

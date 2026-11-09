@@ -12,13 +12,14 @@ namespace GiysiGo.Modules.Catalog.Infrastructure
         public static IServiceCollection AddCatalogModule(this IServiceCollection services)
         {
             services.AddScoped<ICatalogRepository, CatalogRepository>();
+            services.AddScoped<ICatalogManagementRepository, CatalogManagementRepository>();
+            services.AddScoped<IStoreScopeReader, StoreScopeReader>();
+
             services.AddScoped<IStoreManagementRepository, StoreManagementRepository>();
             services.AddScoped<StoreManagementService>();
-            services.AddScoped<IStoreScopeReader, StoreScopeReader>();
             services.AddScoped<StoreCatalogReader>();
             services.AddScoped<IStoreCatalogReader>(provider => provider.GetRequiredService<StoreCatalogReader>());
             services.AddScoped<ITransactionalStoreCatalogReader>(provider => provider.GetRequiredService<StoreCatalogReader>());
-
             return services;
         }
     }
