@@ -18,6 +18,9 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <None Update="Fixtures/*.sql" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../../docs/openapi/mvp-contracts.json" Link="mvp-contracts.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../../database/GiysiGo.Database/Scripts/StoreManagementPermissionsSeed.sql" Link="Fixtures/StoreManagementPermissionsSeed.sql" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

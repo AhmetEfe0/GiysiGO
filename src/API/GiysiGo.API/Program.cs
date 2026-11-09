@@ -8,11 +8,21 @@ using GiysiGo.Modules.Operations.Infrastructure;
 using GiysiGo.API.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
+using GiysiGo.API.Errors;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddProblemDetails();
+builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var problem = new ValidationProblemDetails(context.ModelState) { Status = 400 };
+        ApiProblem.Complete(context.HttpContext, problem);
+        return new BadRequestObjectResult(problem) { ContentTypes = { "application/problem+json" } };
+    };
+});
+builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = context => ApiProblem.Complete(context.HttpContext, context.ProblemDetails));
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization(PermissionPolicies.AddPermissionPolicies);
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
@@ -37,6 +47,7 @@ builder.Services.AddSingleton(_ =>
 var app = builder.Build();
 
 app.UseExceptionHandler();
+app.UseStatusCodePages(async context => await Results.Problem(statusCode: context.HttpContext.Response.StatusCode).ExecuteAsync(context.HttpContext));
 
 if (app.Environment.IsDevelopment())
 {

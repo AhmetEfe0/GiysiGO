@@ -9,6 +9,7 @@ namespace GiysiGo.API.Authorization
         {
             string[] codes =
             [
+                PermissionCodes.StoreManage,
                 PermissionCodes.StoreView,
                 PermissionCodes.StoreStaffManage,
                 PermissionCodes.StoreOfferingManage,

@@ -3,7 +3,7 @@
   "info": {
     "title": "GiysiGO MVP shared HTTP contract examples",
     "version": "1.0.0",
-    "description": "Issue #5 design baseline, not implemented endpoints. Module owners implement these examples and expand this document before exposing additional routes. Internal events and system transitions are not HTTP request bodies. HTTP JSON uses camelCase; UUID identifiers, UTC timestamps and TRY decimal amounts."
+    "description": "Ortak MVP sözleşmesi: başlangıç örnekleri planned, #14 dükkân yönetiminin beş işlemi implemented olarak işaretlenir. Her uç kendi uygulama durumuyla değerlendirilir."
   },
   "security": [
     {
@@ -1044,6 +1044,376 @@
           }
         ]
       }
+    },
+    "/corporates/{corporateId}/stores": {
+      "get": {
+        "operationId": "listCorporateStores",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Şirket kapsamında erişilebilir dükkânları sayfalar. Şirket sahibi/platform yöneticisi; personel ayrıntı ucunu kullanır.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "x-required-permission": "store.view",
+        "x-permission-scope": "CORPORATE_OR_STORE",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "corporateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManagedStorePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createCorporateStore",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Aktif şirkete dükkân oluşturur; şirket ve aktör kimlikleri gövdeden alınmaz.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "x-required-permission": "store.manage",
+        "x-permission-scope": "CORPORATE",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "corporateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreWriteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Başarılı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdResult"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Oluşturulan dükkânın ayrıntı adresi.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/corporates/{corporateId}/stores/{id}": {
+      "get": {
+        "operationId": "getManagedStore",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Şirket yöneticisi pasif dükkânı da; personel yalnız aktif atandığı dükkânı görebilir. İşlem store.view şirket izni veya store.view gerçek dükkân izniyle denetlenir.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "x-required-permission": "store.view",
+        "x-permission-scope": "CORPORATE_OR_STORE",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "corporateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManagedStore"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateCorporateStore",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Dükkân bilgilerini günceller; şirket aidiyeti ve aktiflik değişmez.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "x-required-permission": "store.manage",
+        "x-permission-scope": "CORPORATE",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "corporateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreWriteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Başarılı"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/corporates/{corporateId}/stores/{id}/active": {
+      "patch": {
+        "operationId": "setCorporateStoreActive",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Şirket yetkisiyle pasifleştirir veya yeniden açar. Aynı aktiflik tekrarında no-op.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "x-required-permission": "store.manage",
+        "x-permission-scope": "CORPORATE",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "corporateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreActiveRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Başarılı"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1098,6 +1468,8 @@
           "type",
           "title",
           "status",
+          "detail",
+          "instance",
           "code",
           "traceId"
         ]
@@ -1415,6 +1787,150 @@
         "properties": {
           "note": {
             "type": "string"
+          }
+        }
+      },
+      "StoreWriteRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "addressText",
+          "latitude",
+          "longitude",
+          "serviceRadiusKm"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "addressText": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90,
+            "multipleOf": 0.000001,
+            "description": "Derece; en fazla altı ondalık basamak."
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180,
+            "multipleOf": 0.000001,
+            "description": "Derece; en fazla altı ondalık basamak."
+          },
+          "serviceRadiusKm": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 99999.99,
+            "multipleOf": 0.01,
+            "description": "Kilometre; Haversine, dünya yarıçapı 6371 km; sınır dahil."
+          }
+        }
+      },
+      "StoreActiveRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "isActive"
+        ],
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ManagedStore": {
+        "type": "object",
+        "required": [
+          "id",
+          "corporateId",
+          "name",
+          "addressText",
+          "latitude",
+          "longitude",
+          "serviceRadiusKm",
+          "isActive"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "corporateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "addressText": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90,
+            "multipleOf": 0.000001,
+            "description": "Derece; en fazla altı ondalık basamak."
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180,
+            "multipleOf": 0.000001,
+            "description": "Derece; en fazla altı ondalık basamak."
+          },
+          "serviceRadiusKm": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 99999.99,
+            "multipleOf": 0.01,
+            "description": "Kilometre; Haversine, dünya yarıçapı 6371 km; sınır dahil."
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ManagedStorePage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ManagedStore"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "pageSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
           }
         }
       }
