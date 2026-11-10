@@ -1,0 +1,3 @@
+# Üretilen SQL dosyaları GitHub diff görünümünde varsayılan olarak daraltılır.
+database/GiysiGo.Database/Scripts/CatalogSeed.sql linguist-generated=true
+database/GiysiGo.Database/Scripts/IdentityPermissionsSeed.sql linguist-generated=true

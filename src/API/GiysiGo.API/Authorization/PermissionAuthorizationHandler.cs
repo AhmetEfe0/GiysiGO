@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GiysiGo.API.Authorization
 {
-    public sealed class PermissionAuthorizationHandler(ICurrentUser currentUser,
-        IPermissionChecker permissionChecker)
+    public sealed class PermissionAuthorizationHandler(ICurrentUser currentUser)
         : AuthorizationHandler<PermissionRequirement>
     {
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -22,6 +21,7 @@ namespace GiysiGo.API.Authorization
                 return;
             }
 
+            var permissionChecker = httpContext.RequestServices.GetRequiredService<IPermissionChecker>();
             if (await permissionChecker.HasPermissionAsync(userId, requirement.Code,
                 corporateId, storeId, httpContext.RequestAborted))
             {

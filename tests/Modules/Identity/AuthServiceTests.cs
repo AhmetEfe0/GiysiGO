@@ -6,15 +6,17 @@ using Microsoft.Data.SqlClient;
 
 namespace GiysiGo.Modules.Identity.Tests
 {
+    [Collection(nameof(IdentityDatabaseCollection))]
     public sealed class AuthServiceTests
     {
         [SqlServerFact]
         public async Task Register_login_rotate_replay_and_logout_follow_one_session_chain()
         {
             using var db = new IdentityDatabase();
+            var issuer = new TestAccessTokenIssuer();
             var auth = new AuthService(db.Transactions, db.Get<IUserRepository>(),
                 db.Get<IAuthSessionRepository>(), db.Get<IIdentityAccessRepository>(),
-                new PasswordHasher<User>(), new TestAccessTokenIssuer());
+                new PasswordHasher<User>(), issuer);
             var email = $"auth-{Guid.NewGuid():N}@example.test";
             var userId = await auth.RegisterAsync(email, "a-long-unique-password");
 
@@ -31,6 +33,10 @@ namespace GiysiGo.Modules.Identity.Tests
             var login = await auth.LoginAsync(email.ToUpperInvariant(), "a-long-unique-password");
             Assert.NotNull(login);
             Assert.Equal(userId.ToString(), login.AccessToken);
+
+            issuer.FailIssuance = true;
+            await Assert.ThrowsAsync<InvalidOperationException>(() => auth.RefreshAsync(login.RefreshToken));
+            issuer.FailIssuance = false;
 
             var rotations = await Task.WhenAll(auth.RefreshAsync(login.RefreshToken),
                 auth.RefreshAsync(login.RefreshToken));

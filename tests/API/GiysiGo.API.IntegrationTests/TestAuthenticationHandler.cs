@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 
@@ -22,6 +23,21 @@ namespace GiysiGo.API.IntegrationTests
                 [new Claim(ClaimTypes.NameIdentifier, userId.ToString())], Scheme.Name);
             return Task.FromResult(AuthenticateResult.Success(
                 new AuthenticationTicket(new ClaimsPrincipal(identity), Scheme.Name)));
+        }
+
+        protected override Task HandleChallengeAsync(AuthenticationProperties properties)
+        {
+            Response.StatusCode = StatusCodes.Status401Unauthorized;
+            Response.Headers.WWWAuthenticate = "Test realm=\"GiysiGo\"";
+            Response.Headers["X-Test-Challenge"] = "invoked";
+            return Task.CompletedTask;
+        }
+
+        protected override Task HandleForbiddenAsync(AuthenticationProperties properties)
+        {
+            Response.StatusCode = StatusCodes.Status403Forbidden;
+            Response.Headers["X-Test-Forbid"] = "invoked";
+            return Task.CompletedTask;
         }
     }
 }

@@ -14,6 +14,8 @@
   <ItemGroup>
     <Using Include="Xunit" />
     <None Update="Fixtures/*.sql" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../../database/GiysiGo.Database/Scripts/IdentityPermissionsSeed.sql"
+          Link="Fixtures/IdentityPermissionsSeed.sql" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../../src/Modules/Identity/Application/GiysiGo.Modules.Identity.Application.csproj" />

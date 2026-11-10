@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -25,6 +26,7 @@ namespace GiysiGo.API.IntegrationTests
         public async Task Register_login_protected_refresh_replay_and_logout()
         {
             var connection = Environment.GetEnvironmentVariable("GIYSIGO_IDENTITY_TEST_CONNECTION")!;
+            Assert.StartsWith("GiysiGo_IdentityTest_", new SqlConnectionStringBuilder(connection).InitialCatalog, StringComparison.Ordinal);
             var key = Convert.ToBase64String(RandomNumberGenerator.GetBytes(48));
             await using var application = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
             {
@@ -45,9 +47,11 @@ namespace GiysiGo.API.IntegrationTests
             using var invalidRegister = await client.PostAsJsonAsync("/auth/register", new { email, password = "short" });
             Assert.Equal(HttpStatusCode.BadRequest, invalidRegister.StatusCode);
             var invalidProblem = await invalidRegister.Content.ReadFromJsonAsync<ProblemDetails>();
-            Assert.Equal("validation_error", invalidProblem?.Extensions["code"]?.ToString());
+            Assert.Equal("validation_failed", invalidProblem?.Extensions["code"]?.ToString());
             var validationErrors = Assert.IsType<JsonElement>(invalidProblem?.Extensions["errors"]);
             Assert.True(validationErrors.TryGetProperty("password", out _));
+            using var unexpectedField = await client.PostAsJsonAsync("/auth/register", new { email, password = "a-very-long-password", displayName = "Test" });
+            Assert.Equal(HttpStatusCode.BadRequest, unexpectedField.StatusCode);
             using var register = await client.PostAsJsonAsync("/auth/register", new { email, password = "a-very-long-password" });
             Assert.Equal(HttpStatusCode.Created, register.StatusCode);
             using var registration = JsonDocument.Parse(await register.Content.ReadAsStringAsync());

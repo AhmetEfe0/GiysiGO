@@ -9,6 +9,7 @@ BEGIN
 
     IF @UserId IS NULL OR @UserId = '00000000-0000-0000-0000-000000000000'
         OR @PermissionCode IS NULL OR DATALENGTH(@PermissionCode) > 200
+        OR (@StoreId IS NOT NULL AND @CorporateId IS NULL)
         OR NOT EXISTS (SELECT 1 FROM [identity].users WHERE id = @UserId AND is_active = 1 AND delete_date IS NULL)
         OR (@CorporateId IS NOT NULL AND NOT EXISTS (
             SELECT 1 FROM [identity].corporates WHERE id = @CorporateId AND is_active = 1 AND delete_date IS NULL))

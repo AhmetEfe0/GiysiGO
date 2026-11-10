@@ -37,22 +37,21 @@ namespace GiysiGo.Modules.Identity.Infrastructure
             var tokenHash = HashRefreshToken(refreshToken);
             var sessionId = Guid.NewGuid();
             var expiry = DateTime.UtcNow.Add(RefreshLifetime);
-            var userId = await transactions.ExecuteAsync(async (connection, transaction, token) =>
+            return await transactions.ExecuteAsync<AuthTokenResult?>(async (connection, transaction, token) =>
             {
                 var user = await users.GetByEmailAsync(email.Trim(), connection, transaction, token);
                 if (user is null || !user.IsActive || user.DeleteDate.HasValue)
-                    return (Guid?)null;
+                    return null;
 
                 var verification = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
-                if (verification == PasswordVerificationResult.Failed) return (Guid?)null;
+                if (verification == PasswordVerificationResult.Failed) return null;
                 if (verification == PasswordVerificationResult.SuccessRehashNeeded)
                     await users.SetPasswordHashAsync(user.Id, passwordHasher.HashPassword(user, password),
                         connection, transaction, token);
 
                 await sessions.CreateAsync(sessionId, user.Id, tokenHash, expiry, connection, transaction, token);
-                return user.Id;
+                return IssueTokens(user.Id, refreshToken);
             }, cancellationToken);
-            return userId.HasValue ? IssueTokens(userId.Value, refreshToken) : null;
         }
 
         public async Task<AuthTokenResult?> RefreshAsync(string refreshToken, CancellationToken cancellationToken = default)
@@ -61,10 +60,12 @@ namespace GiysiGo.Modules.Identity.Infrastructure
             var replacement = CreateRefreshToken();
             var newId = Guid.NewGuid();
             var newExpiry = DateTime.UtcNow.Add(RefreshLifetime);
-            var userId = await transactions.ExecuteAsync((connection, transaction, token) =>
-                sessions.RotateAsync(HashRefreshToken(refreshToken), newId, HashRefreshToken(replacement),
-                    newExpiry, connection, transaction, token), cancellationToken);
-            return userId.HasValue ? IssueTokens(userId.Value, replacement) : null;
+            return await transactions.ExecuteAsync<AuthTokenResult?>(async (connection, transaction, token) =>
+            {
+                var userId = await sessions.RotateAsync(HashRefreshToken(refreshToken), newId, HashRefreshToken(replacement),
+                    newExpiry, connection, transaction, token);
+                return userId.HasValue ? IssueTokens(userId.Value, replacement) : null;
+            }, cancellationToken);
         }
 
         public Task LogoutAsync(string refreshToken, CancellationToken cancellationToken = default)

@@ -24,7 +24,9 @@ namespace GiysiGo.Contracts.Tests
                     Assert.Contains(operation.GetProperty("x-owner-module").GetString(), new[] { "Identity", "Catalog", "Ordering", "Operations" });
                     if (operation.TryGetProperty("security", out var security) && security.GetArrayLength() == 0)
                     {
-                        Assert.Contains(path.Name, new[] { "/auth/register", "/auth/login", "/auth/refresh", "/auth/logout" });
+                        Assert.True((method.Name == "post" && path.Name is
+                            "/auth/register" or "/auth/login" or "/auth/refresh" or "/auth/logout") ||
+                            (path.Name.StartsWith("/catalog/", StringComparison.Ordinal) && method.Name == "get"));
                     }
 
                     foreach (Match parameter in Regex.Matches(path.Name, @"\{([^}]+)\}"))
@@ -74,6 +76,38 @@ namespace GiysiGo.Contracts.Tests
         }
 
         private static JsonDocument ReadContract() => JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "mvp-contracts.json")));
+
+        [Fact]
+        public void Catalog_lists_and_management_follow_the_shared_pagination_and_security_contract()
+        {
+            using var document = ReadContract();
+            var paths = document.RootElement.GetProperty("paths");
+            var schemas = document.RootElement.GetProperty("components").GetProperty("schemas");
+            foreach (var route in new[] { "/catalog/categories", "/catalog/product-types" })
+            {
+                var list = paths.GetProperty(route).GetProperty("get");
+                var parameters = list.GetProperty("parameters").EnumerateArray().ToArray();
+                Assert.Equal(1, parameters.Single(p => p.GetProperty("name").GetString() == "page").GetProperty("schema").GetProperty("default").GetInt32());
+                var size = parameters.Single(p => p.GetProperty("name").GetString() == "pageSize").GetProperty("schema");
+                Assert.Equal(20, size.GetProperty("default").GetInt32());
+                Assert.Equal(100, size.GetProperty("maximum").GetInt32());
+                Assert.DoesNotContain(parameters, p => p.GetProperty("name").GetString() == "pageNumber");
+            }
+            foreach (var path in paths.EnumerateObject().Where(path => path.Name.StartsWith("/catalog/", StringComparison.Ordinal)))
+                foreach (var method in path.Value.EnumerateObject().Where(method => method.Name != "get"))
+                {
+                    Assert.Equal("catalog.manage", method.Value.GetProperty("x-required-permission").GetString());
+                    Assert.Equal("GLOBAL", method.Value.GetProperty("x-permission-scope").GetString());
+                    Assert.Equal(1, method.Value.GetProperty("security").GetArrayLength());
+                }
+            var pair = schemas.GetProperty("CatalogPairWriteRequest");
+            Assert.False(pair.GetProperty("additionalProperties").GetBoolean());
+            Assert.Contains(pair.GetProperty("required").EnumerateArray(), property => property.GetString() == "defaultPrice");
+            foreach (var field in new[] { "id", "userId", "role", "currency", "isDefaultSelected" })
+                Assert.False(pair.GetProperty("properties").TryGetProperty(field, out _));
+            foreach (var field in new[] { "type", "title", "status", "detail", "instance", "code", "traceId" })
+                Assert.Contains(schemas.GetProperty("Problem").GetProperty("required").EnumerateArray(), property => property.GetString() == field);
+        }
 
         private static void AssertReferencesResolve(JsonElement node, JsonElement root)
         {
