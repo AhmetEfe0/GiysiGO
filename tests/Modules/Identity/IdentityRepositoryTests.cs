@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 
 namespace GiysiGo.Modules.Identity.Tests
 {
+    [Collection(nameof(IdentityDatabaseCollection))]
     public sealed class IdentityRepositoryTests
     {
         [SqlServerFact]

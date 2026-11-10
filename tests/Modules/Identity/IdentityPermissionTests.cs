@@ -7,6 +7,7 @@ using System.Security.Claims;
 
 namespace GiysiGo.Modules.Identity.Tests
 {
+    [Collection(nameof(IdentityDatabaseCollection))]
     public sealed class IdentityPermissionTests
     {
         [Fact]

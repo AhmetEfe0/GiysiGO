@@ -2,7 +2,7 @@ using Dapper;
 
 namespace GiysiGo.Modules.Identity.Tests
 {
-    [Collection(nameof(IdentitySeedCollection))]
+    [Collection(nameof(IdentityDatabaseCollection))]
     public sealed class IdentitySeedTests
     {
         [SqlServerFact]
