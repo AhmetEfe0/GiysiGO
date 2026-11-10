@@ -2,5 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GiysiGo.API.Authorization
 {
-    public sealed record PermissionRequirement(string PermissionCode) : IAuthorizationRequirement;
+    public sealed class PermissionRequirement(string code) : IAuthorizationRequirement
+    {
+        public string Code { get; } = code;
+    }
 }

@@ -1,34 +1,44 @@
-using System.Data;
-using Dapper;
 using GiysiGo.BuildingBlocks.Application.Contracts;
-using GiysiGo.BuildingBlocks.Application.Transactions;
+using GiysiGo.BuildingBlocks.Infrastructure;
+using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
 
 namespace GiysiGo.Modules.Identity.Infrastructure
 {
-    public sealed class PermissionChecker(ITransactionRunner transactions, IStoreScopeReader stores) : IPermissionChecker
+    public sealed class PermissionChecker(SqlConnectionFactory connectionFactory,
+        IIdentityAuthorizationRepository authorizationRepository, IStoreScopeReader? storeScopeReader = null) : IPermissionChecker
     {
-        public Task<bool> HasPermissionAsync(Guid userId, string permissionCode, Guid? corporateId = null, Guid? storeId = null, CancellationToken cancellationToken = default)
+        public async Task<bool> HasPermissionAsync(Guid userId, string permissionCode, Guid? corporateId = null, Guid? storeId = null, CancellationToken cancellationToken = default)
         {
-            if (userId == Guid.Empty || corporateId == Guid.Empty || storeId == Guid.Empty
-                || string.IsNullOrWhiteSpace(permissionCode) || permissionCode.Length > 100)
-                return Task.FromResult(false);
-
-            return transactions.ExecuteAsync(async (connection, transaction, token) =>
+            if (userId == Guid.Empty || string.IsNullOrWhiteSpace(permissionCode)
+                || corporateId == Guid.Empty || storeId == Guid.Empty)
             {
-                var effectiveCorporateId = corporateId;
-                if (storeId is Guid scopedStoreId)
+                return false;
+            }
+
+            await using var connection = await connectionFactory.OpenAsync(cancellationToken);
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+
+            if (storeId.HasValue)
+            {
+                if (storeScopeReader is null)
                 {
-                    var scope = await stores.GetScopeAsync(scopedStoreId, connection, transaction, token);
-                    if (scope is null || !scope.IsActive || (corporateId.HasValue && corporateId != scope.CorporateId))
-                        return false;
-                    effectiveCorporateId = scope.CorporateId;
+                    throw new InvalidOperationException("IStoreScopeReader is required to evaluate store permissions.");
                 }
 
-                return await connection.QuerySingleAsync<bool>(new CommandDefinition(
-                    "identity.spHasPermission",
-                    new { UserId = userId, PermissionCode = permissionCode, CorporateId = effectiveCorporateId, StoreId = storeId },
-                    transaction, commandType: CommandType.StoredProcedure, cancellationToken: token));
-            }, cancellationToken);
+                var store = await storeScopeReader.GetScopeAsync(storeId.Value, connection, transaction, cancellationToken);
+                if (store is null || store.StoreId != storeId.Value || !store.IsActive || store.CorporateId == Guid.Empty
+                    || (corporateId.HasValue && corporateId.Value != store.CorporateId))
+                {
+                    return false;
+                }
+
+                corporateId = store.CorporateId;
+            }
+
+            var allowed = await authorizationRepository.HasPermissionAsync(userId, permissionCode,
+                corporateId, storeId, connection, transaction, cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            return allowed;
         }
     }
 }

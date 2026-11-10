@@ -7,6 +7,7 @@ using GiysiGo.Modules.Ordering.Infrastructure;
 using GiysiGo.Modules.Operations.Infrastructure;
 using GiysiGo.API.Authorization;
 using GiysiGo.API.Errors;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,8 @@ builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
 builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = context =>
     ApiProblem.Complete(context.HttpContext, context.ProblemDetails));
 builder.Services.AddIdentityAuthentication(builder.Configuration);
+builder.Services.AddAuthorization(PermissionPolicies.AddPermissionPolicies);
+builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ProblemDetailsAuthorizationResultHandler>();
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 builder.Services.AddIdentityModule();
