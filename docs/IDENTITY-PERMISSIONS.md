@@ -58,9 +58,11 @@ politikası veya UI butonunu gizlemek yetki kanıtı değildir. Personel atama
 endpoint'leri #15'te bu temeli ve `IStaffAssignmentAuthorizer`'ı kullanır.
 
 Gerçek MSSQL testi için `./scripts/Test-IdentityData.ps1` DACPAC'i izole
-veritabanına iki kez yayınlar. Bu, seed tekrarını, izin eşleşmelerini ve kapsam
-okumalarını doğrular. API entegrasyon testi test authentication şeması ve
-permission fake'iyle HTTP 401/403/200 ve kapsam aktarımını doğrular. Mevcut
+veritabanına iki kez yayınlar. Identity SQL testleri izin eşleşmelerini ve kapsam
+okumalarını doğrular. Seed testi pasif izin ve iptal edilmiş eşleşmeyi kendi
+transaction'ında hazırlar, PostDeployment'da kullanılan seed'i yeniden çalıştırır
+ve test değişikliklerini geri alır. API entegrasyon testi, test authentication
+şeması ve permission fake'iyle HTTP 401/403/200 ve kapsam aktarımını doğrular. Mevcut
 Linux CI bağlantı değişkeni yoksa DB testlerini skipped gösterir; gerçek DB CI
 entegrasyonu #19 kapsamındadır. Bu testlerdeki `FixtureStoreScopeReader`, #10'un
 Catalog'dan bağımsız geliştirilebilmesi içindir; canlı Catalog verisi okuduğu
@@ -77,6 +79,5 @@ route kapsamı/Challenge/Forbid testleri aynı API host'u üzerinde çalışır.
 `./scripts/Test-IdentityData.ps1 -BaselineDacpacPath <PR52.dacpac>` önce #52'nin
 izole veritabanını kurar, mevcut kullanıcıya rol atar ve rol/permission/grant
 kimliklerini kaydeder. #46 DACPAC'i bu veritabanına yayımlandığında kimliklerin
-ve kullanıcı rol ilişkisinin değişmediğini karşılaştırır. Sonraki tekrar yayın
-pasif izin ve iptal edilmiş eşleşmenin geri verilmediğini sınar. Baseline
-verildiğinde gerçek SQL destekli Catalog ve API yetki testleri de çalışır.
+ve kullanıcı rol ilişkisinin değişmediğini karşılaştırır. Baseline verildiğinde
+gerçek SQL destekli Catalog ve API yetki testleri de çalışır.
