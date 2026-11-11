@@ -105,6 +105,8 @@ namespace GiysiGo.Modules.Ordering.Tests
             public InlineTransactionRunner() => Transaction = new StubDbTransaction(Connection);
             public Task<TResult> ExecuteAsync<TResult>(Func<DbConnection, DbTransaction, CancellationToken, Task<TResult>> action, CancellationToken cancellationToken = default) =>
                 action(Connection, Transaction, cancellationToken);
+            public Task<TResult> ExecuteAsync<TResult>(Func<DbConnection, DbTransaction, CancellationToken, Task<TResult>> action, System.Data.IsolationLevel isolationLevel, CancellationToken cancellationToken = default) =>
+                throw new NotSupportedException("This test double supports only the default transaction isolation.");
         }
 
         private sealed class FakeWorkflowRepository : IOrderWorkflowRepository

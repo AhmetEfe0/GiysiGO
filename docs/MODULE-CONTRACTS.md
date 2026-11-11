@@ -118,6 +118,10 @@ Bu metot fiyatı, rolü veya hizmetin tamamlanma durumunu değiştirmez.
 
 1. Dış komut `ITransactionRunner` ile tek connection/transaction açar. Outbox
    handler'ı ise dispatcher'dan gelen çifti kullanır; tekrar runner çağırmaz.
+   Mevcut overload `READ COMMITTED` kullanır; izolasyon alan overload yalnız
+   ihtiyaç duyan komutta seçilir. #15 personel atama/kaldırma komutu
+   `SERIALIZABLE` seçerek Identity yetkisi ve Catalog kapsamı okumalarını
+   commit/rollback'e kadar korur. Diğer modüllerin izolasyonu değişmez.
 2. Transaction alan public reader/writer ve repository'ler aynı nesneleri kullanır;
    yeni bağlantı/transaction açmaz, commit/rollback/dispose etmez. Bağlantı açık,
    `transaction.Connection == connection` olmalıdır; uyuşmazlık hata verir.

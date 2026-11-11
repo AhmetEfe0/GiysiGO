@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Common;
 using GiysiGo.BuildingBlocks.Application.Contracts;
 using GiysiGo.BuildingBlocks.Application.Transactions;
@@ -57,7 +58,7 @@ namespace GiysiGo.Modules.Identity.Infrastructure
                     else await access.RevokeCorporateMembershipAsync(userId, corporateId, roleId, connection, transaction, cancellation);
                 }
                 return true;
-            }, token);
+            }, IsolationLevel.Serializable, token);
         }
 
         public Task<StaffMemberPage> GetMembersAsync(Guid corporateId, Guid? storeId, int page, int pageSize, CancellationToken token = default)

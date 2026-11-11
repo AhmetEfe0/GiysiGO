@@ -4,6 +4,16 @@ Kimlik JWT'den `ICurrentUser` ile alınır. Şirket ve dükkân personeli komutl
 `IStaffAssignmentAuthorizer` kararını, değişiklikle aynı connection/transaction
 içinde kullanır. SQL çağrıları Identity repository'lerindedir.
 
+Atama/kaldırma komutu `SERIALIZABLE` izolasyonuyla açılır. Catalog'un kapsam
+okuyucusu ve Identity authorizer'ı aynı transaction'a katılır; olumlu kararın
+dayandığı kullanıcı, rol, izin, rol–izin, üyelik/atama, şirket ve dükkân kayıtları
+commit/rollback'e kadar korunur. Eşzamanlı yetki kaldırma veya pasifleştirme önce
+tamamlanırsa komut 403 alır; kontrol önce tamamlanırsa diğer yazma atamanın
+bitmesini bekler. Hedef kullanıcı ve rol okumaları `UPDLOCK, HOLDLOCK` kullanır;
+grant prosedürlerinin güncelleme kilitleri kontrol sırasında alınır ve mevcut
+paralel atama davranışı korunur.
+Ortak runner'ın mevcut çağrıları `READ COMMITTED` kullanmayı sürdürür.
+
 | İşlem | Uç | Yetki |
 | --- | --- | --- |
 | Şirket oluştur | POST /corporates | Aktif GLOBAL PlatformAdmin ve store.staff.manage |
@@ -57,3 +67,10 @@ istemciye taşınmaz.
 yinelenen ve paralel atama, kaldırma/yeniden verme, sayfalama ve panel özetini
 doğrular. HTTP authentication test şemasıdır. JWT doğrulaması mevcut #13 ve
 Catalog JWT testlerinde korunur. Testler yalnız ayrılmış veritabanında çalışır.
+
+`StaffAssignmentConcurrencyTests`, gerçek authorizer olumlu karar verdikten sonra
+HTTP komutunu atama yazılmadan bekletir. Ayrı SQL bağlantısında yönetici rolünü
+veya şirket sahibi üyeliğini kaldırma, şirketi ya da dükkânı pasifleştirme
+işlemleri 1500 ms kilit zaman aşımı (1222) alır. Atama 204 ile tamamlandıktan
+sonra aynı değişiklik başarılı olur ve sonraki atama 403 alır. Test decorator'ı
+yalnız bekleme noktası ekler; yetki kararı ve Catalog kapsamı gerçek SQL'den gelir.
