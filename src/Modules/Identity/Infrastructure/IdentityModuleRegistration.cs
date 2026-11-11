@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using GiysiGo.BuildingBlocks.Application.Contracts;
 using GiysiGo.Modules.Identity.Application.Interfaces.Authorization;
 using GiysiGo.Modules.Identity.Application.Interfaces.Authentication;
+using GiysiGo.Modules.Identity.Application.Interfaces;
 using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
 using GiysiGo.Modules.Identity.Domain.Entities;
 using GiysiGo.Modules.Identity.Infrastructure.Repositories;
@@ -20,6 +21,8 @@ namespace GiysiGo.Modules.Identity.Infrastructure
             services.AddScoped<IStaffAssignmentAuthorizer, StaffAssignmentAuthorizer>();
             services.AddScoped<IIdentityAuthorizationRepository, IdentityAuthorizationRepository>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IStaffManagementService, StaffManagementService>();
+            services.AddScoped<IStaffManagementRepository, StaffManagementRepository>();
             services.AddScoped<IAuthSessionRepository, AuthSessionRepository>();
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddScoped<ICorporateRepository, CorporateRepository>();

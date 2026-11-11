@@ -204,6 +204,7 @@ OpenAPI dosyası bütün MVP endpoint'lerinin listesi değildir. Dört modülü 
 planlanan örneğin bağlayıcı başlangıç sözleşmesine, #11 kapsamında uygulanmış 18
 Catalog işlemi ve #14 kapsamında beş dükkân yönetimi işlemi eklenmiştir.
 #13 ile kayıt, giriş, refresh ve çıkış uçları uygulanmıştır.
+#15 ile şirket aktifliği, üyelik/personel yönetimi ve kişisel erişim özeti uygulanmıştır.
 Yeni endpoint'ler aynı kurallarla
 modül PR'ında eklenir. Örneklerin `x-implementation-status=planned` değeri mevcut
 API'de çalıştıkları izlenimi verilmesini önler. `x-required-permission` ve

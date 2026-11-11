@@ -17,6 +17,7 @@ olarak planlanır. MVP'de kurye paneli yerine mock kurye verileri kullanılır.
 | [STORED-PROCEDURE-CONVENTIONS.md](STORED-PROCEDURE-CONVENTIONS.md) | Repository/SP sözleşmesi |
 | [IDENTITY-PERMISSIONS.md](IDENTITY-PERMISSIONS.md) | Rol seed'i, kapsamlı yetki denetimi ve 401/403 davranışı |
 | [IDENTITY-AUTH.md](IDENTITY-AUTH.md) | #13 kayıt, JWT ve refresh oturumu davranışı |
+| [IDENTITY-STAFF.md](IDENTITY-STAFF.md) | #15 şirket ve personel yönetimi, hiyerarşi ve erişim özeti |
 | [Veritabanı kurulumu](../database/README.md) | SSDT, DACPAC ve yerel yayınlama |
 
 Kesin tablo, sütun ve kısıt tanımları SQL projesindedir. Derlenen C# arayüzleri
