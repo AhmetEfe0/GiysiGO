@@ -17,6 +17,8 @@ namespace GiysiGo.Modules.Catalog.Infrastructure
 
             services.AddScoped<IStoreManagementRepository, StoreManagementRepository>();
             services.AddScoped<StoreManagementService>();
+            services.AddScoped<IStoreOfferingManagementRepository, StoreOfferingManagementRepository>();
+            services.AddScoped<GiysiGo.Modules.Catalog.Application.Offerings.StoreOfferingManagementService>();
             services.AddScoped<StoreCatalogReader>();
             services.AddScoped<IStoreCatalogReader>(provider => provider.GetRequiredService<StoreCatalogReader>());
             services.AddScoped<ITransactionalStoreCatalogReader>(provider => provider.GetRequiredService<StoreCatalogReader>());

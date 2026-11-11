@@ -25,6 +25,329 @@
     }
   ],
   "paths": {
+    "/corporates/{corporateId}/stores/{storeId}/offerings": {
+      "get": {
+        "operationId": "listManagedOfferings",
+        "tags": [
+          "Catalog"
+        ],
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "x-required-permission": "store.offering.manage",
+        "x-permission-scope": "STORE",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "corporateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "storeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "$ref": "#/components/responses/500"
+          },
+          "200": {
+            "description": "Managed offerings including inactive offerings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManagedOfferingPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          }
+        }
+      }
+    },
+    "/corporates/{corporateId}/stores/{storeId}/offerings/{combinationId}": {
+      "put": {
+        "operationId": "saveStoreOffering",
+        "tags": [
+          "Catalog"
+        ],
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "x-required-permission": "store.offering.manage",
+        "x-permission-scope": "STORE",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "corporateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "storeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "combinationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "$ref": "#/components/responses/500"
+          },
+          "204": {
+            "description": "Saved"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfferingWriteRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/corporates/{corporateId}/stores/{storeId}/offerings/{combinationId}/active": {
+      "patch": {
+        "operationId": "setStoreOfferingActive",
+        "tags": [
+          "Catalog"
+        ],
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "x-required-permission": "store.offering.manage",
+        "x-permission-scope": "STORE",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "corporateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "storeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "combinationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "$ref": "#/components/responses/500"
+          },
+          "204": {
+            "description": "Saved"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreActiveRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/corporates/{corporateId}/stores/{storeId}/offerings/{combinationId}/price": {
+      "patch": {
+        "operationId": "setStoreOfferingPrice",
+        "tags": [
+          "Catalog"
+        ],
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "x-required-permission": "store.offering.manage",
+        "x-permission-scope": "STORE",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "corporateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "storeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "combinationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "$ref": "#/components/responses/500"
+          },
+          "204": {
+            "description": "Saved"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfferingPriceRequest"
+              }
+            }
+          }
+        }
+      }
+    },
     "/corporates": {
       "post": {
         "operationId": "createCorporate",
@@ -3157,6 +3480,131 @@
       }
     },
     "schemas": {
+      "ManagedOfferingPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ManagedOffering"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "pageSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
+      "ManagedOffering": {
+        "type": "object",
+        "required": [
+          "id",
+          "productTypeServiceId",
+          "priceOverride",
+          "defaultPrice",
+          "unitPrice",
+          "currency",
+          "priceUnit",
+          "isActive"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "productTypeServiceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "priceOverride": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 9999999999.99,
+            "multipleOf": 0.01,
+            "nullable": true
+          },
+          "defaultPrice": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 9999999999.99,
+            "multipleOf": 0.01
+          },
+          "unitPrice": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 9999999999.99,
+            "multipleOf": 0.01
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "TRY"
+            ]
+          },
+          "priceUnit": {
+            "type": "string",
+            "enum": [
+              "PIECE",
+              "M2"
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "OfferingWriteRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "isActive",
+          "priceOverride"
+        ],
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          },
+          "priceOverride": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 9999999999.99,
+            "multipleOf": 0.01,
+            "nullable": true
+          }
+        }
+      },
+      "OfferingPriceRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "priceOverride"
+        ],
+        "properties": {
+          "priceOverride": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 9999999999.99,
+            "multipleOf": 0.01,
+            "nullable": true
+          }
+        }
+      },
     "CorporateCreateRequest": {
       "type": "object",
       "additionalProperties": false,
