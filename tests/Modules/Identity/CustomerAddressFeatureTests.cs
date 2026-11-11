@@ -79,6 +79,9 @@ namespace GiysiGo.Modules.Identity.Tests
             Assert.Empty(await self.GetAddressesAsync(owner));
             var original = await db.Transactions.ExecuteAsync((connection, transaction, token) =>
                 db.Get<IUserRepository>().GetByIdAsync(owner, connection, transaction, token));
+            foreach (var invalidEmail in new[] { "a@b", " a@b " })
+                await Assert.ThrowsAsync<ArgumentException>(() => self.UpdateProfileAsync(owner, invalidEmail));
+            Assert.Equal(original!.Email, (await self.GetProfileAsync(owner))?.Email);
             var email = $"new-{Guid.NewGuid():N}@example.test";
             Assert.Equal(email, (await self.UpdateProfileAsync(owner, email))?.Email);
             var updated = await db.Transactions.ExecuteAsync((connection, transaction, token) =>

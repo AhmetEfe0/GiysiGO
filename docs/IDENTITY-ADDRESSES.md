@@ -8,6 +8,7 @@ olarak yorumlanmamalıdır. Temel veri erişimi #6, JWT kimliği #13 üzerinden 
 - `GET /me/profile` yalnız `id` ve `email` döndürür. `PUT /me/profile` yalnız
   `email` günceller; tanımsız gövde alanları `400` alır. Parola hash'i, roller ve `is_active` değişmez. E-posta
   benzersizliği SQL Server'ın case-insensitive canlı kullanıcı indeksindedir.
+  E-posta SQL kuralıyla uyumlu olarak kırpıldıktan sonra en az dört karakterdir.
 - `GET /me/addresses?page=1&pageSize=20` yalnız aktif, silinmemiş ve token'daki
   kullanıcıya ait adresleri `{items,page,pageSize,totalCount}` olarak döndürür.
   `pageSize` en fazla 100'dür; sayfalama SQL prosedüründe yapılır.

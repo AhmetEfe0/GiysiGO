@@ -110,6 +110,18 @@ namespace GiysiGo.API.IntegrationTests
             Assert.DoesNotContain("isActive", profileBody, StringComparison.OrdinalIgnoreCase);
             using (var body = JsonDocument.Parse(profileBody))
                 Assert.Equal(ownerEmail, body.RootElement.GetProperty("email").GetString());
+            foreach (var invalidEmail in new[] { "a@b", " a@b " })
+            {
+                using var invalidProfile = await owner.PutAsJsonAsync("/me/profile", new { email = invalidEmail });
+                Assert.Equal(HttpStatusCode.BadRequest, invalidProfile.StatusCode);
+                using var problem = JsonDocument.Parse(await invalidProfile.Content.ReadAsStringAsync());
+                Assert.Equal("validation_failed", problem.RootElement.GetProperty("code").GetString());
+                Assert.True(problem.RootElement.GetProperty("errors").TryGetProperty("email", out _));
+                using var unchanged = await owner.GetAsync("/me/profile");
+                Assert.Equal(HttpStatusCode.OK, unchanged.StatusCode);
+                using var unchangedBody = JsonDocument.Parse(await unchanged.Content.ReadAsStringAsync());
+                Assert.Equal(ownerEmail, unchangedBody.RootElement.GetProperty("email").GetString());
+            }
             var newEmail = $"changed-{Guid.NewGuid():N}@example.test";
             using var unsafeProfile = await owner.PutAsJsonAsync("/me/profile", new { email = newEmail,
                 passwordHash = "not-accepted", isActive = false });

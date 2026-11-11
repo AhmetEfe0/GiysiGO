@@ -2337,7 +2337,7 @@
       },
       "ProfileUpdateRequest": {
         "type":"object","additionalProperties":false,
-        "properties":{"email":{"type":"string","format":"email","maxLength":320}},
+        "properties":{"email":{"type":"string","format":"email","minLength":4,"maxLength":320}},
         "required":["email"]
       },
       "CustomerProfile": {

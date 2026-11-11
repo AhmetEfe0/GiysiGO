@@ -131,7 +131,7 @@ namespace GiysiGo.Modules.Identity.Infrastructure
 
         private static string ValidateEmail(string? email)
         {
-            if (string.IsNullOrWhiteSpace(email) || email.Length > 320 ||
+            if (string.IsNullOrWhiteSpace(email) || email.Trim().Length < 4 || email.Length > 320 ||
                 !MailAddress.TryCreate(email.Trim(), out var parsed) || parsed.Address != email.Trim())
                 throw new ArgumentException("A valid email address is required.", nameof(email));
             return email.Trim();
