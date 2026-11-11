@@ -6,7 +6,7 @@ BEGIN
     IF @Latitude IS NULL OR @Latitude NOT BETWEEN -90 AND 90 OR @Longitude IS NULL OR @Longitude NOT BETWEEN -180 AND 180
         THROW 52300, N'Koordinat geçersiz.', 1;
     SELECT CAST(CASE WHEN EXISTS (
-        SELECT 1 FROM catalog.v_VisibleStores s
+        SELECT 1 FROM catalog.v_VisibleStores s WITH (HOLDLOCK)
         CROSS APPLY (SELECT POWER(SIN(RADIANS((CONVERT(float,@Latitude)-s.latitude)/2)),2)
             + COS(RADIANS(CONVERT(float,s.latitude)))*COS(RADIANS(CONVERT(float,@Latitude)))
               * POWER(SIN(RADIANS((CONVERT(float,@Longitude)-s.longitude)/2)),2) AS Haversine) h
