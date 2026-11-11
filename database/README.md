@@ -1,6 +1,6 @@
 # GiysiGO MSSQL veritabanı projesi
 
-`GiysiGo.Database/GiysiGo.Database.sqlproj`, veritabanının tek şema kaynağıdır. Visual Studio Solution Explorer'da `identity`, `catalog`, `ordering`, `operations` ve `building_blocks` klasörleri altında tablolar, indeksler, şemalar ve stored procedure'ler ayrı dosyalarda görünür. SQL projesi derlenince `.dacpac` üretilir. Toplam 39 tablo vardır; hepsinde `id`, `create_date`, `update_date` ve `delete_date` bulunur.
+`GiysiGo.Database/GiysiGo.Database.sqlproj`, veritabanının tek şema kaynağıdır. Visual Studio Solution Explorer'da `identity`, `catalog`, `ordering`, `operations` ve `building_blocks` klasörleri altında tablolar, indeksler, şemalar ve stored procedure'ler ayrı dosyalarda görünür. SQL projesi derlenince `.dacpac` üretilir. Toplam 40 tablo vardır; hepsinde `id`, `create_date`, `update_date` ve `delete_date` bulunur.
 
 Tabloların işlevi, operasyon sırasında nasıl kullanıldıkları ve aralarındaki farklar [tablo rehberinde](../docs/TABLE-PURPOSES.md) tek tek açıklanır.
 

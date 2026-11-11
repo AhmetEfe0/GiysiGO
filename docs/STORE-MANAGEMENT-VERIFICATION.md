@@ -1,7 +1,13 @@
 # Dükkân yönetimi #14 doğrulama takibi
 
 Branch: `codex/catalog-store-management`. Başlangıç: #10 / PR #46 commit `7dc8764`.
-Güncel `main` commit `915cea7` ile uyumlandırıldı; #10 / PR #46 birleşmiştir. PR'ın yeni hedefi `main` olmalıdır. Güncel JWT doğrulaması ve Catalog/Identity testleri korunur.
+Güncel `main` commit `a0639da` ile uyumlandırıldı; #10 / PR #46 ve #13 / PR #47 birleşmiştir. PR hedefi `main`dir. Güncel JWT doğrulaması ve Catalog/Identity testleri korunur.
+
+## 11 Kasım 2026 — güncel main ile belge çakışması çözümü
+
+`main` commit `a0639da` (#13 / PR #47) branch'e alındı. Tek metin çakışması `MODULE-CONTRACTS.md` içindeki OpenAPI açıklamasındaydı: #14'ün beş dükkân işlemi ve #13'ün dört oturum ucu birlikte korunarak çözüldü. Otomatik birleşen OpenAPI ve Identity servis kayıtlarında iki çalışmanın kayıtları da kontrol edildi.
+
+Birleşik kaynaklarla SQL Server 2022 LocalDB'de Release DACPAC derlemesi, iki kez yayın ve seed `--check` başarılı. **121 geçti, 0 başarısız, 0 atlanan** — Catalog 9, API 65, Identity 17, Ordering 9, Operations 1, Contracts 20. #13'ün main'den gelen iki testi toplamı 119'dan 121'e çıkardı. Kanıt: `database/GiysiGo.Database/bin/Release/store-14-main-a0639da-verification.log`, `StoreVerification/*.trx`. `GGST_c981ef2bff14` örneği temizlendi. Sonuçlar yereldir; bu uyumlandırma PR'ın main'e merge edildiği anlamına gelmez.
 
 ## 11 Kasım 2026 — ikinci reviewer dönüşü: repository ve namespace
 

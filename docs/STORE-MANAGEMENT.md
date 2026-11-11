@@ -1,6 +1,6 @@
 # Şirkete bağlı dükkân yönetimi — #14
 
-Bu çalışma `codex/catalog-store-management` branch'indedir. #10 / PR #46 ana dala birleşti; çalışma `main` commit `915cea7` ile uyumlandırıldı. PR'ın yeni hedefi `main` olmalıdır.
+Bu çalışma `codex/catalog-store-management` branch'indedir. #10 / PR #46 ve #13 / PR #47 ana dala birleşti; çalışma `main` commit `a0639da` ile uyumlandırıldı. PR hedefi `main`dir.
 
 ## HTTP ve yetki
 
