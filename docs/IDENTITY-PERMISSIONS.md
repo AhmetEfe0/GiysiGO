@@ -1,9 +1,11 @@
 # Identity rol ve izin temeli — #10
 
 `Scripts/IdentityPermissionsSeed.sql`, DACPAC PostDeployment sırasında beş sabit rolü,
-`PermissionCodes` içindeki on izni ve varsayılan rol–izin eşleşmelerini kurar.
+`PermissionCodes` içindeki on bir izni ve varsayılan rol–izin eşleşmelerini kurar.
 Bu seed #52'nin sabit kimliklerini ve rol matrisini korur; ikinci bir Identity
 seed'i çalıştırılmaz. `catalog.manage` yalnız GLOBAL PlatformAdmin rolündedir.
+`store.manage` aynı üreticide sabit GUID ile yalnız PlatformAdmin ve CorporateOwner
+rollerine verilir; StoreManager/StoreStaff bu izni almaz.
 Tekrar yayınlama aynı rol/izin kodunu veya canlı eşleşmeyi çoğaltmaz. Mevcut
 rol/iznin aktiflik durumunu değiştirmez ve kaldırılmış bir rol–izin eşleşmesini
 yeniden vermez; yetkili kişinin yaptığı iptal DACPAC yayınında korunur. Customer

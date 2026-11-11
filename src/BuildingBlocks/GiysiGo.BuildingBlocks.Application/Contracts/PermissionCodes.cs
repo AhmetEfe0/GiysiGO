@@ -2,6 +2,7 @@ namespace GiysiGo.BuildingBlocks.Application.Contracts
 {
     public static class PermissionCodes
     {
+        public const string StoreManage = "store.manage";
         public const string CatalogManage = "catalog.manage";
         public const string StoreView = "store.view";
         public const string StoreStaffManage = "store.staff.manage";

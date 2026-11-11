@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <None Include="../../../database/GiysiGo.Database/Scripts/IdentityPermissionsSeed.sql" Link="Fixtures/IdentityPermissionsSeed.sql" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Fixtures/*.sql" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="../../../docs/openapi/mvp-contracts.json" Link="mvp-contracts.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
