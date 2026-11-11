@@ -14,8 +14,8 @@ namespace GiysiGo.API.Controllers.Stores
                 UnauthorizedAccessException => 403,
                 KeyNotFoundException => 404,
                 ArgumentException => 400,
-                SqlException { Number: 52300 } => 400,
-                SqlException { Number: 52301 } => 404,
+                SqlException { Number: 52300 or 52400 } => 400,
+                SqlException { Number: 52301 or 52401 } => 404,
                 SqlException { Number: 52302 or 2601 or 2627 } => 409,
                 _ => 0
             };

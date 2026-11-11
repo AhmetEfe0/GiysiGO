@@ -3,7 +3,6 @@ using GiysiGo.BuildingBlocks.Application.Contracts;
 using GiysiGo.Modules.Identity.Application.Interfaces.Authorization;
 using GiysiGo.Modules.Identity.Application.Interfaces;
 using GiysiGo.Modules.Identity.Application.Interfaces.Authentication;
-using GiysiGo.Modules.Identity.Application.Interfaces;
 using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
 using GiysiGo.Modules.Identity.Domain.Entities;
 using GiysiGo.Modules.Identity.Infrastructure.Repositories;
@@ -19,6 +18,7 @@ namespace GiysiGo.Modules.Identity.Infrastructure
             services.AddScoped<ICurrentUser, CurrentUser>();
             services.AddScoped<ICorporateStatusReader, CorporateStatusReader>();
             services.AddScoped<IPermissionChecker, PermissionChecker>();
+            services.AddScoped<ITransactionalPermissionChecker, PermissionChecker>();
             services.AddScoped<IStaffAssignmentAuthorizer, StaffAssignmentAuthorizer>();
             services.AddScoped<IIdentityAuthorizationRepository, IdentityAuthorizationRepository>();
             services.AddScoped<IAuthService, AuthService>();
