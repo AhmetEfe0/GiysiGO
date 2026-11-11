@@ -236,10 +236,13 @@ namespace GiysiGo.API.IntegrationTests
             var path = System.IO.Path.Combine(AppContext.BaseDirectory,"Fixtures");
             var snapshot = await File.ReadAllTextAsync(System.IO.Path.Combine(path,"ReadStoreManagementSeedState.sql"));
             var original = (await connection.QueryAsync<string>(snapshot)).ToArray(); Assert.Equal(2, original.Length);
+            Assert.All(original, state => Assert.Equal(Guid.Parse("8b314bca-963a-5231-b7d0-768947eebe68"), Guid.Parse(state.Split('|')[0])));
+            var roles = await connection.QueryAsync<string>(await File.ReadAllTextAsync(System.IO.Path.Combine(path,"ReadStoreManagementSeedRoles.sql")));
+            Assert.Equal(new[] { "CorporateOwner", "PlatformAdmin" }, roles);
             await using var transaction = await connection.BeginTransactionAsync();
             await connection.ExecuteAsync(await File.ReadAllTextAsync(System.IO.Path.Combine(path,"RevokeStoreManagementSeed.sql")), transaction: transaction);
             var revoked = (await connection.QueryAsync<string>(snapshot, transaction: transaction)).ToArray();
-            var seed = await File.ReadAllTextAsync(System.IO.Path.Combine(path,"StoreManagementPermissionsSeed.sql"));
+            var seed = await File.ReadAllTextAsync(System.IO.Path.Combine(path,"IdentityPermissionsSeed.sql"));
             await connection.ExecuteAsync(seed, transaction: transaction);
             await connection.ExecuteAsync(seed, transaction: transaction);
             Assert.Equal(revoked, (await connection.QueryAsync<string>(snapshot, transaction: transaction)).ToArray());

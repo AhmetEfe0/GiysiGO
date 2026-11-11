@@ -1,8 +1,10 @@
 # Şirkete bağlı dükkân yönetimi — #14
 
-Bu çalışma #10'un `7dc8764` commit'inden açılan `codex/catalog-store-management` branch'indedir. Güncel #10 `a02fa0f` ve onun içerdiği #11 değişiklikleriyle uyumlandırılmıştır. PR, #10 birleşene kadar `feature/identity-issue-10` branch'ini hedefler; #10 birleşince hedef `main` olarak güncellenir.
+Bu çalışma `codex/catalog-store-management` branch'indedir. #10 / PR #46 ana dala birleşti; çalışma `main` commit `915cea7` ile uyumlandırıldı. PR'ın yeni hedefi `main` olmalıdır.
 
 ## HTTP ve yetki
+
+Koordinat ve yarıçap JSON alanları sayı olmalıdır. Ondalık dönüşümde değer kaybı olan girdiler 400 ile reddedilir; örneğin `90.00000000000000000000000000001` değeri 90'a, `1e-100` değeri sıfıra yuvarlanarak kabul edilmez. Tam temsil edilebilen bilimsel gösterim ve sondaki sıfırlar desteklenir. Ardından mevcut aralık ve basamak kontrolleri uygulanır.
 
 | İşlem | Uç | Gereken izin |
 | --- | --- | --- |
@@ -32,13 +34,13 @@ Listeler `page=1`, `pageSize=20`, üst sınır 100 ve `{ items, page, pageSize, 
 
 ## Public okuyucular ve modül sınırı
 
-Catalog, gerçek `IStoreScopeReader` uygulamasını DI'a kaydeder. Verilen açık bağlantı ve ona ait transaction kullanılır; başka bağlantı açılmaz. Pasif/silinmiş şirket veya silinmiş dükkânda null; pasif dükkânda `IsActive=false` döner. Identity checker/atama authorizer bu kapsamı reddeder. Şirket/dükkân uyuşmazlığı gerçek okuyucuyla test edilir.
+Catalog, gerçek `IStoreScopeReader` uygulamasını DI'a kaydeder. Verilen açık bağlantı ve ona ait transaction kullanılır; başka bağlantı açılmaz. Yalnız silinmiş/yok dükkânda null; pasif dükkânda `IsActive=false` döner. Şirket pasif veya silinmiş olsa da silinmemiş dükkânın gerçek şirketi döndürülür. Şirket aktifliğini Identity checker/atama authorizer kendi yetki kararında değerlendirir.
 
 `IStoreCatalogReader` ve `ITransactionalStoreCatalogReader` aynı `StoreCatalogReader` uygulamasına kayıtlıdır. `GetStoreLocationAsync` yalnız aktif şirket/aktif dükkân döndürür; bulunamayan/pasif/silinmiş kaynak null, hizmet alanı kontrolü false verir. Transaction alan metotlar verilen transaction'ı commit/rollback/dispose etmez. Boş GUID veya geçersiz koordinat ArgumentException, iptal ve DB hatası çağırana taşınır; altyapı hatası false/null'a dönüştürülmez.
 
 Mevcut public arayüzlerin tamamını kullanılabilir sunmak için `GetOfferingAsync` ve `ServesLocationAsync` de uygulanmıştır; boş veya hata fırlatan üretim yer tutucusu yoktur. Fiyat okuyucusu aktif şirket/dükkân/offering/kategori/ürün/hizmet/çift zincirini arar; fiyat override varsa onu, yoksa çiftin varsayılan fiyatını döndürür. Bu, #21'in dükkân offering yönetimi veya müşteri keşif HTTP ekranlarının tamamlandığı anlamına gelmez; onlar ayrı teslimdir.
 
-Ortak `catalog.v_VisibleStores` görünümü aktif/silinmemiş şirket ve silinmemiş dükkân filtresini altı okuma prosedüründe tekrar yazmayı önler. Müşteri okuyucuları ayrıca dükkânın aktifliğini arar; yönetim okumaları pasif dükkânı gösterebilir. Yazma prosedürü fiziksel tabloları transaction/UPDLOCK/HOLDLOCK ile denetler; şirket aidiyeti koruması SQL tarafında da vardır.
+Ortak `catalog.v_VisibleStores` görünümü yalnız Catalog'un silinmemiş dükkânlarını kapsar; Identity tablosunu okumaz. Catalog müşteri ve yönetim okuyucuları şirket aktifliğini Identity'nin `ICorporateStatusReader` sözleşmesiyle denetler. Sağlayıcı `identity.spIsCorporateActive` prosedürünü çağırır ve aynı bağlantı/transaction içinde aktif/silinmemiş şirketi doğrular. Şirket satırındaki paylaşım kilidi transaction sonuna kadar tutulur; okuma veya yazma kararı sırasında şirketin pasifleştirilmesiyle yarışılmaz. Yönetim repository'si ve müşteri okuyucuları işlemi aynı transaction'da sürdürür. Yazma prosedürü yalnız Catalog verisini ve şirket/dükkân aidiyetini transaction/UPDLOCK/HOLDLOCK ile denetler. Şirket kontrolü gerektiren tüketici doğrudan Catalog prosedürünü çağırmak yerine bu public okuyucu veya yönetim servisini kullanmalıdır.
 
 ## Hatalar, seed ve teslim sınırları
 
@@ -60,8 +62,10 @@ Ana ticari Word belgesi ekspres işlem ve 24 saat/aynı gün teslimi sayar. Mevc
 
 400 doğrulama, 401 kimliksiz, 403 izinsiz, 404 şirket kapsamında bulunamayan dükkân, 409 veri durumu çatışması; beklenmeyen hatalar güvenli 500'dür. Problem Details yedi ortak alanı ve 400 için errors alanını taşır. SQL iç ayrıntıları istemciye verilmez.
 
-`StoreManagementPermissionsSeed.sql` yalnız #14 iznini/eşleşmelerini atomik ekler; mevcut kimlikleri, pasif izni ve iptal edilmiş eşleşmeleri değiştirmez. Güncel #10, eski `IdentitySeed.sql` yerine transaction kullanan `IdentityPermissionsSeed.sql` dosyasını çalıştırır. Önceki hata atomikliği bulgusu SQL Server 2022'de yeniden doğrulanarak kapatılmıştır; ortak test hazırlığına ilişkin kalan madde [doğrulama takibinde](STORE-MANAGEMENT-VERIFICATION.md) açıklanır.
+`store.manage` yalnız ortak `generate-identity-permission-seed.mjs` üreticisinden `IdentityPermissionsSeed.sql` içine üretilir; ayrı #14 seed'i yoktur. Sabit izin GUID'i `8b314bca-963a-5231-b7d0-768947eebe68`; yalnız PlatformAdmin ve CorporateOwner eşleşmeleri vardır. Tekrar, pasif izin ve iptal edilmiş eşleşmeler korunur. `--check` seçeneği üretilmiş dosyanın kaynakla uyuşmasını denetler; doğrulama script'i DACPAC derlemeden önce bu kontrolü yapar. #10 testleri artık kendi hazırlığını transaction içinde yapıp geri alır; #14 script'inde eski hazırlık çağrısı bulunmaz.
+
+Eski #14 seed'inin rastgele kimlikle oluşturduğu izin, yalnız tanınan eski açıklamasıyla bulunduğunda aynı transaction içinde sabit GUID'e taşınır. İznin aktiflik/silinme/tarih bilgileri ve grant kimlikleri/tarihleri korunur; referanslar yeni izin kimliğine bağlanır. Tanınmayan bir kimlik uyuşmazlığı veya hedef GUID'in başka kayda ait olması 52100 ile durur. Sonraki seed adımında hata olursa geçiş de geri alınır. Bu özel yükseltme, diğer sabit rol/izin kimliklerinin uyuşmazlık kontrollerini gevşetmez.
 
 API host'unda #11 ile gelen JWT doğrulaması korunur. #14 HTTP testleri gerçek Identity checker/repository, SQL prosedürleri ve Catalog okuyucularını kullanır. Yönetim senaryolarında authentication test şeması, `StoreJwtTests` içinde ise gerçek JWT doğrulaması kullanılır. JWT testi sahip/personel erişimini, pasifleştirme/yeniden açmayı, pasif kullanıcıyı ve yanlış imzayı kapsar. Giriş/refresh/token üretimi #13 kapsamındadır. Flutter/React istemci projesi bu branch'te bulunmaz; ekran testi yapılmış sayılmaz.
 
-Çalıştırma: `pwsh -NoProfile -File scripts/Test-StoreManagementData.ps1`. Script SSDT araçlarını doğrular, ayrılmış SQL 2022 örneğinde DACPAC'i iki kez yayımlar, altı test paketinin TRX sonuçlarını yazar ve yalnız kendi veritabanı/örneğini temizler. Son test ve inceleme onaylarından sonra önce #10, ardından #14 birleştirilir.
+Çalıştırma: `pwsh -NoProfile -File scripts/Test-StoreManagementData.ps1`. Script ortak seed üretimini ve SSDT araçlarını doğrular, ayrılmış SQL 2022 örneğinde DACPAC'i iki kez yayımlar, altı test paketinin TRX sonuçlarını yazar ve yalnız kendi veritabanı/örneğini temizler. #10 birleşmiştir; #14 son test ve yeniden inceleme onayından sonra birleştirilir.

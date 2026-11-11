@@ -12,6 +12,7 @@ namespace GiysiGo.Modules.Identity.Infrastructure
         {
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUser, CurrentUser>();
+            services.AddScoped<ICorporateStatusReader, CorporateStatusReader>();
             services.AddScoped<IPermissionChecker, PermissionChecker>();
             services.AddScoped<IStaffAssignmentAuthorizer, StaffAssignmentAuthorizer>();
             services.AddScoped<IIdentityAuthorizationRepository, IdentityAuthorizationRepository>();

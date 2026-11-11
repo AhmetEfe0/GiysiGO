@@ -3,6 +3,7 @@ using GiysiGo.Modules.Identity.Infrastructure;
 
 namespace GiysiGo.Modules.Identity.Tests
 {
+    [Collection(nameof(IdentityDatabaseCollection))]
     public sealed class StaffAssignmentAuthorizerTests
     {
         [SqlServerFact]

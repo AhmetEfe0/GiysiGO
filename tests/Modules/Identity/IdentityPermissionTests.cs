@@ -7,6 +7,7 @@ using System.Security.Claims;
 
 namespace GiysiGo.Modules.Identity.Tests
 {
+    [Collection(nameof(IdentityDatabaseCollection))]
     public sealed class IdentityPermissionTests
     {
         [Fact]
@@ -29,7 +30,7 @@ namespace GiysiGo.Modules.Identity.Tests
         }
 
         [SqlServerFact]
-        public async Task Seed_is_idempotent_and_permissions_require_the_correct_scope()
+        public async Task Seeded_permissions_require_the_correct_scope()
         {
             using var db = new IdentityDatabase();
             var roles = (await db.Get<IRoleRepository>().GetAllAsync()).ToDictionary(role => role.Code);
@@ -39,15 +40,14 @@ namespace GiysiGo.Modules.Identity.Tests
             Assert.Equal("GLOBAL", roles["Customer"].Scope);
             Assert.Equal("CORPORATE", roles["CorporateOwner"].Scope);
             Assert.Equal("STORE", roles["StoreStaff"].Scope);
-            Assert.False(permissions[PermissionCodes.OrderFulfill].IsActive);
             await db.Transactions.ExecuteAsync(async (connection, transaction, token) =>
             {
                 var staffGrants = await db.Get<IIdentityAccessRepository>().GetRolePermissionListAsync(roles["StoreStaff"].Id, connection, transaction, token);
-                Assert.Equal(5, staffGrants.Count);
+                Assert.Equal(6, staffGrants.Count);
                 Assert.Contains(staffGrants, grant => grant.PermissionId == permissions[PermissionCodes.QuotePrepare].Id);
                 Assert.DoesNotContain(staffGrants, grant => grant.PermissionId == permissions[PermissionCodes.QuoteApprove].Id);
                 var managerGrants = await db.Get<IIdentityAccessRepository>().GetRolePermissionListAsync(roles["StoreManager"].Id, connection, transaction, token);
-                Assert.DoesNotContain(managerGrants, grant => grant.PermissionId == permissions[PermissionCodes.QuoteApprove].Id);
+                Assert.Contains(managerGrants, grant => grant.PermissionId == permissions[PermissionCodes.QuoteApprove].Id);
                 return true;
             });
 
@@ -72,7 +72,7 @@ namespace GiysiGo.Modules.Identity.Tests
 
             Assert.False(await checker.HasPermissionAsync(user, PermissionCodes.QuotePrepare));
             Assert.True(await checker.HasPermissionAsync(user, PermissionCodes.QuotePrepare, corporate));
-            Assert.False(await checker.HasPermissionAsync(user, PermissionCodes.OrderFulfill, corporate));
+            Assert.True(await checker.HasPermissionAsync(user, PermissionCodes.OrderFulfill, corporate));
             Assert.False(await checker.HasPermissionAsync(user, PermissionCodes.QuotePrepare, otherCorporate));
             Assert.True(await checker.HasPermissionAsync(user, PermissionCodes.QuoteApprove, storeId: store));
             Assert.False(await checker.HasPermissionAsync(user, PermissionCodes.QuoteApprove, otherCorporate, store));

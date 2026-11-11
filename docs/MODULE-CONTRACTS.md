@@ -17,6 +17,7 @@ durum ve olay matrisi `WORKFLOW-CONTRACTS.md` dosyasıdır.
 | `IStoreCatalogReader` | Catalog #21 | Liste/önizleme fiyat ve konum kontrolü |
 | `ITransactionalStoreCatalogReader` | Catalog #21 | Checkout fiyatı ve görev başlangıcında dükkân konumu |
 | `IStoreScopeReader` | Catalog #14/#21 | Identity #10/#15: dükkânın şirketi ve aktifliği |
+| `ICorporateStatusReader` | Identity, #14 entegrasyonu | Catalog: şirket aktifliği ve silinme kontrolü |
 | `IOrderPickupReader` | Ordering #26/#28 | Alım bilgisi önizlemesi |
 | `ITransactionalOrderPickupReader` | Ordering #26/#28 | Operations #29: alım, teslim ve iade adres kopyaları |
 | `IOrderOperationsReader` | Ordering #28 | Operations #31/#38: ürün inceleme ve ödenmiş hizmet listesi |
@@ -65,9 +66,17 @@ Tüm Guid parametreleri boş olamaz. Koordinatlar latitude [-90,90], longitude
 | `GetStoreLocationAsync` | Aktif store'un konumu; `IsActive=true` | `null` |
 | `ServesLocationAsync` | Aktif store için küresel kuş uçuşu km uzaklığı ≤ hizmet yarıçapı | `false`; yol mesafesi değildir |
 | `GetScopeAsync` | Silinmemiş store'un gerçek CorporateId'si; pasif store `IsActive=false` | Silinmiş/yok store `null`; Identity corporate aktifliğini ayrıca denetler |
+| `ICorporateStatusReader.IsActiveAsync` | Aktif ve silinmemiş şirket için `true` | Yok/pasif/silinmiş şirket için `false`; boş Guid geçersizdir |
 | `GetPickupAsync` | Siparişin değişmez adres kopyası, store, fiziksel ürün kapasitesi ve alım penceresi | Yok/silinmiş sipariş `null`; durum geçişi uygunluğunu tüketici denetler |
 | `GetOrderAsync` | İstenen store'a ait siparişin ürün/fotoğraf/hizmet snapshot'ları | Yok/silinmiş sipariş veya store uyuşmazlığı `null` |
 | `GetTaskAsync` | Silinmemiş kurye görevinin order/type/status bilgisi | Yok/silinmiş görev `null`; terminal görevler tekrar-işleme kontrolü için görünür |
+
+`ICorporateStatusReader` yalnız çağıranın açık bağlantısını ve ona ait etkin
+transaction'ı kullanır. Bağlantı açmaz, commit/rollback yapmaz. Identity sağlayıcısı
+aktiflik kararını transaction sonuna kadar paylaşım kilidiyle korur; Catalog
+okuma/yazma işlemini aynı transaction'da sürdürür. Catalog SQL'i şirket tablosunu
+okumaz. `IStoreScopeReader` şirket aktifliğinden bağımsızdır; Identity kendi
+yetki kararında şirket aktifliğini ayrıca denetler.
 
 `GetPickupAsync` müşteri adres defterini yeniden okumaz. Aktif siparişin teslim/iade
 işlemi müşterinin adresi silmesiyle durmamalıdır. `RequiredCapacityUnits`, fiziksel

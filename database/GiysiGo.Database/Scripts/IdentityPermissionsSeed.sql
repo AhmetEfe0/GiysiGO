@@ -23,6 +23,33 @@ IF EXISTS (SELECT 1 FROM [identity].roles WHERE code = N'StoreStaff' AND (id <> 
     THROW 52100, N'Sabit rol kimliği veya kapsamı uyuşmuyor: StoreStaff.', 1;
 IF NOT EXISTS (SELECT 1 FROM [identity].roles WHERE code = N'StoreStaff')
     INSERT [identity].roles (id, code, name, scope) VALUES ('e6d6590c-e813-5a50-9537-c01687f506b7', N'StoreStaff', N'Dükkân personeli', N'STORE');
+-- Eski #14 seed'inin tanınan rastgele kimliğini, yetki durumunu değiştirmeden taşı.
+DECLARE @LegacyStoreManageId uniqueidentifier;
+SELECT @LegacyStoreManageId = id FROM [identity].permissions WITH (UPDLOCK,HOLDLOCK)
+WHERE code = N'store.manage' AND id <> '8b314bca-963a-5231-b7d0-768947eebe68';
+IF @LegacyStoreManageId IS NOT NULL
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM [identity].permissions WHERE id = @LegacyStoreManageId
+        AND description = N'Şirkete bağlı fiziksel dükkânları yönetme')
+        OR EXISTS (SELECT 1 FROM [identity].permissions WHERE id = '8b314bca-963a-5231-b7d0-768947eebe68')
+        THROW 52100, N'store.manage eski kimliği tanınmıyor veya hedef kimlik kullanımda.', 1;
+    INSERT [identity].permissions (id,code,description,is_active,create_date,update_date,delete_date)
+    SELECT '8b314bca-963a-5231-b7d0-768947eebe68', CONCAT(N'__seed.store.manage.',CONVERT(nvarchar(36),@LegacyStoreManageId)),
+        description,is_active,create_date,update_date,delete_date
+    FROM [identity].permissions WHERE id = @LegacyStoreManageId;
+    UPDATE [identity].role_permissions SET permission_id = '8b314bca-963a-5231-b7d0-768947eebe68'
+    WHERE permission_id = @LegacyStoreManageId;
+    DELETE FROM [identity].permissions WHERE id = @LegacyStoreManageId;
+    UPDATE [identity].permissions SET code = N'store.manage' WHERE id = '8b314bca-963a-5231-b7d0-768947eebe68';
+END;
+IF EXISTS (SELECT 1 FROM [identity].permissions WHERE code = N'store.manage' AND id <> '8b314bca-963a-5231-b7d0-768947eebe68')
+    THROW 52100, N'Sabit permission kimliği uyuşmuyor: store.manage.', 1;
+IF NOT EXISTS (SELECT 1 FROM [identity].permissions WHERE code = N'store.manage')
+    INSERT [identity].permissions (id, code, description) VALUES ('8b314bca-963a-5231-b7d0-768947eebe68', N'store.manage', N'store.manage işlemi için sunucu izni');
+IF NOT EXISTS (SELECT 1 FROM [identity].role_permissions WHERE role_id = '78e6e4f5-a904-5b42-acdc-4f399cb6ffd1' AND permission_id = '8b314bca-963a-5231-b7d0-768947eebe68')
+    INSERT [identity].role_permissions (id, role_id, permission_id) VALUES ('b9d064fb-432e-59cc-9a29-4ee2b8076b71', '78e6e4f5-a904-5b42-acdc-4f399cb6ffd1', '8b314bca-963a-5231-b7d0-768947eebe68');
+IF NOT EXISTS (SELECT 1 FROM [identity].role_permissions WHERE role_id = '3222365a-af22-5e1c-9528-2d148915d707' AND permission_id = '8b314bca-963a-5231-b7d0-768947eebe68')
+    INSERT [identity].role_permissions (id, role_id, permission_id) VALUES ('30c816be-cf56-5098-b9a0-62166bca5cfe', '3222365a-af22-5e1c-9528-2d148915d707', '8b314bca-963a-5231-b7d0-768947eebe68');
 IF EXISTS (SELECT 1 FROM [identity].permissions WHERE code = N'catalog.manage' AND id <> '63a9905c-d427-51b7-9924-2fe02ee993bb')
     THROW 52100, N'Sabit permission kimliği uyuşmuyor: catalog.manage.', 1;
 IF NOT EXISTS (SELECT 1 FROM [identity].permissions WHERE code = N'catalog.manage')

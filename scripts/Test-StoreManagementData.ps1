@@ -16,6 +16,8 @@ foreach ($tool in @($localDb,$sqlcmd)) { if (-not $tool -or -not (Test-Path -Lit
 $versions = & $localDb versions
 if ($LASTEXITCODE -ne 0 -or -not ($versions -match '\b16\.0\.')) { throw 'SQL Server 2022 LocalDB kurulmalıdır.' }
 Write-Output "MSBuild: $($tools.MSBuildPath); SSDT: $($tools.MSBuildExtensionsPath); SqlPackage: $($tools.SqlPackagePath)"
+& node (Join-Path $repositoryRoot 'docs/generate-identity-permission-seed.mjs') --check
+if ($LASTEXITCODE -ne 0) { throw 'Identity seed ortak üreticiyle uyuşmuyor.' }
 & $tools.MSBuildPath (Join-Path $repositoryRoot 'database/GiysiGo.Database/GiysiGo.Database.sqlproj') /p:Configuration=Release "/p:VisualStudioVersion=$($tools.VisualStudioVersion)" "/p:MSBuildExtensionsPath=$($tools.MSBuildExtensionsPath)" /p:Platform=AnyCPU /m /verbosity:minimal
 if ($LASTEXITCODE -ne 0) { throw 'DACPAC derlenemedi.' }
 $suffix = [Guid]::NewGuid().ToString('N')
@@ -39,10 +41,6 @@ try {
     foreach ($publication in 1..2) {
         & $tools.SqlPackagePath /Action:Publish "/SourceFile:$(Join-Path $repositoryRoot 'database/GiysiGo.Database/bin/Release/GiysiGo.Database.dacpac')" "/TargetConnectionString:$connection" /p:AllowIncompatiblePlatform=false /p:BlockOnPossibleDataLoss=true
         if ($LASTEXITCODE -ne 0) { throw 'DACPAC yayını başarısız.' }
-        if ($publication -eq 1) {
-            & $sqlcmd -S $server -d $database -E -I -b -i (Join-Path $repositoryRoot 'tests/Modules/Identity/Fixtures/PrepareSeedRedeploy.sql')
-            if ($LASTEXITCODE -ne 0) { throw 'Identity seed tekrar testi hazırlanamadı.' }
-        }
     }
     foreach ($variable in $variables) { [Environment]::SetEnvironmentVariable($variable,$connection) }
     $projects = [ordered]@{

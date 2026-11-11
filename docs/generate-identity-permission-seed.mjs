@@ -32,12 +32,32 @@ IF NOT EXISTS (SELECT 1 FROM [identity].roles WHERE code = ${quote(code)})
 }
 for (const permission of permissions) {
   const id = guid(`permission:${permission}`);
+  if (permission === 'store.manage') sql.push(`-- Eski #14 seed'inin tanınan rastgele kimliğini, yetki durumunu değiştirmeden taşı.
+DECLARE @LegacyStoreManageId uniqueidentifier;
+SELECT @LegacyStoreManageId = id FROM [identity].permissions WITH (UPDLOCK,HOLDLOCK)
+WHERE code = N'store.manage' AND id <> '${id}';
+IF @LegacyStoreManageId IS NOT NULL
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM [identity].permissions WHERE id = @LegacyStoreManageId
+        AND description = N'Şirkete bağlı fiziksel dükkânları yönetme')
+        OR EXISTS (SELECT 1 FROM [identity].permissions WHERE id = '${id}')
+        THROW 52100, N'store.manage eski kimliği tanınmıyor veya hedef kimlik kullanımda.', 1;
+    INSERT [identity].permissions (id,code,description,is_active,create_date,update_date,delete_date)
+    SELECT '${id}', CONCAT(N'__seed.store.manage.',CONVERT(nvarchar(36),@LegacyStoreManageId)),
+        description,is_active,create_date,update_date,delete_date
+    FROM [identity].permissions WHERE id = @LegacyStoreManageId;
+    UPDATE [identity].role_permissions SET permission_id = '${id}'
+    WHERE permission_id = @LegacyStoreManageId;
+    DELETE FROM [identity].permissions WHERE id = @LegacyStoreManageId;
+    UPDATE [identity].permissions SET code = N'store.manage' WHERE id = '${id}';
+END;`);
   sql.push(`IF EXISTS (SELECT 1 FROM [identity].permissions WHERE code = ${quote(permission)} AND id <> '${id}')
     THROW 52100, N'Sabit permission kimliği uyuşmuyor: ${permission}.', 1;
 IF NOT EXISTS (SELECT 1 FROM [identity].permissions WHERE code = ${quote(permission)})
     INSERT [identity].permissions (id, code, description) VALUES ('${id}', ${quote(permission)}, ${quote(`${permission} işlemi için sunucu izni`)});`);
   for (const [role] of roles) {
     const allowed = role === 'PlatformAdmin'
+      || (role === 'CorporateOwner' && permission === 'store.manage')
       || (['CorporateOwner', 'StoreManager'].includes(role) && scopedManagement.has(permission))
       || (role === 'StoreStaff' && staff.has(permission));
     if (!allowed) continue;
@@ -46,5 +66,9 @@ IF NOT EXISTS (SELECT 1 FROM [identity].permissions WHERE code = ${quote(permiss
   }
 }
 sql.push('COMMIT TRANSACTION;', 'END TRY', 'BEGIN CATCH', 'IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;', 'THROW;', 'END CATCH;', '');
-writeFileSync(resolve(root, 'database/GiysiGo.Database/Scripts/IdentityPermissionsSeed.sql'), sql.join('\n'), 'utf8');
-console.log(`Identity seed üretildi: ${roles.length} rol ve ${permissions.length} permission.`);
+const output = resolve(root, 'database/GiysiGo.Database/Scripts/IdentityPermissionsSeed.sql');
+if (process.argv.includes('--check')) {
+  if (readFileSync(output, 'utf8').replaceAll('\r\n', '\n') !== sql.join('\n'))
+    throw new Error('Identity seed ortak üreticiyle uyuşmuyor; üreticiyi çalıştırıp çıktıyı güncelleyin.');
+} else writeFileSync(output, sql.join('\n'), 'utf8');
+console.log(`Identity seed ${process.argv.includes('--check') ? 'doğrulandı' : 'üretildi'}: ${roles.length} rol ve ${permissions.length} permission.`);

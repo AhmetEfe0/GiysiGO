@@ -22,9 +22,6 @@ BEGIN
 
     BEGIN TRY
         BEGIN TRANSACTION;
-        IF NOT EXISTS (SELECT 1 FROM [identity].corporates WITH (UPDLOCK,HOLDLOCK)
-            WHERE id = @CorporateId AND is_active = 1 AND delete_date IS NULL)
-            THROW 52302, N'Aktif şirket bulunamadı.', 1;
         IF @Operation = 'CREATE'
         BEGIN
             IF EXISTS (SELECT 1 FROM catalog.stores WITH (UPDLOCK,HOLDLOCK) WHERE id = @Id)
