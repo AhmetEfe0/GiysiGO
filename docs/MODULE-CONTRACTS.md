@@ -118,6 +118,10 @@ Bu metot fiyatı, rolü veya hizmetin tamamlanma durumunu değiştirmez.
 
 1. Dış komut `ITransactionRunner` ile tek connection/transaction açar. Outbox
    handler'ı ise dispatcher'dan gelen çifti kullanır; tekrar runner çağırmaz.
+   Mevcut overload `READ COMMITTED` kullanır; izolasyon alan overload yalnız
+   ihtiyaç duyan komutta seçilir. #15 personel atama/kaldırma komutu
+   `SERIALIZABLE` seçerek Identity yetkisi ve Catalog kapsamı okumalarını
+   commit/rollback'e kadar korur. Diğer modüllerin izolasyonu değişmez.
 2. Transaction alan public reader/writer ve repository'ler aynı nesneleri kullanır;
    yeni bağlantı/transaction açmaz, commit/rollback/dispose etmez. Bağlantı açık,
    `transaction.Connection == connection` olmalıdır; uyuşmazlık hata verir.
@@ -204,6 +208,7 @@ OpenAPI dosyası bütün MVP endpoint'lerinin listesi değildir. Dört modülü 
 planlanan örneğin bağlayıcı başlangıç sözleşmesine, #11 kapsamında uygulanmış 18
 Catalog işlemi ve #14 kapsamında beş dükkân yönetimi işlemi eklenmiştir.
 #13 ile kayıt, giriş, refresh ve çıkış uçları uygulanmıştır.
+#15 ile şirket aktifliği, üyelik/personel yönetimi ve kişisel erişim özeti uygulanmıştır.
 Yeni endpoint'ler aynı kurallarla
 modül PR'ında eklenir. Örneklerin `x-implementation-status=planned` değeri mevcut
 API'de çalıştıkları izlenimi verilmesini önler. `x-required-permission` ve

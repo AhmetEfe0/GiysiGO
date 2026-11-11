@@ -20,7 +20,7 @@ namespace GiysiGo.API.IntegrationTests
         private readonly List<Guid> users = [];
         private readonly WebApplicationFactory<Program> application;
         private readonly IServiceScope scope;
-        public StoreTestDatabase()
+        public StoreTestDatabase(Action<IServiceCollection>? configureServices = null)
         {
             var configuration = new SqlConnectionStringBuilder(Environment.GetEnvironmentVariable("GIYSIGO_STORE_TEST_CONNECTION"));
             if (!Regex.IsMatch(configuration.InitialCatalog, "^GiysiGo_IdentityTest_[a-f0-9]{32}$")) throw new InvalidOperationException("Yalnız ayrılmış test veritabanı kullanılabilir.");
@@ -31,6 +31,7 @@ namespace GiysiGo.API.IntegrationTests
                 // Yalnız HTTP kimlik doğrulaması test şemasıdır; Identity checker/repository ve Catalog okuyucuları gerçektir.
                 services.AddAuthentication(options => { options.DefaultAuthenticateScheme = "Test"; options.DefaultChallengeScheme = "Test"; })
                     .AddScheme<AuthenticationSchemeOptions, TestAuthenticationHandler>("Test", _ => { });
+                configureServices?.Invoke(services);
             }));
             Client = application.CreateClient();
             scope = application.Services.CreateScope();

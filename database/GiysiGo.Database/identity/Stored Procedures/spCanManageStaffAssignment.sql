@@ -12,7 +12,7 @@ BEGIN
         OR @CorporateId IS NULL OR NOT EXISTS (
             SELECT 1 FROM [identity].users WHERE id = @ActorUserId AND is_active = 1 AND delete_date IS NULL)
         OR NOT EXISTS (
-            SELECT 1 FROM [identity].users WHERE id = @TargetUserId AND is_active = 1 AND delete_date IS NULL)
+            SELECT 1 FROM [identity].users WITH (UPDLOCK, HOLDLOCK) WHERE id = @TargetUserId AND is_active = 1 AND delete_date IS NULL)
         OR NOT EXISTS (
             SELECT 1 FROM [identity].corporates WHERE id = @CorporateId AND is_active = 1 AND delete_date IS NULL)
     BEGIN
@@ -21,7 +21,7 @@ BEGIN
     END;
 
     DECLARE @TargetCode nvarchar(100);
-    SELECT @TargetCode = code FROM [identity].roles
+    SELECT @TargetCode = code FROM [identity].roles WITH (UPDLOCK, HOLDLOCK)
     WHERE id = @TargetRoleId AND is_active = 1 AND delete_date IS NULL
         AND ((@StoreId IS NULL AND scope = 'CORPORATE' AND code = 'CorporateOwner')
              OR (@StoreId IS NOT NULL AND scope = 'STORE' AND code IN ('StoreManager', 'StoreStaff')));
