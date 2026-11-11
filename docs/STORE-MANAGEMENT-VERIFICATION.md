@@ -3,7 +3,16 @@
 Branch: `codex/catalog-store-management`. Başlangıç: #10 / PR #46 commit `7dc8764`.
 Güncel `main` commit `915cea7` ile uyumlandırıldı; #10 / PR #46 birleşmiştir. PR'ın yeni hedefi `main` olmalıdır. Güncel JWT doğrulaması ve Catalog/Identity testleri korunur.
 
-## 11 Kasım 2026 — yalnız #14 için son inceleme
+## 11 Kasım 2026 — ikinci reviewer dönüşü: repository ve namespace
+
+[Reviewer yorumu](https://github.com/DOU-SEProjects/GiysiGO/pull/53#issuecomment-6791508571) önceki üç bulgunun düzeldiğini ve yeni bir işlevsel hata doğrulanmadığını belirtiyor. Ancak iki proje düzeni ihlali önceki kaynak incelemesinde atlanmıştı; başarılı çalışma testleri bu kuralları denetlemiyordu.
+
+- `spIsCorporateActive` çağrısı ve bağlantı/transaction doğrulaması `ICorporateRepository.IsActiveAsync` / `CorporateRepository` içine taşındı. `CorporateStatusReader` repository'ye aynı kimlik, bağlantı, transaction ve cancellation token ile delegasyon yapar. Yeni bağlantı veya transaction açmaz; commit/rollback yapmaz.
+- `ExactDecimalConverter` blok namespace biçimine çevrildi; dönüşüm mantığı aynı kaldı. İlgili dosyalarda file-scoped namespace ve reader içindeki doğrudan Dapper çağrısı kaynak üzerinden ayrıca kontrol edildi.
+
+Son tekrar: **119 geçti, 0 başarısız, 0 atlanan** — Catalog 9, API 64, Identity 16, Ordering 9, Operations 1, Contracts 20. API paketindeki mevcut şirket aktifliği/rollback, yanlış bağlantı, cancellation ve eşzamanlı değişiklik testleri repository üzerinden de geçti. SQL Server 2022 üzerinde Release DACPAC derlemesi, iki kez yayın ve seed `--check` başarılı. Kanıt: `database/GiysiGo.Database/bin/Release/store-14-repository-style-2026-11-11.log`, `StoreVerification/*.trx`. `GGST_88729c87f49c` örneği temizlendi. Bu iki düzen düzeltmesi yereldedir; henüz commit/push/yorum yapılmadı.
+
+## 11 Kasım 2026 — yalnız #14 için önceki inceleme
 
 Dükkân oluşturma/güncelleme/aktiflik işlemleri, yetki ve şirket sınırları, konum doğrulaması, sayfalama, ortak şirket aktiflik sözleşmesi ve izin seed'i yeniden incelendi. Yeni doğrulanmış hata bulunmadı; uygulama kodunda ek değişiklik yapılmadı.
 
