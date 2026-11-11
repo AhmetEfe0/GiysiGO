@@ -26,10 +26,22 @@ namespace GiysiGo.Modules.Catalog.Infrastructure
             return await transactions.ExecuteAsync((connection, transaction, token) => ReadOfferingAsync(storeId, productTypeId, serviceId, connection, transaction, token), cancellationToken);
         }
 
+        public async Task<StoreOfferingSnapshot?> GetOfferingByIdAsync(Guid storeId, Guid productTypeId, Guid storeOfferingId, CancellationToken cancellationToken = default)
+        {
+            ValidateId(storeId); ValidateId(productTypeId); ValidateId(storeOfferingId);
+            return await transactions.ExecuteAsync((connection, transaction, token) => ReadOfferingByIdAsync(storeId, productTypeId, storeOfferingId, connection, transaction, token), cancellationToken);
+        }
+
         public Task<StoreOfferingSnapshot?> GetOfferingAsync(Guid storeId, Guid productTypeId, Guid serviceId, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default)
         {
             ValidateId(storeId); ValidateId(productTypeId); ValidateId(serviceId); ValidateTransaction(connection, transaction);
             return ReadOfferingAsync(storeId, productTypeId, serviceId, connection, transaction, cancellationToken);
+        }
+
+        public Task<StoreOfferingSnapshot?> GetOfferingByIdAsync(Guid storeId, Guid productTypeId, Guid storeOfferingId, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default)
+        {
+            ValidateId(storeId); ValidateId(productTypeId); ValidateId(storeOfferingId); ValidateTransaction(connection, transaction);
+            return ReadOfferingByIdAsync(storeId, productTypeId, storeOfferingId, connection, transaction, cancellationToken);
         }
 
         public async Task<bool> ServesLocationAsync(Guid storeId, decimal latitude, decimal longitude, CancellationToken cancellationToken = default)
@@ -76,6 +88,10 @@ namespace GiysiGo.Modules.Catalog.Infrastructure
             => !await IsActiveAsync(storeId, connection, transaction, token) ? null
                 : await connection.QuerySingleOrDefaultAsync<StoreOfferingSnapshot>(new CommandDefinition("catalog.usp_GetValidStoreOffering",
                     new { StoreId = storeId, ProductTypeId = productTypeId, ServiceId = serviceId }, transaction, commandType: CommandType.StoredProcedure, cancellationToken: token));
+        private async Task<StoreOfferingSnapshot?> ReadOfferingByIdAsync(Guid storeId, Guid productTypeId, Guid storeOfferingId, DbConnection connection, DbTransaction transaction, CancellationToken token)
+            => !await IsActiveAsync(storeId, connection, transaction, token) ? null
+                : await connection.QuerySingleOrDefaultAsync<StoreOfferingSnapshot>(new CommandDefinition("catalog.usp_GetCartStoreOfferingById",
+                    new { StoreId = storeId, ProductTypeId = productTypeId, StoreOfferingId = storeOfferingId }, transaction, commandType: CommandType.StoredProcedure, cancellationToken: token));
         private async Task<bool> ReadCoverageAsync(Guid storeId, decimal latitude, decimal longitude, DbConnection connection, DbTransaction transaction, CancellationToken token)
             => await IsActiveAsync(storeId, connection, transaction, token)
                 && await connection.QuerySingleAsync<bool>(new CommandDefinition("catalog.usp_StoreServesLocation",

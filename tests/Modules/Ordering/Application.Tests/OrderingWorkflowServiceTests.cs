@@ -106,7 +106,7 @@ namespace GiysiGo.Modules.Ordering.Tests
             public Task<TResult> ExecuteAsync<TResult>(Func<DbConnection, DbTransaction, CancellationToken, Task<TResult>> action, CancellationToken cancellationToken = default) =>
                 action(Connection, Transaction, cancellationToken);
             public Task<TResult> ExecuteAsync<TResult>(Func<DbConnection, DbTransaction, CancellationToken, Task<TResult>> action, System.Data.IsolationLevel isolationLevel, CancellationToken cancellationToken = default) =>
-                throw new NotSupportedException("This test double supports only the default transaction isolation.");
+                action(Connection, Transaction, cancellationToken);
         }
 
         private sealed class FakeWorkflowRepository : IOrderWorkflowRepository
@@ -154,6 +154,7 @@ namespace GiysiGo.Modules.Ordering.Tests
         private sealed class FakeCatalogReader : IStoreCatalogReader
         {
             public Task<StoreOfferingSnapshot?> GetOfferingAsync(Guid storeId, Guid productTypeId, Guid serviceId, CancellationToken cancellationToken = default) => Task.FromResult<StoreOfferingSnapshot?>(null);
+            public Task<StoreOfferingSnapshot?> GetOfferingByIdAsync(Guid storeId, Guid productTypeId, Guid storeOfferingId, CancellationToken cancellationToken = default) => Task.FromResult<StoreOfferingSnapshot?>(null);
             public Task<StoreLocationSnapshot?> GetStoreLocationAsync(Guid storeId, CancellationToken cancellationToken = default) => Task.FromResult<StoreLocationSnapshot?>(null);
             public Task<bool> ServesLocationAsync(Guid storeId, decimal latitude, decimal longitude, CancellationToken cancellationToken = default) => Task.FromResult(true);
         }

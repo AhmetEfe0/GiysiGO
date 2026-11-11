@@ -33,18 +33,32 @@ BEGIN
         THROW 51003, 'Cart address is not active or not owned by customer.', 1;
     IF NOT EXISTS (SELECT 1 FROM [ordering].cart_items WHERE cart_id = @CartId AND delete_date IS NULL)
         THROW 51004, 'Cart is empty.', 1;
+    IF EXISTS (SELECT 1 FROM [ordering].cart_items ci WHERE ci.cart_id = @CartId AND ci.delete_date IS NULL
+               AND NOT EXISTS (
+                   SELECT 1 FROM [ordering].cart_item_services cis
+                   JOIN [catalog].store_offerings so ON so.id = cis.store_offering_id
+                   JOIN [catalog].product_type_services pts ON pts.id = so.product_type_service_id
+                   WHERE cis.cart_item_id = ci.id AND cis.delete_date IS NULL
+                     AND pts.selection_kind IN ('BASE', 'ALTERNATIVE')))
+        THROW 51006, 'Every cart item must have at least one BASE or ALTERNATIVE service.', 1;
     IF EXISTS (
         SELECT 1 FROM [ordering].cart_items ci
+        JOIN [ordering].cart_item_services cis ON cis.cart_item_id = ci.id AND cis.delete_date IS NULL
+        JOIN [catalog].store_offerings so ON so.id = cis.store_offering_id
+        JOIN [catalog].product_type_services pts ON pts.id = so.product_type_service_id
+        WHERE ci.cart_id = @CartId AND ci.delete_date IS NULL AND pts.price_unit = 'M2'
+          AND ci.customer_measurement IS NULL
+    ) THROW 51018, 'Square-meter services require a customer measurement.', 1;
+    IF EXISTS (
+        SELECT ci.id
+        FROM [ordering].cart_items ci
+        JOIN [ordering].cart_item_services cis ON cis.cart_item_id = ci.id AND cis.delete_date IS NULL
+        JOIN [catalog].store_offerings so ON so.id = cis.store_offering_id
+        JOIN [catalog].product_type_services pts ON pts.id = so.product_type_service_id
         WHERE ci.cart_id = @CartId AND ci.delete_date IS NULL
-          AND NOT EXISTS (
-              SELECT 1 FROM [ordering].cart_item_services cis
-              JOIN [catalog].store_offerings so ON so.id = cis.store_offering_id
-              JOIN [catalog].product_type_services pts ON pts.id = so.product_type_service_id
-              WHERE cis.cart_item_id = ci.id AND cis.delete_date IS NULL
-                AND so.store_id = @StoreId AND pts.product_type_id = ci.product_type_id
-                AND pts.selection_kind IN ('BASE', 'ALTERNATIVE')
-          )
-    ) THROW 51006, N'Her ürün için en az bir BASE veya ALTERNATIVE hizmet seçilmelidir; yalnız ek hizmet yeterli değildir.', 1;
+          AND pts.selection_kind IN ('BASE', 'ALTERNATIVE')
+        GROUP BY ci.id HAVING COUNT(*) > 1
+    ) THROW 51019, 'Only one BASE or ALTERNATIVE service may be selected per physical item.', 1;
     IF NOT EXISTS (SELECT 1 FROM [catalog].stores WHERE id = @StoreId AND is_active = 1 AND delete_date IS NULL)
         THROW 51007, 'Store is not active.', 1;
     IF NOT EXISTS (SELECT 1 FROM [identity].corporates corp JOIN [catalog].stores st ON st.corporate_id = corp.id
@@ -79,8 +93,11 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM @CartSelections)
         THROW 51004, 'Cart is empty.', 1;
     IF (SELECT COUNT(DISTINCT ci.id) FROM [ordering].cart_items ci WHERE ci.cart_id = @CartId AND ci.delete_date IS NULL)
-       <> (SELECT COUNT(DISTINCT CartItemId) FROM @CartSelections)
-        THROW 51006, 'Every cart item must have at least one selected service.', 1;
+       <> (SELECT COUNT(DISTINCT cs.CartItemId) FROM @CartSelections cs
+           JOIN [catalog].store_offerings so ON so.id = cs.StoreOfferingId
+           JOIN [catalog].product_type_services pts ON pts.id = so.product_type_service_id
+           WHERE pts.selection_kind IN ('BASE', 'ALTERNATIVE'))
+        THROW 51006, 'Every cart item must have at least one BASE or ALTERNATIVE service.', 1;
 
     DECLARE @CheckoutPrices TABLE (
         CartItemId uniqueidentifier NOT NULL,
@@ -104,7 +121,7 @@ BEGIN
     JOIN [catalog].services s WITH (UPDLOCK, HOLDLOCK) ON s.id = pts.service_id
     JOIN [catalog].product_types pt WITH (UPDLOCK, HOLDLOCK) ON pt.id = selections.ProductTypeId
     CROSS APPLY (SELECT COALESCE(so.price_override, pts.default_price) AS UnitPrice) price
-    CROSS APPLY (SELECT CONVERT(decimal(12,3), CASE pts.price_unit WHEN 'M2' THEN COALESCE(selections.CustomerMeasurement, 1) ELSE 1 END) AS Quantity) quantity
+    CROSS APPLY (SELECT CONVERT(decimal(12,3), CASE pts.price_unit WHEN 'M2' THEN selections.CustomerMeasurement ELSE 1 END) AS Quantity) quantity
     WHERE so.is_active = 1 AND so.delete_date IS NULL
       AND pts.is_active = 1 AND pts.delete_date IS NULL
       AND s.is_active = 1 AND s.delete_date IS NULL

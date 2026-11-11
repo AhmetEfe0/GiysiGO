@@ -8,7 +8,8 @@ namespace GiysiGo.Modules.Ordering.Application.Contracts
     {
         Task<Guid> CreateAsync(Cart cart, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
         Task AddItemAsync(CartItem item, Guid customerId, int expectedCartVersion, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
-        Task AddServiceAsync(CartItemService service, Guid customerId, int expectedCartVersion, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
+        Task<CartItemCatalogContext?> GetCartItemCatalogContextAsync(Guid cartItemId, Guid customerId, int expectedCartVersion, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
+        Task AddServiceAsync(CartItemService service, Guid serviceId, Guid customerId, int expectedCartVersion, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
         Task RemoveServiceAsync(Guid cartId, Guid cartItemId, Guid serviceId, Guid customerId, int expectedCartVersion, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
         Task AddPhotoAsync(CartItemPhoto photo, Guid customerId, int expectedCartVersion, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
         Task RemovePhotoAsync(Guid cartId, Guid cartItemId, Guid photoId, Guid customerId, int expectedCartVersion, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);

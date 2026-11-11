@@ -6,7 +6,7 @@ namespace GiysiGo.Modules.Ordering.Application.Contracts
     {
         Task<Guid> CreateAsync(Guid storeId, Guid addressId, DateTime? pickupStartUtc, DateTime? pickupEndUtc, CancellationToken cancellationToken = default);
         Task AddItemAsync(CartItem item, int expectedCartVersion, CancellationToken cancellationToken = default);
-        Task AddServiceAsync(CartItemService service, int expectedCartVersion, CancellationToken cancellationToken = default);
+        Task AddServiceAsync(CartItemService service, Guid serviceId, int expectedCartVersion, CancellationToken cancellationToken = default);
         Task RemoveServiceAsync(Guid cartId, Guid cartItemId, Guid serviceId, int expectedCartVersion, CancellationToken cancellationToken = default);
         Task AddPhotoAsync(CartItemPhoto photo, int expectedCartVersion, CancellationToken cancellationToken = default);
         Task RemovePhotoAsync(Guid cartId, Guid cartItemId, Guid photoId, int expectedCartVersion, CancellationToken cancellationToken = default);

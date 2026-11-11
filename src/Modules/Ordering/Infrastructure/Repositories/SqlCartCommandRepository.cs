@@ -21,8 +21,11 @@ namespace GiysiGo.Modules.Ordering.Infrastructure.Repositories
                 item.Id, item.CartId, CustomerId = customerId, item.ProductTypeId, item.CustomerNote, item.CustomerMeasurement, ExpectedCartVersion = expectedCartVersion
             }, transaction, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));
 
-        public async Task AddServiceAsync(CartItemService service, Guid customerId, int expectedCartVersion, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default) =>
-            await connection.ExecuteAsync(new CommandDefinition("[ordering].[spAddCartItemService]", new { service.Id, service.CartItemId, service.StoreOfferingId, CustomerId = customerId, ExpectedCartVersion = expectedCartVersion }, transaction, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));
+        public Task<CartItemCatalogContext?> GetCartItemCatalogContextAsync(Guid cartItemId, Guid customerId, int expectedCartVersion, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default) =>
+            connection.QuerySingleOrDefaultAsync<CartItemCatalogContext>(new CommandDefinition("[ordering].[spGetCartItemCatalogContext]", new { CartItemId = cartItemId, CustomerId = customerId, ExpectedCartVersion = expectedCartVersion }, transaction, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));
+
+        public async Task AddServiceAsync(CartItemService service, Guid serviceId, Guid customerId, int expectedCartVersion, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default) =>
+            await connection.ExecuteAsync(new CommandDefinition("[ordering].[spAddCartItemService]", new { service.Id, service.CartItemId, service.StoreOfferingId, ServiceId = serviceId, CustomerId = customerId, ExpectedCartVersion = expectedCartVersion }, transaction, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));
 
         public async Task RemoveServiceAsync(Guid cartId, Guid cartItemId, Guid serviceId, Guid customerId, int expectedCartVersion, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default) =>
             await connection.ExecuteAsync(new CommandDefinition("[ordering].[spRemoveCartItemService]", new { CartId = cartId, CartItemId = cartItemId, ServiceId = serviceId, CustomerId = customerId, ExpectedCartVersion = expectedCartVersion }, transaction, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));

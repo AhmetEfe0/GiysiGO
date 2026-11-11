@@ -111,6 +111,53 @@ namespace GiysiGo.Modules.Ordering.Tests
         }
 
         [SqlServerFact]
+        public async Task Cart_commands_enforce_version_and_cart_read_hides_deleted_children_and_other_customers()
+        {
+            var connectionString = RequireConnectionString();
+            var fixture = await CreateFixtureAsync(connectionString);
+            var secondItemId = Guid.NewGuid();
+            var firstPhotoId = Guid.NewGuid();
+            var secondPhotoId = Guid.NewGuid();
+            try
+            {
+                await using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync();
+                await ExecuteProcedureAsync(connection, null, "[ordering].[spAddCartItem]",
+                    ("@Id", secondItemId), ("@CartId", fixture.CartId), ("@CustomerId", fixture.CustomerId),
+                    ("@ProductTypeId", fixture.ProductTypeId), ("@CustomerNote", "second physical item"),
+                    ("@CustomerMeasurement", DBNull.Value), ("@ExpectedCartVersion", 0));
+
+                await Assert.ThrowsAsync<SqlException>(() => ExecuteProcedureAsync(connection, null, "[ordering].[spAddCartItem]",
+                    ("@Id", Guid.NewGuid()), ("@CartId", fixture.CartId), ("@CustomerId", fixture.CustomerId),
+                    ("@ProductTypeId", fixture.ProductTypeId), ("@CustomerNote", "stale version"),
+                    ("@CustomerMeasurement", DBNull.Value), ("@ExpectedCartVersion", 0)));
+
+                await ExecuteProcedureAsync(connection, null, "[ordering].[spAddCartItemPhoto]",
+                    ("@Id", firstPhotoId), ("@CartItemId", fixture.CartItemId), ("@StorageKey", "test-one.png"),
+                    ("@PhotoType", "CUSTOMER_UPLOAD"), ("@CustomerId", fixture.CustomerId), ("@ExpectedCartVersion", 1));
+                await ExecuteProcedureAsync(connection, null, "[ordering].[spAddCartItemPhoto]",
+                    ("@Id", secondPhotoId), ("@CartItemId", fixture.CartItemId), ("@StorageKey", "test-two.png"),
+                    ("@PhotoType", "CUSTOMER_UPLOAD"), ("@CustomerId", fixture.CustomerId), ("@ExpectedCartVersion", 2));
+                await ExecuteAsync(connection, null,
+                    "UPDATE [ordering].cart_item_services SET delete_date = SYSUTCDATETIME() WHERE cart_item_id = @ItemId; "
+                    + "UPDATE [ordering].cart_item_photos SET delete_date = SYSUTCDATETIME() WHERE id = @PhotoId;",
+                    ("@ItemId", fixture.CartItemId), ("@PhotoId", firstPhotoId));
+
+                var ownerRead = await ReadCartResultCountsAsync(connection, fixture.CartId, fixture.CustomerId);
+                Assert.Equal((1, 2, 0, 1), ownerRead);
+                await Assert.ThrowsAsync<SqlException>(() => ExecuteProcedureAsync(connection, null, "[ordering].[spAddCartItemPhoto]",
+                    ("@Id", Guid.NewGuid()), ("@CartItemId", fixture.CartItemId), ("@StorageKey", "other-customer.png"),
+                    ("@PhotoType", "CUSTOMER_UPLOAD"), ("@CustomerId", fixture.OtherCustomerId), ("@ExpectedCartVersion", 3)));
+                var otherCustomerRead = await ReadCartResultCountsAsync(connection, fixture.CartId, fixture.OtherCustomerId);
+                Assert.Equal((0, 0, 0, 0), otherCustomerRead);
+            }
+            finally
+            {
+                await CleanupFixtureAsync(connectionString, fixture);
+            }
+        }
+
+        [SqlServerFact]
         public async Task Payment_idempotency_returns_existing_attempt_only_to_owning_customer()
         {
             var connectionString = RequireConnectionString();
@@ -148,7 +195,7 @@ namespace GiysiGo.Modules.Ordering.Tests
             return connectionString;
         }
 
-        private static async Task<(Guid CartId, Guid CustomerId, Guid OtherCustomerId, Guid ActorUserId, Guid CorporateId, Guid StoreId, Guid AddressId, Guid CategoryId, Guid ProductTypeId, Guid ServiceId, Guid ProductTypeServiceId, Guid OfferingId, Guid OrderId, Guid OrderItemServiceId, Guid QuoteId)> CreateFixtureAsync(
+        private static async Task<(Guid CartId, Guid CustomerId, Guid OtherCustomerId, Guid ActorUserId, Guid CorporateId, Guid StoreId, Guid AddressId, Guid CategoryId, Guid ProductTypeId, Guid ServiceId, Guid ProductTypeServiceId, Guid CartItemId, Guid OfferingId, Guid OrderId, Guid OrderItemServiceId, Guid QuoteId)> CreateFixtureAsync(
             string connectionString, string? orderStatus = null, string? quoteStatus = null)
         {
             var fixture = (CartId: Guid.NewGuid(), CustomerId: Guid.NewGuid(), OtherCustomerId: Guid.NewGuid(), ActorUserId: Guid.NewGuid(),
@@ -223,11 +270,11 @@ namespace GiysiGo.Modules.Ordering.Tests
             await transaction.CommitAsync();
             return (fixture.CartId, fixture.CustomerId, fixture.OtherCustomerId, fixture.ActorUserId, fixture.CorporateId,
                 fixture.StoreId, fixture.AddressId, fixture.CategoryId, fixture.ProductTypeId, fixture.ServiceId,
-                fixture.ProductTypeServiceId, fixture.OfferingId, fixture.OrderId, fixture.OrderItemServiceId, fixture.QuoteId);
+                fixture.ProductTypeServiceId, fixture.CartItemId, fixture.OfferingId, fixture.OrderId, fixture.OrderItemServiceId, fixture.QuoteId);
         }
 
         private static async Task CleanupFixtureAsync(string connectionString,
-            (Guid CartId, Guid CustomerId, Guid OtherCustomerId, Guid ActorUserId, Guid CorporateId, Guid StoreId, Guid AddressId, Guid CategoryId, Guid ProductTypeId, Guid ServiceId, Guid ProductTypeServiceId, Guid OfferingId, Guid OrderId, Guid OrderItemServiceId, Guid QuoteId) fixture)
+            (Guid CartId, Guid CustomerId, Guid OtherCustomerId, Guid ActorUserId, Guid CorporateId, Guid StoreId, Guid AddressId, Guid CategoryId, Guid ProductTypeId, Guid ServiceId, Guid ProductTypeServiceId, Guid CartItemId, Guid OfferingId, Guid OrderId, Guid OrderItemServiceId, Guid QuoteId) fixture)
         {
             await using var connection = new SqlConnection(connectionString);
             await connection.OpenAsync();
@@ -307,6 +354,26 @@ namespace GiysiGo.Modules.Ordering.Tests
             await using var reader = await command.ExecuteReaderAsync();
             Assert.True(await reader.ReadAsync(), "Checkout should create the order and service snapshots.");
             return (reader.GetDecimal(0), reader.GetDecimal(1), reader.GetDecimal(2));
+        }
+
+        private static async Task<(int CartCount, int ItemCount, int ServiceCount, int PhotoCount)> ReadCartResultCountsAsync(SqlConnection connection, Guid cartId, Guid customerId)
+        {
+            await using var command = new SqlCommand("[ordering].[spGetOpenCart]", connection) { CommandType = CommandType.StoredProcedure };
+            command.Parameters.AddWithValue("@CartId", cartId);
+            command.Parameters.AddWithValue("@CustomerId", customerId);
+            await using var reader = await command.ExecuteReaderAsync();
+            var cartCount = 0;
+            while (await reader.ReadAsync()) cartCount++;
+            await reader.NextResultAsync();
+            var itemCount = 0;
+            while (await reader.ReadAsync()) itemCount++;
+            await reader.NextResultAsync();
+            var serviceCount = 0;
+            while (await reader.ReadAsync()) serviceCount++;
+            await reader.NextResultAsync();
+            var photoCount = 0;
+            while (await reader.ReadAsync()) photoCount++;
+            return (cartCount, itemCount, serviceCount, photoCount);
         }
 
         private static void AddParameters(SqlCommand command, IEnumerable<(string Name, object? Value)> parameters)
