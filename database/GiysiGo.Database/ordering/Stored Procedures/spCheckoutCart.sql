@@ -33,9 +33,18 @@ BEGIN
         THROW 51003, 'Cart address is not active or not owned by customer.', 1;
     IF NOT EXISTS (SELECT 1 FROM [ordering].cart_items WHERE cart_id = @CartId AND delete_date IS NULL)
         THROW 51004, 'Cart is empty.', 1;
-    IF EXISTS (SELECT 1 FROM [ordering].cart_items ci WHERE ci.cart_id = @CartId AND ci.delete_date IS NULL
-               AND NOT EXISTS (SELECT 1 FROM [ordering].cart_item_services cis WHERE cis.cart_item_id = ci.id AND cis.delete_date IS NULL))
-        THROW 51006, 'Every cart item must have at least one selected service.', 1;
+    IF EXISTS (
+        SELECT 1 FROM [ordering].cart_items ci
+        WHERE ci.cart_id = @CartId AND ci.delete_date IS NULL
+          AND NOT EXISTS (
+              SELECT 1 FROM [ordering].cart_item_services cis
+              JOIN [catalog].store_offerings so ON so.id = cis.store_offering_id
+              JOIN [catalog].product_type_services pts ON pts.id = so.product_type_service_id
+              WHERE cis.cart_item_id = ci.id AND cis.delete_date IS NULL
+                AND so.store_id = @StoreId AND pts.product_type_id = ci.product_type_id
+                AND pts.selection_kind IN ('BASE', 'ALTERNATIVE')
+          )
+    ) THROW 51006, N'Her ürün için en az bir BASE veya ALTERNATIVE hizmet seçilmelidir; yalnız ek hizmet yeterli değildir.', 1;
     IF NOT EXISTS (SELECT 1 FROM [catalog].stores WHERE id = @StoreId AND is_active = 1 AND delete_date IS NULL)
         THROW 51007, 'Store is not active.', 1;
     IF NOT EXISTS (SELECT 1 FROM [identity].corporates corp JOIN [catalog].stores st ON st.corporate_id = corp.id

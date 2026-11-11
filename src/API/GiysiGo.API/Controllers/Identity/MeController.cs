@@ -1,3 +1,4 @@
+using GiysiGo.API.Errors;
 using GiysiGo.Modules.Identity.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -10,32 +11,32 @@ namespace GiysiGo.API.Controllers.Identity
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfile(CancellationToken cancellationToken)
         {
-            if (!TryGetUserId(out var userId)) return Failure(401, "unauthorized", "Authentication is required.");
+            if (!TryGetUserId(out var userId)) return Failure(401, "authentication_required", "Authentication is required.");
             var profile = await self.GetProfileAsync(userId, cancellationToken);
-            return profile is null ? Failure(404, "not_found", "Profile was not found.") : Ok(profile);
+            return profile is null ? Failure(404, "resource_not_found", "Profile was not found.") : Ok(profile);
         }
 
         [HttpPut("profile")]
         public async Task<IActionResult> UpdateProfile([FromBody] ProfileUpdateRequest request, CancellationToken cancellationToken)
         {
-            if (!TryGetUserId(out var userId)) return Failure(401, "unauthorized", "Authentication is required.");
+            if (!TryGetUserId(out var userId)) return Failure(401, "authentication_required", "Authentication is required.");
             try
             {
                 var profile = await self.UpdateProfileAsync(userId, request.Email ?? string.Empty, cancellationToken);
-                return profile is null ? Failure(404, "not_found", "Profile was not found.") : Ok(profile);
+                return profile is null ? Failure(404, "resource_not_found", "Profile was not found.") : Ok(profile);
             }
             catch (ArgumentException exception) { return ValidationFailure(exception); }
             catch (SqlException exception) when (exception.Number is 2601 or 2627)
             { return Failure(409, "email_conflict", "Email address is already registered."); }
             catch (SqlException exception) when (exception.Number == 51001)
-            { return Failure(404, "not_found", "Profile was not found."); }
+            { return Failure(404, "resource_not_found", "Profile was not found."); }
         }
 
         [HttpGet("addresses")]
         public async Task<IActionResult> GetAddresses([FromQuery] int page = 1, [FromQuery] int pageSize = 20,
             CancellationToken cancellationToken = default)
         {
-            if (!TryGetUserId(out var userId)) return Failure(401, "unauthorized", "Authentication is required.");
+            if (!TryGetUserId(out var userId)) return Failure(401, "authentication_required", "Authentication is required.");
             if (page < 1 || pageSize is < 1 or > 100) return ValidationFailure(new ArgumentException("Page must be positive and pageSize must be 1 to 100.", nameof(page)));
             var addresses = await self.GetAddressPageAsync(userId, page, pageSize, cancellationToken);
             return Ok(new AddressPage(addresses.Items.Select(AddressResponse.From).ToArray(), page, pageSize, addresses.TotalCount));
@@ -44,16 +45,16 @@ namespace GiysiGo.API.Controllers.Identity
         [HttpGet("addresses/{addressId:guid}")]
         public async Task<IActionResult> GetAddress(Guid addressId, CancellationToken cancellationToken)
         {
-            if (!TryGetUserId(out var userId)) return Failure(401, "unauthorized", "Authentication is required.");
+            if (!TryGetUserId(out var userId)) return Failure(401, "authentication_required", "Authentication is required.");
             if (addressId == Guid.Empty) return ValidationFailure(new ArgumentException("Address ID is required.", nameof(addressId)));
             var address = await self.GetAddressAsync(userId, addressId, cancellationToken);
-            return address is null ? Failure(404, "not_found", "Address was not found.") : Ok(AddressResponse.From(address));
+            return address is null ? Failure(404, "resource_not_found", "Address was not found.") : Ok(AddressResponse.From(address));
         }
 
         [HttpPost("addresses")]
         public async Task<IActionResult> CreateAddress([FromBody] AddressRequest request, CancellationToken cancellationToken)
         {
-            if (!TryGetUserId(out var userId)) return Failure(401, "unauthorized", "Authentication is required.");
+            if (!TryGetUserId(out var userId)) return Failure(401, "authentication_required", "Authentication is required.");
             try
             {
                 var id = await self.CreateAddressAsync(userId, request.ToInput(), cancellationToken);
@@ -61,35 +62,35 @@ namespace GiysiGo.API.Controllers.Identity
             }
             catch (ArgumentException exception) { return ValidationFailure(exception); }
             catch (SqlException exception) when (exception.Number == 51001)
-            { return Failure(404, "not_found", "Profile was not found."); }
+            { return Failure(404, "resource_not_found", "Profile was not found."); }
         }
 
         [HttpPut("addresses/{addressId:guid}")]
         public async Task<IActionResult> UpdateAddress(Guid addressId, [FromBody] AddressRequest request, CancellationToken cancellationToken)
         {
-            if (!TryGetUserId(out var userId)) return Failure(401, "unauthorized", "Authentication is required.");
+            if (!TryGetUserId(out var userId)) return Failure(401, "authentication_required", "Authentication is required.");
             try
             {
                 var changed = await self.UpdateAddressAsync(userId, addressId, request.ToInput(), cancellationToken);
-                return changed ? NoContent() : Failure(404, "not_found", "Address was not found.");
+                return changed ? NoContent() : Failure(404, "resource_not_found", "Address was not found.");
             }
             catch (ArgumentException exception) { return ValidationFailure(exception); }
             catch (SqlException exception) when (exception.Number == 51001)
-            { return Failure(404, "not_found", "Address was not found."); }
+            { return Failure(404, "resource_not_found", "Address was not found."); }
         }
 
         [HttpDelete("addresses/{addressId:guid}")]
         public async Task<IActionResult> DeleteAddress(Guid addressId, CancellationToken cancellationToken)
         {
-            if (!TryGetUserId(out var userId)) return Failure(401, "unauthorized", "Authentication is required.");
+            if (!TryGetUserId(out var userId)) return Failure(401, "authentication_required", "Authentication is required.");
             try
             {
                 var deleted = await self.DeleteAddressAsync(userId, addressId, cancellationToken);
-                return deleted ? NoContent() : Failure(404, "not_found", "Address was not found.");
+                return deleted ? NoContent() : Failure(404, "resource_not_found", "Address was not found.");
             }
             catch (ArgumentException exception) { return ValidationFailure(exception); }
             catch (SqlException exception) when (exception.Number == 51001)
-            { return Failure(404, "not_found", "Address was not found."); }
+            { return Failure(404, "resource_not_found", "Address was not found."); }
         }
 
         private ObjectResult ValidationFailure(ArgumentException exception)
@@ -97,11 +98,9 @@ namespace GiysiGo.API.Controllers.Identity
             var field = exception.ParamName ?? string.Empty;
             var problem = new ValidationProblemDetails(new Dictionary<string, string[]> { [field] = [exception.Message] })
             {
-                Type = "https://httpstatuses.io/400", Title = "Bad Request", Status = 400,
-                Detail = "Request validation failed.", Instance = HttpContext.Request.Path
+                Status = 400
             };
-            problem.Extensions["code"] = "validation_error";
-            problem.Extensions["traceId"] = HttpContext.TraceIdentifier;
+            ApiProblem.Complete(HttpContext, problem);
             var response = new ObjectResult(problem) { StatusCode = 400 };
             response.ContentTypes.Add("application/problem+json");
             return response;
@@ -109,14 +108,8 @@ namespace GiysiGo.API.Controllers.Identity
 
         private ObjectResult Failure(int status, string code, string detail)
         {
-            var problem = new ProblemDetails
-            {
-                Type = $"https://httpstatuses.io/{status}",
-                Title = status switch { 401 => "Unauthorized", 404 => "Not Found", _ => "Error" },
-                Status = status, Detail = detail, Instance = HttpContext.Request.Path
-            };
+            var problem = ApiProblem.Create(HttpContext, status, detail: detail);
             problem.Extensions["code"] = code;
-            problem.Extensions["traceId"] = HttpContext.TraceIdentifier;
             var response = new ObjectResult(problem) { StatusCode = status };
             response.ContentTypes.Add("application/problem+json");
             return response;

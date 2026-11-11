@@ -4,7 +4,14 @@ namespace GiysiGo.Modules.Identity.Tests
 {
     public sealed class TestAccessTokenIssuer : IAccessTokenIssuer
     {
+        public bool FailIssuance { get; set; }
+
         public (string Token, DateTime ExpiresAtUtc) Issue(Guid userId)
-            => (userId.ToString(), DateTime.UtcNow.AddMinutes(15));
+        {
+            if (FailIssuance)
+                throw new InvalidOperationException("Test token issuance failed.");
+
+            return (userId.ToString(), DateTime.UtcNow.AddMinutes(15));
+        }
     }
 }

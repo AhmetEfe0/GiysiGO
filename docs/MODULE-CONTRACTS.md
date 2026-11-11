@@ -191,8 +191,10 @@ tamamlanma önkoşullarını uygular. `source=SYSTEM` HTTP'den alınamaz; #28 g�
 handler girişini kullanıcı komutundan ayırır. #32 otomatik worker/retry,
 #40 gerçek modüller arası teslim/iade testlerini tamamlar.
 
-OpenAPI dosyası bütün MVP endpoint'lerinin listesi değil, dört modülü kapsayan 16
-örnek operasyonun bağlayıcı başlangıç sözleşmesidir. Yeni endpoint'ler aynı kurallarla
+OpenAPI dosyası bütün MVP endpoint'lerinin listesi değildir. Dört modülü kapsayan 16
+planlanan örneğin bağlayıcı başlangıç sözleşmesine, #11 kapsamında uygulanmış 18
+Catalog işlemi eklenmiştir. #13 ile kayıt, giriş, refresh ve çıkış uçları uygulanmıştır.
+Yeni endpoint'ler aynı kurallarla
 modül PR'ında eklenir. Örneklerin `x-implementation-status=planned` değeri mevcut
 API'de çalıştıkları izlenimi verilmesini önler. `x-required-permission` ve
 `x-environments` runtime güvenlik uygulaması değildir; controller/host bunları

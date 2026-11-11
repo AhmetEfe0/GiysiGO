@@ -11,6 +11,7 @@ olarak yorumlanmamalıdır. Temel veri erişimi #6, JWT kimliği #13 üzerinden 
 - `GET /me/addresses?page=1&pageSize=20` yalnız aktif, silinmemiş ve token'daki
   kullanıcıya ait adresleri `{items,page,pageSize,totalCount}` olarak döndürür.
   `pageSize` en fazla 100'dür; sayfalama SQL prosedüründe yapılır.
+  Toplam sayı ve sayfa satırları aynı geçici veri kümesinden okunur.
   `GET /me/addresses/{addressId}` tek adresi okur.
 - `POST /me/addresses` adresi ekler ve `201` + `id` verir; `PUT` alanları
   değiştirir, `DELETE` soft-delete yapar ve `204` döndürür. İstek gövdesindeki
@@ -19,7 +20,7 @@ olarak yorumlanmamalıdır. Temel veri erişimi #6, JWT kimliği #13 üzerinden 
   üst sınırı sırasıyla 100, 2000 ve 200 karakterdir. Telefon, isteğe bağlı baştaki
   `+` işaretinden sonra 7–15 rakam içerir. Latitude [-90,90], longitude
   [-180,180] ve en fazla altı ondalık basamak olur. Geçersiz istek `400`
-  (`validation_error`), tekrarlanan e-posta `409` (`email_conflict`) alır.
+  (`validation_failed`), tekrarlanan e-posta `409` (`email_conflict`) alır.
   Yanıtlarda parola hash'i ve aktiflik alanı yoktur.
 
 ## Veri akışı ve transaction

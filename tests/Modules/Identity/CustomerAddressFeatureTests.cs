@@ -8,6 +8,7 @@ using Microsoft.Data.SqlClient;
 
 namespace GiysiGo.Modules.Identity.Tests
 {
+    [Collection(nameof(IdentityDatabaseCollection))]
     public sealed class CustomerAddressFeatureTests
     {
         [SqlServerFact]
@@ -33,6 +34,20 @@ namespace GiysiGo.Modules.Identity.Tests
             Assert.False(await self.UpdateAddressAsync(other, addressId, input with { AddressText = "Başka" }));
             Assert.False(await self.DeleteAddressAsync(other, addressId));
             Assert.Equal("İstanbul", (await self.GetAddressAsync(owner, addressId))?.AddressText);
+            await using (var connection = await db.Factory.OpenAsync())
+            await using (var transaction = await connection.BeginTransactionAsync())
+            {
+                await using var otherConnection = await db.Factory.OpenAsync();
+                await Assert.ThrowsAsync<ArgumentException>(() =>
+                    transactional.GetOwnedAddressAsync(owner, addressId, otherConnection, transaction));
+                var changed = (await self.GetAddressAsync(owner, addressId))!;
+                changed.AddressText = "Transaction adresi";
+                await db.Get<ICustomerAddressRepository>().UpdateOwnedAsync(owner, changed, connection, transaction);
+                Assert.Equal(changed.AddressText,
+                    (await transactional.GetOwnedAddressAsync(owner, addressId, connection, transaction))?.AddressText);
+                await transaction.RollbackAsync();
+            }
+            Assert.Equal("İstanbul", (await reader.GetOwnedAddressAsync(owner, addressId))?.AddressText);
             var inactiveId = await db.Transactions.ExecuteAsync((connection, transaction, token) =>
                 db.Get<ICustomerAddressRepository>().InsertAsync(owner, new CustomerAddress
                 {

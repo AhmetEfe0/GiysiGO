@@ -2,12 +2,16 @@ param(
     [string]$SqlPackagePath,
     [string]$MSBuildPath,
     [string]$VisualStudioVersion,
+    [string]$BaselineDacpacPath,
     [ValidateSet('Debug', 'Release')]
     [string]$ApiConfiguration = 'Release'
 )
 
 $ErrorActionPreference = 'Stop'
 $repositoryRoot = Split-Path $PSScriptRoot
+if ($BaselineDacpacPath -and -not (Test-Path -LiteralPath $BaselineDacpacPath -PathType Leaf)) {
+    throw 'The baseline DACPAC does not exist.'
+}
 $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
 $installation = (& $vswhere -latest -products Microsoft.VisualStudio.Product.Community Microsoft.VisualStudio.Product.Professional Microsoft.VisualStudio.Product.Enterprise Microsoft.VisualStudio.Product.BuildTools -format json | ConvertFrom-Json) | Select-Object -First 1
 if (-not $MSBuildPath) { $MSBuildPath = Join-Path $installation.installationPath 'MSBuild\Current\Bin\MSBuild.exe' }
@@ -35,6 +39,7 @@ if ($databaseName -notmatch '^GiysiGo_IdentityTest_[a-f0-9]{32}$') { throw 'Inva
 $serverName = '(localdb)\' + $instanceName
 $connectionString = "Server=$serverName;Database=$databaseName;Integrated Security=true;Encrypt=false;Pooling=false"
 $previousConnection = $env:GIYSIGO_IDENTITY_TEST_CONNECTION
+$previousCatalogConnection = $env:GIYSIGO_CATALOG_TEST_CONNECTION
 $instanceCreated = $false
 $instanceStarted = $false
 try {
@@ -44,20 +49,41 @@ try {
     & $localDbTool start $instanceName
     if ($LASTEXITCODE -ne 0) { throw 'LocalDB startup failed.' }
     $instanceStarted = $true
+    if ($BaselineDacpacPath) {
+        & $SqlPackagePath /Action:Publish "/SourceFile:$BaselineDacpacPath" "/TargetConnectionString:$connectionString" /p:BlockOnPossibleDataLoss=true
+        if ($LASTEXITCODE -ne 0) { throw 'Baseline deployment failed.' }
+        & $sqlcmdTool -S $serverName -d $databaseName -E -I -b -i (Join-Path $repositoryRoot 'tests/Modules/Identity/Fixtures/PrepareSeedUpgrade.sql')
+        if ($LASTEXITCODE -ne 0) { throw 'Could not create the baseline user role assignment.' }
+        $snapshotPath = Join-Path $repositoryRoot 'tests/Modules/Identity/Fixtures/ReadSeedUpgradeSnapshot.sql'
+        $baselineSnapshot = & $sqlcmdTool -S $serverName -d $databaseName -E -I -b -h -1 -W -w 4000 -i $snapshotPath
+        if ($LASTEXITCODE -ne 0) { throw 'Could not read the baseline seed snapshot.' }
+    }
     & $SqlPackagePath /Action:Publish "/SourceFile:$(Join-Path $repositoryRoot 'database/GiysiGo.Database/bin/Release/GiysiGo.Database.dacpac')" "/TargetConnectionString:$connectionString" /p:BlockOnPossibleDataLoss=true
     if ($LASTEXITCODE -ne 0) { throw 'Test database deployment failed.' }
-    & $sqlcmdTool -S $serverName -d $databaseName -E -b -i (Join-Path $repositoryRoot 'tests/Modules/Identity/Fixtures/PrepareSeedRedeploy.sql')
-    if ($LASTEXITCODE -ne 0) { throw 'Could not prepare Identity seed redeployment test.' }
+    if ($BaselineDacpacPath) {
+        $upgradedSnapshot = & $sqlcmdTool -S $serverName -d $databaseName -E -I -b -h -1 -W -w 4000 -i $snapshotPath
+        if ($LASTEXITCODE -ne 0) { throw 'Could not read the upgraded seed snapshot.' }
+        if (Compare-Object $baselineSnapshot $upgradedSnapshot) { throw 'Role, permission or user role identities changed during upgrade.' }
+        Write-Output 'Baseline role/permission/grant IDs and user role assignment were preserved.'
+    }
     & $SqlPackagePath /Action:Publish "/SourceFile:$(Join-Path $repositoryRoot 'database/GiysiGo.Database/bin/Release/GiysiGo.Database.dacpac')" "/TargetConnectionString:$connectionString" /p:BlockOnPossibleDataLoss=true
     if ($LASTEXITCODE -ne 0) { throw 'Repeated deployment failed; Identity seed must be idempotent.' }
     $env:GIYSIGO_IDENTITY_TEST_CONNECTION = $connectionString
     & dotnet test (Join-Path $repositoryRoot 'tests/Modules/Identity/GiysiGo.Modules.Identity.Tests.csproj') --configuration Release --verbosity minimal
     if ($LASTEXITCODE -ne 0) { throw 'Identity data tests failed.' }
+    if ($BaselineDacpacPath) {
+        $env:GIYSIGO_CATALOG_TEST_CONNECTION = $connectionString
+    }
     & dotnet test (Join-Path $repositoryRoot 'tests/API/GiysiGo.API.IntegrationTests/GiysiGo.API.IntegrationTests.csproj') --configuration $ApiConfiguration --verbosity minimal
     if ($LASTEXITCODE -ne 0) { throw 'Identity API integration tests failed.' }
+    if ($BaselineDacpacPath) {
+        & dotnet test (Join-Path $repositoryRoot 'tests/Modules/Catalog/GiysiGo.Modules.Catalog.Tests.csproj') --configuration Release --verbosity minimal
+        if ($LASTEXITCODE -ne 0) { throw 'Catalog compatibility tests failed.' }
+    }
 }
 finally {
     $env:GIYSIGO_IDENTITY_TEST_CONNECTION = $previousConnection
+    $env:GIYSIGO_CATALOG_TEST_CONNECTION = $previousCatalogConnection
     if ($instanceStarted) {
         & $sqlcmdTool -S $serverName -d master -E -b -i (Join-Path $PSScriptRoot 'Drop-IdentityTestDatabase.sql') -v "DatabaseName=$databaseName"
         if ($LASTEXITCODE -ne 0) { throw "Could not clean test database $databaseName. Instance is retained for recovery." }

@@ -3,7 +3,7 @@
   "info": {
     "title": "GiysiGO MVP shared HTTP contract examples",
     "version": "1.0.0",
-    "description": "Issue #5 design baseline with per-operation implementation status. Module owners expand these examples as routes are implemented. Internal events and system transitions are not HTTP request bodies. HTTP JSON uses camelCase; UUID identifiers, UTC timestamps and TRY decimal amounts."
+    "description": "Issue #5 tasarım başlangıcındaki planlanan örnekleri ve #11 kapsamında uygulanmış 18 Catalog işlemini içerir. Her işlemin uygulama durumu x-implementation-status alanındadır. Modül sahipleri yeni uçları sunmadan önce bu belgeyi genişletir. İç olaylar ve sistem geçişleri HTTP istek gövdesi değildir. HTTP JSON camelCase; kimlikler UUID, zamanlar UTC ve tutarlar TRY decimal biçimindedir."
   },
   "security": [
     {
@@ -1141,6 +1141,1064 @@
           }
         ]
       }
+    },
+    "/catalog/categories": {
+      "get": {
+        "operationId": "listCatalogCategories",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Aktif ve silinmemiş kategorileri ortak sayfalama biçiminde döndürür.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "200": {
+            "description": "İşlem başarılı.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogCategoryPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 2147483647,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createCatalogCategory",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Platform kataloğunda kayıt oluşturur; kimliği sunucu üretir.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "201": {
+            "description": "İşlem başarılı.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdResult"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Oluşturulan kaynağın veya ürün hizmet seçeneklerinin okuma adresi.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri-reference"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-required-permission": "catalog.manage",
+        "x-permission-scope": "GLOBAL",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CatalogCategoryWriteRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/catalog/product-types": {
+      "get": {
+        "operationId": "listCatalogProductTypes",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Ürün ve kategorisi aktif/silinmemiş olan kayıtları sayfalar; toplam aynı filtreyi kullanır.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "200": {
+            "description": "İşlem başarılı.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogProductTypePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 2147483647,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createCatalogProductType",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Platform kataloğunda kayıt oluşturur; kimliği sunucu üretir.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "201": {
+            "description": "İşlem başarılı.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdResult"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Oluşturulan kaynağın veya ürün hizmet seçeneklerinin okuma adresi.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri-reference"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-required-permission": "catalog.manage",
+        "x-permission-scope": "GLOBAL",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CatalogProductTypeWriteRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/catalog/categories/{id}": {
+      "get": {
+        "operationId": "getCatalogCategory",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Aktif ve silinmemiş kaydı döndürür; ürünün kategorisi de geçerli olmalıdır.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "200": {
+            "description": "İşlem başarılı.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateCatalogCategory",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Yetkili katalog güncellemesi; sabit kodlar ve çiftin ürün/hizmet kimlikleri değiştirilemez.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "204": {
+            "description": "İşlem tamamlandı; yanıt gövdesi yok."
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-required-permission": "catalog.manage",
+        "x-permission-scope": "GLOBAL",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CatalogCategoryWriteRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteCatalogCategory",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Yetkili soft-delete; aktif ürünleri bulunan kategori silinemez.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "204": {
+            "description": "İşlem tamamlandı; yanıt gövdesi yok."
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-required-permission": "catalog.manage",
+        "x-permission-scope": "GLOBAL",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/catalog/product-types/{id}": {
+      "get": {
+        "operationId": "getCatalogProductType",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Aktif ve silinmemiş kaydı döndürür; ürünün kategorisi de geçerli olmalıdır.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "200": {
+            "description": "İşlem başarılı.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogProductType"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateCatalogProductType",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Yetkili katalog güncellemesi; sabit kodlar ve çiftin ürün/hizmet kimlikleri değiştirilemez.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "204": {
+            "description": "İşlem tamamlandı; yanıt gövdesi yok."
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-required-permission": "catalog.manage",
+        "x-permission-scope": "GLOBAL",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CatalogProductTypeWriteRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteCatalogProductType",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Yetkili soft-delete; aktif ürünleri bulunan kategori silinemez.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "204": {
+            "description": "İşlem tamamlandı; yanıt gövdesi yok."
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-required-permission": "catalog.manage",
+        "x-permission-scope": "GLOBAL",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/catalog/services/{id}": {
+      "get": {
+        "operationId": "getCatalogService",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Aktif ve silinmemiş kaydı döndürür; ürünün kategorisi de geçerli olmalıdır.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "200": {
+            "description": "İşlem başarılı.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogService"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateCatalogService",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Yetkili katalog güncellemesi; sabit kodlar ve çiftin ürün/hizmet kimlikleri değiştirilemez.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "204": {
+            "description": "İşlem tamamlandı; yanıt gövdesi yok."
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-required-permission": "catalog.manage",
+        "x-permission-scope": "GLOBAL",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CatalogServiceWriteRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteCatalogService",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Yetkili soft-delete; aktif ürünleri bulunan kategori silinemez.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "204": {
+            "description": "İşlem tamamlandı; yanıt gövdesi yok."
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-required-permission": "catalog.manage",
+        "x-permission-scope": "GLOBAL",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/catalog/product-types/{productTypeId}/services": {
+      "get": {
+        "operationId": "getCatalogProductServices",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Ürünün tüm geçerli hizmetlerini ve seçim kurallarını döndürür; başlangıçta seçim yoktur, en az bir BASE/ALTERNATIVE gereklidir.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "200": {
+            "description": "İşlem başarılı.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogProductServices"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "productTypeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/catalog/services": {
+      "post": {
+        "operationId": "createCatalogService",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Platform kataloğunda kayıt oluşturur; kimliği sunucu üretir.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "201": {
+            "description": "İşlem başarılı.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdResult"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Oluşturulan kaynağın veya ürün hizmet seçeneklerinin okuma adresi.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri-reference"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-required-permission": "catalog.manage",
+        "x-permission-scope": "GLOBAL",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CatalogServiceWriteRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/catalog/product-type-services": {
+      "post": {
+        "operationId": "createCatalogPair",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Platform kataloğunda kayıt oluşturur; kimliği sunucu üretir.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "201": {
+            "description": "İşlem başarılı.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdResult"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Oluşturulan kaynağın veya ürün hizmet seçeneklerinin okuma adresi.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri-reference"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-required-permission": "catalog.manage",
+        "x-permission-scope": "GLOBAL",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CatalogPairWriteRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/catalog/product-type-services/{id}": {
+      "put": {
+        "operationId": "updateCatalogPair",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Yetkili katalog güncellemesi; sabit kodlar ve çiftin ürün/hizmet kimlikleri değiştirilemez.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "204": {
+            "description": "İşlem tamamlandı; yanıt gövdesi yok."
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-required-permission": "catalog.manage",
+        "x-permission-scope": "GLOBAL",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CatalogPairWriteRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteCatalogPair",
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Yetkili soft-delete; aktif ürünleri bulunan kategori silinemez.",
+        "x-owner-module": "Catalog",
+        "x-implementation-status": "implemented",
+        "responses": {
+          "204": {
+            "description": "İşlem tamamlandı; yanıt gövdesi yok."
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-required-permission": "catalog.manage",
+        "x-permission-scope": "GLOBAL",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1196,7 +2254,9 @@
           "title",
           "status",
           "code",
-          "traceId"
+          "traceId",
+          "detail",
+          "instance"
         ]
       },
       "IdResult": {
@@ -1553,6 +2613,436 @@
             "type": "string"
           }
         }
+      },
+      "CatalogCategory": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "sortOrder"
+        ]
+      },
+      "CatalogProductType": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "baseUnit": {
+            "type": "string",
+            "enum": [
+              "PIECE",
+              "M2"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "categoryId",
+          "code",
+          "name",
+          "baseUnit"
+        ]
+      },
+      "CatalogService": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name"
+        ]
+      },
+      "CatalogCategoryPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogCategory"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "pageSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalCount": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ]
+      },
+      "CatalogProductTypePage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogProductType"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "pageSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalCount": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ]
+      },
+      "CatalogServiceOption": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "productTypeServiceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "defaultPrice": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 9999999999.99,
+            "multipleOf": 0.01
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "TRY"
+            ]
+          },
+          "priceUnit": {
+            "type": "string",
+            "enum": [
+              "PIECE",
+              "M2"
+            ]
+          },
+          "selectionKind": {
+            "type": "string",
+            "enum": [
+              "BASE",
+              "ALTERNATIVE",
+              "ADD_ON"
+            ]
+          },
+          "isSelectedByDefault": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          }
+        },
+        "required": [
+          "productTypeServiceId",
+          "serviceId",
+          "code",
+          "name",
+          "defaultPrice",
+          "currency",
+          "priceUnit",
+          "selectionKind",
+          "isSelectedByDefault"
+        ]
+      },
+      "CatalogProductServices": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "productTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "initialSelection": {
+            "type": "string",
+            "enum": [
+              "none"
+            ]
+          },
+          "minimumPrimarySelections": {
+            "type": "integer",
+            "enum": [
+              1
+            ]
+          },
+          "addOnsCountTowardMinimum": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogServiceOption"
+            }
+          }
+        },
+        "required": [
+          "productTypeId",
+          "initialSelection",
+          "minimumPrimarySelections",
+          "addOnsCountTowardMinimum",
+          "services"
+        ]
+      },
+      "CatalogCategoryWriteRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647,
+            "default": 0
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "code",
+          "name"
+        ]
+      },
+      "CatalogProductTypeWriteRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "enum": [
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            }
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "baseUnit": {
+            "type": "string",
+            "enum": [
+              "PIECE",
+              "M2"
+            ],
+            "default": "PIECE"
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "categoryId",
+          "code",
+          "name"
+        ]
+      },
+      "CatalogServiceWriteRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "code",
+          "name"
+        ]
+      },
+      "CatalogPairWriteRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "productTypeId": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "enum": [
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            }
+          },
+          "serviceId": {
+            "type": "string",
+            "format": "uuid",
+            "not": {
+              "enum": [
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            }
+          },
+          "defaultPrice": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 9999999999.99,
+            "multipleOf": 0.01
+          },
+          "priceUnit": {
+            "type": "string",
+            "enum": [
+              "PIECE",
+              "M2"
+            ]
+          },
+          "selectionKind": {
+            "type": "string",
+            "enum": [
+              "BASE",
+              "ALTERNATIVE",
+              "ADD_ON"
+            ]
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "productTypeId",
+          "serviceId",
+          "defaultPrice",
+          "priceUnit",
+          "selectionKind"
+        ]
       }
     },
     "responses": {

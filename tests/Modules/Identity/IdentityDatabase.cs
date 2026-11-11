@@ -4,9 +4,10 @@ using GiysiGo.Modules.Identity.Infrastructure;
 using GiysiGo.Modules.Identity.Application.Interfaces.Repositories;
 using GiysiGo.Modules.Identity.Domain.Entities;
 using GiysiGo.Modules.Identity.Application.Interfaces.Authentication;
-using GiysiGo.BuildingBlocks.Application.Transactions;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
+using GiysiGo.BuildingBlocks.Application.Contracts;
+using GiysiGo.BuildingBlocks.Application.Transactions;
 
 namespace GiysiGo.Modules.Identity.Tests
 {
@@ -28,6 +29,7 @@ namespace GiysiGo.Modules.Identity.Tests
             services.AddSingleton(Factory);
             services.AddSingleton<ITransactionRunner>(Transactions);
             services.AddSingleton<IAccessTokenIssuer, TestAccessTokenIssuer>();
+            services.AddSingleton<IStoreScopeReader, UnavailableStoreScopeReader>();
             services.AddIdentityModule();
             provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
             scope = provider.CreateScope();

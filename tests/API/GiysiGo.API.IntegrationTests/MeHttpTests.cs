@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using GiysiGo.Modules.Identity.Application.Interfaces.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 namespace GiysiGo.API.IntegrationTests
@@ -15,6 +16,7 @@ namespace GiysiGo.API.IntegrationTests
         public async Task Addresses_and_profile_require_owner_and_reject_invalid_inputs()
         {
             var connection = Environment.GetEnvironmentVariable("GIYSIGO_IDENTITY_TEST_CONNECTION")!;
+            Assert.StartsWith("GiysiGo_IdentityTest_", new SqlConnectionStringBuilder(connection).InitialCatalog, StringComparison.Ordinal);
             await using var application = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
                 builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(
                     new Dictionary<string, string?>
@@ -28,7 +30,7 @@ namespace GiysiGo.API.IntegrationTests
             using var anonymous = await owner.GetAsync("/me/addresses");
             Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
             using (var problem = JsonDocument.Parse(await anonymous.Content.ReadAsStringAsync()))
-                Assert.Equal("unauthorized", problem.RootElement.GetProperty("code").GetString());
+                Assert.Equal("authentication_required", problem.RootElement.GetProperty("code").GetString());
             var ownerEmail = $"owner-{Guid.NewGuid():N}@example.test";
             var otherEmail = $"other-{Guid.NewGuid():N}@example.test";
             Assert.Equal(HttpStatusCode.Created, (await owner.PostAsJsonAsync("/auth/register", new { email = ownerEmail, password = "a-very-long-password" })).StatusCode);
@@ -44,13 +46,13 @@ namespace GiysiGo.API.IntegrationTests
                 latitude = 91, address.longitude, address.contactName, address.contactPhone });
             Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
             using (var problem = JsonDocument.Parse(await invalid.Content.ReadAsStringAsync()))
-                Assert.Equal("validation_error", problem.RootElement.GetProperty("code").GetString());
+                Assert.Equal("validation_failed", problem.RootElement.GetProperty("code").GetString());
             using var invalidPhone = await owner.PostAsJsonAsync("/me/addresses", new { address.label,
                 address.addressText, address.latitude, address.longitude, address.contactName,
                 contactPhone = "abc" });
             Assert.Equal(HttpStatusCode.BadRequest, invalidPhone.StatusCode);
             using (var problem = JsonDocument.Parse(await invalidPhone.Content.ReadAsStringAsync()))
-                Assert.Equal("validation_error", problem.RootElement.GetProperty("code").GetString());
+                Assert.Equal("validation_failed", problem.RootElement.GetProperty("code").GetString());
             using var created = await owner.PostAsJsonAsync("/me/addresses", address);
             Assert.Equal(HttpStatusCode.Created, created.StatusCode);
             using var createdBody = JsonDocument.Parse(await created.Content.ReadAsStringAsync());
@@ -59,7 +61,7 @@ namespace GiysiGo.API.IntegrationTests
             using var otherRead = await other.GetAsync($"/me/addresses/{addressId}");
             Assert.Equal(HttpStatusCode.NotFound, otherRead.StatusCode);
             using (var problem = JsonDocument.Parse(await otherRead.Content.ReadAsStringAsync()))
-                Assert.Equal("not_found", problem.RootElement.GetProperty("code").GetString());
+                Assert.Equal("resource_not_found", problem.RootElement.GetProperty("code").GetString());
             using var otherUpdate = await other.PutAsJsonAsync($"/me/addresses/{addressId}", address);
             Assert.Equal(HttpStatusCode.NotFound, otherUpdate.StatusCode);
             using var otherDelete = await other.DeleteAsync($"/me/addresses/{addressId}");
@@ -78,7 +80,7 @@ namespace GiysiGo.API.IntegrationTests
             using var invalidPage = await owner.GetAsync("/me/addresses?pageSize=101");
             Assert.Equal(HttpStatusCode.BadRequest, invalidPage.StatusCode);
             using (var problem = JsonDocument.Parse(await invalidPage.Content.ReadAsStringAsync()))
-                Assert.Equal("validation_error", problem.RootElement.GetProperty("code").GetString());
+                Assert.Equal("validation_failed", problem.RootElement.GetProperty("code").GetString());
             using var beyondPage = await owner.GetAsync("/me/addresses?page=2&pageSize=1");
             Assert.Equal(HttpStatusCode.OK, beyondPage.StatusCode);
             using (var page = JsonDocument.Parse(await beyondPage.Content.ReadAsStringAsync()))
@@ -113,7 +115,7 @@ namespace GiysiGo.API.IntegrationTests
                 passwordHash = "not-accepted", isActive = false });
             Assert.Equal(HttpStatusCode.BadRequest, unsafeProfile.StatusCode);
             using (var problem = JsonDocument.Parse(await unsafeProfile.Content.ReadAsStringAsync()))
-                Assert.Equal("validation_error", problem.RootElement.GetProperty("code").GetString());
+                Assert.Equal("validation_failed", problem.RootElement.GetProperty("code").GetString());
             using var changedProfile = await owner.PutAsJsonAsync("/me/profile", new { email = newEmail });
             Assert.Equal(HttpStatusCode.OK, changedProfile.StatusCode);
             using var changedBody = JsonDocument.Parse(await changedProfile.Content.ReadAsStringAsync());
