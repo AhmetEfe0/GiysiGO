@@ -24,7 +24,8 @@ namespace GiysiGo.Contracts.Tests
                     Assert.Contains(operation.GetProperty("x-owner-module").GetString(), new[] { "Identity", "Catalog", "Ordering", "Operations" });
                     if (operation.TryGetProperty("security", out var security) && security.GetArrayLength() == 0)
                     {
-                        Assert.True(path.Name == "/auth/login" ||
+                        Assert.True((method.Name == "post" && path.Name is
+                            "/auth/register" or "/auth/login" or "/auth/refresh" or "/auth/logout") ||
                             (path.Name.StartsWith("/catalog/", StringComparison.Ordinal) && method.Name == "get"));
                     }
 

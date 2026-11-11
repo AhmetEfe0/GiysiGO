@@ -2,7 +2,7 @@
 
 Bu taslak, dört kişilik ekibin Identity, Catalog, Ordering ve Operations modülleri için hazırlanmıştır. Müşterinin verdiği ilk kategori/fiyat listesi `catalog-draft.json` içinde yapılandırılmıştır. Belirsiz fiyat ve seçim kuralları netleşince seed kayıtları kesinleştirilecektir. Düzenlenebilir MSSQL modeli `database/GiysiGo.Database` içindedir. API iskeleti hazırdır; modül iş akışları henüz uygulanmamıştır.
 
-Her tablonun amacı, hangi aşamada yazılıp okunduğu ve benzer tablolardan farkı için [39 tabloyu tek tek açıklayan rehbere](TABLE-PURPOSES.md) bakın.
+Her tablonun amacı, hangi aşamada yazılıp okunduğu ve benzer tablolardan farkı için [40 tabloyu tek tek açıklayan rehbere](TABLE-PURPOSES.md) bakın.
 
 ## Kabul edilen iş kuralları
 
@@ -24,7 +24,7 @@ Tek uygulama ve tek MSSQL veritabanı önerilir. Modüller kendi şemalarındaki
 
 | Modül | Sorumluluk | Tablolar |
 | --- | --- | --- |
-| Identity | Kullanıcı, şirket, personel, yetki ve adres | User, Role, Permission, RolePermission, UserRole, Corporate, CorporateMembership, StoreAssignment, CustomerAddress |
+| Identity | Kullanıcı, oturum, şirket, personel, yetki ve adres | User, AuthSession, Role, Permission, RolePermission, UserRole, Corporate, CorporateMembership, StoreAssignment, CustomerAddress |
 | Catalog | Dükkân, hizmet bölgesi, katalog ve fiyat tarifesi | Store, ProductCategory, ProductType, Service, ProductTypeService, StoreOffering |
 | Ordering | Sepet, sipariş, teklif, onay ve ödeme kayıtları | Cart, CartItem, CartItemService, CartItemPhoto, Order, OrderAddressSnapshot, OrderItem, OrderItemService, OrderItemPhoto, PriceQuote, PriceQuoteLine, QuoteApprovalHistory, PaymentAttempt, OrderStatusHistory |
 | Operations | Ürün kabulü, fotoğraflı inceleme, işlem ve mock kuryelerle otomatik atama | CourierProfile, CourierAvailability, DeliveryTask, DeliveryAssignment, DeliveryEvent, ItemInspection, InspectionPhoto, ItemWork, ItemWorkHistory |

@@ -25,6 +25,29 @@
     }
   ],
   "paths": {
+    "/auth/register": {
+      "post": {
+        "operationId": "register",
+        "tags": ["Identity"],
+        "summary": "Create a customer account; the server assigns the Customer role.",
+        "x-owner-module": "Identity",
+        "x-implementation-status": "implemented-in-issue-13",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RegisterRequest"}}}
+        },
+        "responses": {
+          "201": {"description": "Registered", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RegisterResult"}}}},
+          "400": {"$ref": "#/components/responses/400"},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "409": {"$ref": "#/components/responses/409"},
+          "500": {"$ref": "#/components/responses/500"}
+        }
+      }
+    },
     "/auth/login": {
       "post": {
         "operationId": "login",
@@ -33,7 +56,7 @@
         ],
         "summary": "Email/password login; identity comes from the validated token.",
         "x-owner-module": "Identity",
-        "x-implementation-status": "planned",
+        "x-implementation-status": "implemented-in-issue-13",
         "responses": {
           "200": {
             "description": "Success",
@@ -74,6 +97,46 @@
               }
             }
           }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "refreshSession",
+        "tags": ["Identity"],
+        "summary": "Atomically rotate a refresh token; consumed tokens cannot be replayed.",
+        "x-owner-module": "Identity",
+        "x-implementation-status": "implemented-in-issue-13",
+        "security": [],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RefreshRequest"}}}},
+        "responses": {
+          "200": {"description": "Rotated", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/TokenResult"}}}},
+          "400": {"$ref": "#/components/responses/400"},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "409": {"$ref": "#/components/responses/409"},
+          "500": {"$ref": "#/components/responses/500"}
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "tags": ["Identity"],
+        "summary": "Revoke the supplied refresh token; repeat requests are idempotent.",
+        "x-owner-module": "Identity",
+        "x-implementation-status": "implemented-in-issue-13",
+        "security": [],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RefreshRequest"}}}},
+        "responses": {
+          "204": {"description": "Session revoked"},
+          "400": {"$ref": "#/components/responses/400"},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "409": {"$ref": "#/components/responses/409"},
+          "500": {"$ref": "#/components/responses/500"}
         }
       }
     },
@@ -2174,6 +2237,27 @@
         "required": [
           "id"
         ]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "email": {"type": "string", "format": "email"},
+          "password": {"type": "string", "minLength": 12, "maxLength": 128, "writeOnly": true}
+        },
+        "required": ["email", "password"]
+      },
+      "RegisterResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {"userId": {"type": "string", "format": "uuid"}},
+        "required": ["userId"]
+      },
+      "RefreshRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {"refreshToken": {"type": "string", "minLength": 1, "writeOnly": true}},
+        "required": ["refreshToken"]
       },
       "LoginRequest": {
         "type": "object",

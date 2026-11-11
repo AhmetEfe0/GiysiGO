@@ -5,6 +5,7 @@ namespace GiysiGo.Modules.Identity.Application.Interfaces.Repositories
 {
     public interface IIdentityAccessRepository
     {
+        Task GrantCustomerRoleAsync(Guid userId, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
         Task<Guid> GrantRolePermissionAsync(Guid roleId, Guid permissionId, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
         Task RevokeRolePermissionAsync(Guid roleId, Guid permissionId, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<RolePermission>> GetRolePermissionListAsync(Guid roleId, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default);
