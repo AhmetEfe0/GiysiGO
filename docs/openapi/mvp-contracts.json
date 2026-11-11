@@ -148,7 +148,7 @@
         ],
         "summary": "Only addresses owned by the authenticated customer.",
         "x-owner-module": "Identity",
-        "x-implementation-status": "planned",
+        "x-implementation-status": "implemented-in-issue-16",
         "responses": {
           "200": {
             "description": "Success",
@@ -208,7 +208,7 @@
         ],
         "summary": "Customer ID is taken from the authenticated principal.",
         "x-owner-module": "Identity",
-        "x-implementation-status": "planned",
+        "x-implementation-status": "implemented-in-issue-16",
         "responses": {
           "201": {
             "description": "Success",
@@ -249,6 +249,40 @@
             }
           }
         }
+      }
+    },
+    "/me/addresses/{addressId}": {
+      "get": {
+        "operationId": "getMyAddress", "tags": ["Identity"], "x-owner-module": "Identity",
+        "x-implementation-status": "implemented-in-issue-16",
+        "parameters": [{"name":"addressId","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],
+        "responses": {"200":{"description":"Owned address","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Address"}}}},"400":{"$ref":"#/components/responses/400"},"401":{"$ref":"#/components/responses/401"},"403":{"$ref":"#/components/responses/403"},"404":{"$ref":"#/components/responses/404"},"409":{"$ref":"#/components/responses/409"},"500":{"$ref":"#/components/responses/500"}}
+      },
+      "put": {
+        "operationId": "updateMyAddress", "tags": ["Identity"], "x-owner-module": "Identity",
+        "x-implementation-status": "implemented-in-issue-16",
+        "parameters": [{"name":"addressId","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],
+        "requestBody": {"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/AddressRequest"}}}},
+        "responses": {"204":{"description":"Updated"},"400":{"$ref":"#/components/responses/400"},"401":{"$ref":"#/components/responses/401"},"403":{"$ref":"#/components/responses/403"},"404":{"$ref":"#/components/responses/404"},"409":{"$ref":"#/components/responses/409"},"500":{"$ref":"#/components/responses/500"}}
+      },
+      "delete": {
+        "operationId": "deleteMyAddress", "tags": ["Identity"], "x-owner-module": "Identity",
+        "x-implementation-status": "implemented-in-issue-16",
+        "parameters": [{"name":"addressId","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],
+        "responses": {"204":{"description":"Deleted"},"400":{"$ref":"#/components/responses/400"},"401":{"$ref":"#/components/responses/401"},"403":{"$ref":"#/components/responses/403"},"404":{"$ref":"#/components/responses/404"},"409":{"$ref":"#/components/responses/409"},"500":{"$ref":"#/components/responses/500"}}
+      }
+    },
+    "/me/profile": {
+      "get": {
+        "operationId": "getMyProfile", "tags": ["Identity"], "x-owner-module": "Identity",
+        "x-implementation-status": "implemented-in-issue-16",
+        "responses": {"200":{"description":"Own profile","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CustomerProfile"}}}},"400":{"$ref":"#/components/responses/400"},"401":{"$ref":"#/components/responses/401"},"403":{"$ref":"#/components/responses/403"},"404":{"$ref":"#/components/responses/404"},"409":{"$ref":"#/components/responses/409"},"500":{"$ref":"#/components/responses/500"}}
+      },
+      "put": {
+        "operationId": "updateMyProfile", "tags": ["Identity"], "x-owner-module": "Identity",
+        "x-implementation-status": "implemented-in-issue-16",
+        "requestBody": {"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ProfileUpdateRequest"}}}},
+        "responses": {"200":{"description":"Updated profile","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CustomerProfile"}}}},"400":{"$ref":"#/components/responses/400"},"401":{"$ref":"#/components/responses/401"},"403":{"$ref":"#/components/responses/403"},"404":{"$ref":"#/components/responses/404"},"409":{"$ref":"#/components/responses/409"},"500":{"$ref":"#/components/responses/500"}}
       }
     },
     "/stores": {
@@ -2671,21 +2705,36 @@
           "expiresAtUtc"
         ]
       },
+      "ProfileUpdateRequest": {
+        "type":"object","additionalProperties":false,
+        "properties":{"email":{"type":"string","format":"email","minLength":4,"maxLength":320}},
+        "required":["email"]
+      },
+      "CustomerProfile": {
+        "type":"object","additionalProperties":false,
+        "properties":{"id":{"type":"string","format":"uuid"},"email":{"type":"string","format":"email"}},
+        "required":["id","email"]
+      },
       "AddressRequest": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "label": {"type":"string","minLength":1,"maxLength":100},
           "addressText": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "maxLength": 2000
           },
           "contactName": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "maxLength": 200
           },
           "contactPhone": {
             "type": "string",
-            "minLength": 1
+            "minLength": 7,
+            "maxLength": 16,
+            "pattern": "^\\+?[0-9]{7,15}$"
           },
           "latitude": {
             "type": "number",
@@ -2699,6 +2748,7 @@
           }
         },
         "required": [
+          "label",
           "addressText",
           "contactName",
           "contactPhone",
@@ -2714,6 +2764,7 @@
             "type": "string",
             "format": "uuid"
           },
+          "label": {"type":"string"},
           "addressText": {
             "type": "string",
             "minLength": 1
@@ -2739,6 +2790,7 @@
         },
         "required": [
           "id",
+          "label",
           "addressText",
           "contactName",
           "contactPhone",

@@ -33,6 +33,8 @@ For 4-person collaboration, use per-module feature branches:
 - `feature/operations`
 
 Shared contract work uses a separate branch, such as `feature/shared-contracts`.
+Dependent issue PRs use `feature/<module>-issue-<number>` and stack on their
+prerequisite branch as described in `docs/BRANCHING.md`.
 Public interfaces, API ownership and transaction rules are defined in
 `docs/MODULE-CONTRACTS.md`; lifecycle and event rules are in
 `docs/WORKFLOW-CONTRACTS.md`.

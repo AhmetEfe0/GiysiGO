@@ -2,7 +2,9 @@ param(
     [string]$SqlPackagePath,
     [string]$MSBuildPath,
     [string]$VisualStudioVersion,
-    [string]$BaselineDacpacPath
+    [string]$BaselineDacpacPath,
+    [ValidateSet('Debug', 'Release')]
+    [string]$ApiConfiguration = 'Release'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -72,7 +74,7 @@ try {
     if ($BaselineDacpacPath) {
         $env:GIYSIGO_CATALOG_TEST_CONNECTION = $connectionString
     }
-    & dotnet test (Join-Path $repositoryRoot 'tests/API/GiysiGo.API.IntegrationTests/GiysiGo.API.IntegrationTests.csproj') --configuration Release --verbosity minimal
+    & dotnet test (Join-Path $repositoryRoot 'tests/API/GiysiGo.API.IntegrationTests/GiysiGo.API.IntegrationTests.csproj') --configuration $ApiConfiguration --verbosity minimal
     if ($LASTEXITCODE -ne 0) { throw 'Identity API integration tests failed.' }
     if ($BaselineDacpacPath) {
         & dotnet test (Join-Path $repositoryRoot 'tests/Modules/Catalog/GiysiGo.Modules.Catalog.Tests.csproj') --configuration Release --verbosity minimal

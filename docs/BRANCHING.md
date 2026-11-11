@@ -2,6 +2,13 @@
 
 Each developer works in one branch named after their module.
 
+For a dependency chain of individual issues, use `feature/<module>-issue-<number>`
+branches. Branch each issue from its prerequisite issue branch and target the
+prerequisite branch in its PR. Merge the chain from its oldest PR upward, then
+retarget remaining PRs to `main` as their base branches merge. This keeps each
+review limited to one issue; do not commit a later issue to an earlier issue's
+open PR branch.
+
 ## Module branches
 
 - `feature/identity` → @PnterNN

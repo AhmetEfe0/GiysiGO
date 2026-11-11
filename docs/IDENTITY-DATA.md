@@ -58,8 +58,8 @@ controller/uygulama servisinin işidir; bu PR API hata dönüşü eklemez.
 
 Adres insert'inde userId ayrı parametredir; adres modelinin UserId'si güven kaynağı
 değildir. Update adresin sahipliğini değiştiremez. Okuma aktif kullanıcı ve aktif,
-silinmemiş adres ister. Update aktif kullanıcıya ait silinmemiş adresi yeniden
-etkinleştirebilir; delete sonrası adres geri açılmaz. Yanlış kullanıcıyla update
+silinmemiş adres ister. #16 adres API'sinde update ve delete yalnız aktif adresi
+değiştirir; pasif/silinmiş adres geri açılmaz. Yanlış kullanıcıyla update
 ve delete aynı bulunamadı hatası verir; adresin varlığını açığa çıkarmaz.
 
 UserRole yalnızca GLOBAL, CorporateMembership CORPORATE, StoreAssignment STORE
