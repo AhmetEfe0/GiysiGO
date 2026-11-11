@@ -19,6 +19,9 @@ namespace GiysiGo.Modules.Identity.Infrastructure.Repositories
         public Task SetPasswordHashAsync(Guid userId, string passwordHash, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default)
             => connection.ExecuteAsync(Procedure("[identity].[spSetUserPasswordHash]", new { UserId = userId, PasswordHash = passwordHash }, connection, transaction, cancellationToken));
 
+        public Task SetOwnEmailAsync(Guid userId, string email, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default)
+            => connection.ExecuteAsync(Procedure("[identity].[spSetOwnEmail]", new { UserId = userId, Email = email }, connection, transaction, cancellationToken));
+
         public Task SetActiveAsync(Guid userId, bool isActive, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken = default)
             => connection.ExecuteAsync(Procedure("[identity].[spSetUserActive]", new { UserId = userId, IsActive = isActive }, connection, transaction, cancellationToken));
 

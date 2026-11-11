@@ -43,7 +43,7 @@ Repository kullanan entity'lerin beş temel stored procedure sözleşmesi ve iş
 ## Sabitlenen ortak sözleşmeler
 
 - `ICurrentUser` ve `IPermissionChecker`: Identity sağlar. Sabit permission adları `PermissionCodes` içindedir; Identity seed'i ve diğer modüllerin kontrolleri aynı kodları kullanır. Permission kodu ve isteğin corporate/store kapsamı sunucuda birlikte denetlenir. JWT üretimi/doğrulaması, rollerin seed'i ve gerçek permission uygulaması Identity sahibinin işidir; mevcut API host henüz kullanıcı oturumu açmaz.
-- `ICustomerAddressReader`: Identity sağlar. Müşterinin kendine ait adresini döndürür. Catalog keşif ve Ordering checkout sırasında çağırır.
+- `ICustomerAddressReader`: Identity sağlar; Catalog keşif ve Ordering sepet önizlemesi müşterinin kendine ait adresini okur. Identity #16, aynı SQL transaction'ına katılabilen `ITransactionalCustomerAddressReader` uygulamasını sağlar; Ordering checkout'unun bu okuyucuya geçişi #26 kapsamındadır.
 - `IStoreCatalogReader`: Catalog sağlar. Aktif ürün-hizmet teklifini, dükkân konumunu ve koordinata göre hizmet alanını doğrular. Ordering checkout sırasında tekrar çağırır; dönen birim fiyat sipariş satırına kopyalanır.
 - `IOrderPickupReader`: Ordering sağlar. Operations, `OrderPlacedEvent` geldiğinde alım görevinin adresini, iletişim bilgisini, ürün kapasitesini ve zaman penceresini okur; varış noktası için Catalog'un dükkân konumunu kullanır.
 - On bir olay Ordering ve Operations IntegrationEvents projelerinde tanımlıdır. Eski sekiz olaya kurye atama, taşıma başlangıcı ve ayrı iade tamamlanması eklenmiştir. Olayları başka modülün entity'si yerine kullanın. `EventId` tekrar işleme anahtarıdır. `EventType` sürümlü ve sabittir; yayınlandıktan sonra isim/payload değişikliği yeni sürüm gerektirir.
